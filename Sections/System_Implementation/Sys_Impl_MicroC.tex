@@ -58,51 +58,9 @@ For the PID controllers to be able to receive data from the FPGA, SPI is used as
 
 
 \subsubsection*{Discrete PID Controller}
-To implement a PID controller on the microcontroller, it must be discretized. As described in section \ref{sec:Analysis} the Tustin's method is used. In time-domain each term can be described as in equation \ref{eq:time-domain-PID-controller}.
-\begin{equation}
-    \label{eq:time-domain-PID-controller}
-    u(t) = u_P(t) + u_I(t) + u_D(t)
-\end{equation}
-To discretize, each term will be evaluated at time $kT+T$, with $k$ being sample number.
-\begin{equation}
-    u(kT+T) = u_P(kT+T) + u_I(kT+T) + u_D(kT+T)
-\end{equation}
-By multiplying the error $e$ with gain $k_P$, the proportional term is:
-\begin{equation}
-    u_P(kT+T) = k_P e (kT+T)
-    \label{eq:P-Term_discretized}
-\end{equation}
-To get the integral term a numerical integration of the error is necessary. To get the average error between the error at time $kT$ and $kT+T$ the trapezoidal method is used for integration, shown in equation \ref{eq:TrapezoidalIntegrationMethod}:
-\begin{equation}
-\label{eq:TrapezoidalIntegrationMethod}
-    \int_{kT}^{kT+T}e(\tau) d\tau \approx T\left(\frac{e(kT+T) + e(kT)}{2} \right)
-\end{equation}
-To make sure the integral term keeps increasing while an error is present in the system, the integral at previous sample $kT$ is added. Now the integral term is as follows:
-\begin{equation}
-    u_I(kT+T) \approx u_I(kT) + k_I\frac{T}{2}(e(kT+T) + e(kT))
-    \label{eq:I-term-Discretized}
-\end{equation}
-The derivative term is obtained by integrating equation \ref{eq:startDerivativeTerm}, to obtain equation \ref{eq:DerivativeTermPartiallyIntegrated}:
-\begin{equation}
-    \label{eq:startDerivativeTerm}
-    u_D(t)=k_D\dot{e}(t)
-\end{equation}
-\begin{equation}
-\label{eq:DerivativeTermPartiallyIntegrated}
-    k_De(kT+T) = \int_{0}^{kT}u_D(\tau)d\tau + \int_{kT}^{kT+T}u_D(\tau)d\tau
-\end{equation}
-Which then can be written as:
-\begin{equation}
-    u_D(kT+T) \approx k_D\frac{2}{T}(e(kT+T)-e(kT)) -u_D(kT)
-    \label{eq:D-Term_discretized}
-\end{equation}
-From equation \ref{eq:P-Term_discretized}, \ref{eq:I-term-Discretized} and \ref{eq:D-Term_discretized} the control output of the discrete system is:
-\begin{equation}
-    u(kT+T) = k_P e (kT+T) + u_I(kT) + k_I\frac{T}{2}(e(kT+T) + e(kT)) + k_D\frac{2}{T}(e(kT+T)-e(kT)) -u_D(kT)
-    \label{eq:DisretizedModel}
-\end{equation}
+To implement a PID controller on the microcontroller, it must be discretized. As described in section \ref{sec:Analysis} the Tustin's method is used.
 %Bodeplot til at finde cl båndbredde til at finde minimums samplings frequency
-From equation \ref{eq:DisretizedModel} it is apparent that the controller is dependant on the sampling time $T$, which on the microcontroller is determined by how often data is requested from the slaves. The minimum sampling time is controlled by how often data is sampled and updated on the FGPA. Velocity data is sampled on each encoder edge, with 1080 encoder ticks every revolution with a duration of \SI{0,88}{\second} (ref) at maximum velocity, the minimum sampling time is:
+From equation \ref{eq:continuous_Vs_discrete} it is apparent that the controller is dependant on the sampling time $T$, which on the microcontroller is determined by how often data is requested from the slaves. The minimum sampling time is controlled by how often data is sampled and updated on the FGPA. Velocity data is sampled on each encoder edge, with 1080 encoder ticks every revolution with a duration of \SI{0,88}{\second} \cite{} at maximum velocity, the minimum sampling time is:
 \begin{equation}
     T_{min} = \frac{0.88\,\mathrm{s}}{1080} = 0.814\,\mathrm{ms}
 \end{equation}

@@ -17,7 +17,7 @@ The plant is the system which is to be controlled. The controller outputs a cont
 An example of a plant is an electric motor for which the control signal could be a voltage and the output could be an angular velocity.
 If a perfect model of the plant exists, and no external disturbances act on the system, a controller can be designed that controls the plant purely based on a reference input. In reality, such a system cannot be obtained, so to properly control the system, it is beneficial to monitor the output of the plant. The output is subtracted from the reference, thereby providing a feedback for the system, making the system more robust. In this case it is a closed loop system. When there is no feedback the system is an open loop system.  
 
-The problem description states that a position controller has to be designed, however such a controller can take on many forms, leading to different design approaches and methods. Generally speaking, controller design can be divided into two categories, classical control which operates in the frequency domain and modern control which operates in the time domain. Both approaches will be examined in this section. First, however, some general crucial control theory concepts will be explored.
+The problem description states that a position controller has to be designed, however such a controller can take on many forms, leading to different design approaches and methods. Generally speaking, controller design can be divided into two categories, classical control which operates in the frequency domain and modern control which operates in the time domain. Both approaches will be examined in this section.
 
 
 
@@ -55,20 +55,21 @@ The problem description states that a position controller has to be designed, ho
 
 \subsection*{Classical Control Methods}
 
-% Instead of a single controller for the plant, sometimes it can be beneficial to implement multiple controller in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is separated into multiple simpler plants that feed into each other, so that output from one plant feeds the input of the next plant. However the plants yield output at a different rate and need a separate controller each. In this case the controller design would need to be a cascaded design. This is illustrated on figure \ref{}.
 
 A traditional method for designing a controller for a motor is to use a PID controller. Though many controller configurations using parts of the PID controllers design exists, only the full PID controller will be examined. The block diagram of a PID controller can be seen on figure \ref{fig:PID_controller}. As seen on the block diagram
 a PID controller utilises a feedback loop. The feedback is subtracted from the reference signal resulting in an error, which then is send to the controller. The controller consist of three terms: a proportional term, an integral term and a derivative term. Each evaluated separately and then combined to yield the output of the controller. If only the proportional term is used, a steady state error between the output and the reference will always be present. Therefore the integral term is introduced to eliminate the steady state error, as the integral will keep increasing until there is no steady state error. The derivative term is used to control the overshoot of the step response.
 
-\begin{equation}\label{eq:feedforward}
-    u_{ff}=\frac{1}{G(0)}r(t)
-\end{equation}
-\begin{figure}[]
-    \centering
-    \includegraphics[width=0.7\textwidth]{Sections/Miscellaneous/Images/PID-control-diagram.png}
-    \caption{Block diagram of a PID controller with an additional feedforward implemented.}
-    \label{fig:PID_controller}
-\end{figure}
+Instead of using a single controller for the plant, sometimes it can be beneficial to implement multiple controllers in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is perceived as multiple simpler plants that feed into each other. The outermost control loop will then supply the reference signal for the next and so on. If designed correctly, this design will provide better noise rejection and lower sensitivity to parameter variations. This is because disturbances acting on the inner loop will be isolated from, and ideally invisible to the outer control loops.
+
+% \begin{equation}\label{eq:feedforward}
+%     u_{ff}=\frac{1}{G(0)}r(t)
+% \end{equation}
+% \begin{figure}[]
+%     \centering
+%     \includegraphics[width=0.7\textwidth]{Sections/Miscellaneous/Images/PID-control-diagram.png}
+%     \caption{Block diagram of a PID controller with an additional feedforward implemented.}
+%     \label{fig:PID_controller}
+% \end{figure}
 
 % The proportional term is proportional to the error, but leaving the output with a steady state error, due to the term always requiring an error to function. To correct this steady state error, feedforward can be introduced, where the proportional signal is added as seen on equation \ref{eq:feedforward}, where $G$ is the transfer function of plant and $r$ is the setpoint.
 % \begin{equation}\label{eq:feedforward}
@@ -78,24 +79,13 @@ a PID controller utilises a feedback loop. The feedback is subtracted from the r
 
 To achieve a desired response of the system, the different gains of the PID controller must be found. Finding gains for the PID controller different methods are available each with different advantages. A method is pole placement, where the location of poles in the closed-loop system is analysed. This introduces the prerequisite, that the system must be known. If a no model of the plant is available other means for tuning is present. A method is the Ziegler-Nichols method, where the controller is tuned by examining the input and output of the system. By examining a step response of the actual system and assuming it can be described as a first order delayed system, from where it possible to deduct the \textit{lag}, the amplitude and the rise time of the system. From these measurements it is possible to make an estimation for the gains of the PID controller.
 
-From the transfer function the poles and zeros of a system can be derived. The poles is defined as the roots of the denominator polynomial and the zeros as the roots of the numerator polynomial. By analysing the placement of the poles and zeros in the s-plane performance characteristics of the system can be derived. The root locus provides a method of analysing movement of the poles as an increasing gain is applied to the system. To achieve the desired system response, the gain tweaking
+From the transfer function the poles and zeros of a system can be derived. The poles is defined as the roots of the denominator polynomial and the zeros as the roots of the numerator polynomial. By analysing the placement of the poles and zeros in the s-plane performance characteristics of the system can be derived. The root locus provides a method of analysing movement of the poles as an increasing gain is applied to the system. The method makes it possible to tweak the gain until the desired response is achieved.
 
-the gain the until
+% Having a transfer function of a given plant, $G(s,K)$, with an unknown parameter K, it is possible to describe the movement of the poles in the s-plane using the root locus method. By looking at the rise time, overshoot and settling time it is possible to estimate where in the s-plane the poles can be placed to ensure the desired behavior of the system. %Limitations for the placement of the poles can be found. 
+% With the root locus method, it is possible to tweak the controller in such a manner, that the system satisfies the requirements.
 
-To achieve the desired system response
-
-With the root locus method, it is possible to tweak the controller in such a manner, that the system satisfies the requirements.
-By choosing a gain a desired response of This can be used to a
-
-
-This can be used choose a value of a parameter, in order to get a desired response.     
-
-In the transfer function the roots of the numerator determines the zeros while the roots of the denominator determines the poles. From these, important system response characteristics can be determined. By using root locus, movement of the poles in the s-lane can be described.
-
-Having a transfer function of a given plant, $G(s,K)$, with an unknown parameter K, it is possible to describe the movement of the poles in the s-plane using the root locus method. By looking at the rise time, overshoot and settling time it is possible to estimate where in the s-plane the poles can be placed to ensure the desired behavior of the system. %Limitations for the placement of the poles can be found. 
-With the root locus method, it is possible to tweak the controller in such a manner, that the system satisfies the requirements.
-
-Having a system in saturation the integral term will continue to increment in order to reduce the error. However this is not a desired behavior, creating a slower response of the control signal, $v$, goes below saturation. Figure \ref{fig:anti-windup} illustrates the implementation of back calculation for a PID controller. When the system is in saturation, and therefor not able to increase, the control signal $u$ is constant. The time tracking constant, $\frac{1}{T_t}$ determines how quick the integrator is changed. When implementing anti-windup it can be executed using back-calculation or conditional integration. Back calculation works by subtracting the saturated signal, $u$, with $v$, thus when the system is saturated, the signal $e_s$ is negative. This means that a value is subtracted from the integral term in the controller resulting in a lower value of $v$. This decreases $v$ until the point when $v=u$ and $e_s$ is zero. Conditional integration works by simply keeping the integration term constant in the controller once saturation is reached. 
+Physical systems have limitation such as maximum velocity etc. When modelling such system these limitations can be taken into account by introducing saturation to the control signal. The saturation will level the signal at the saturation limit if the signal exceeds the saturation limits. Having a system in saturation the integral term will continue to windup as long as an error is present between the reference and the output. This is not a desired behaviour, since it will take time for the integral term to decrease for the control signal to go below the saturation limit. To circumvent this anti-windup can be implemented. %However this is not a desired behaviour, creating a slower response of the control signal, $v$, goes below saturation. Figure \ref{fig:anti-windup} illustrates the implementation of back calculation for a PID controller. When the system is in saturation, and therefor not able to increase, the control signal $u$ is constant. The time tracking constant, $\frac{1}{T_t}$ determines how quick the integrator is changed.
+When implementing anti-windup it can be executed using back-calculation or conditional integration. The implementation of back calculation can be seen on figure \ref{fig:anti-windup}. It works by subtracting the saturated signal, $u$, with $v$, thus when the system is saturated the signal $e_s$ is different from zero. This means that a value is subtracted from the integral term in the controller resulting in a lower value of $v$. This decreases $v$ until the point when $v=u$ and $e_s$ is zero. The time tracking constant, $T_t$, dictates how well the saturated control signal follows the unsaturated control signal when it returns from saturation. Conditional integration works by keeping the integration term constant in the controller once saturation is reached for the control signal. 
 
 \begin{figure}
     \centering
@@ -105,7 +95,9 @@ Having a system in saturation the integral term will continue to increment in or
 \end{figure}
 
 \subsubsection*{Modern Control Methods}
-Modern control methods introduces the use of state feedback. The general idea is to achieve the correct steady state response to a command signal. This is done by tweaking a gain on the state feedback, such that the general state space model yields equation \ref{eq:gen_statespace}. To function correctly a prerequisite is that the model is an exact replica of the actual system, which can be difficult to achieve.
+%explain states -> state space form
+Modern control methods utilises state feedback represented as a block diagram on figure \ref{fig:Integral_Diagram}. The state space feedback can be described as seen on equation \ref{eq:gen_statespace}, where $A$ is the system matrix, $B$ is the input matrix, $x$ is the state, $u$ is the control signal, $y$ is the output and $C$ is the output matrix. $F$ is the state feedback matrix. 
+
 \begin{equation}\label{eq:gen_statespace}
     \begin{split}
         \Dot{x}&=Ax+Bu \\
@@ -113,9 +105,11 @@ Modern control methods introduces the use of state feedback. The general idea is
         u&=Fx
     \end{split}
 \end{equation}
-where $A$ is the system matrix, $B$ is the input matrix, $x$ is the state, $u$ is the control signal, $y$ is the output and $C$ is the output matrix. $F$ is the state feedback matrix. 
 
-One approach finding the appropriate state feedback is pole assignment, where the closed loop poles are placed to achieve the desired response. A Different approach is using the Linear Quadratic Regulator (LQR) method. The aforementioned algorithm concerns the minimising of the cost of operating a linear system. 
+One approach to designing the feedback matrix is pole assignment, where the feedback matrix is calculated to yield specific closed loop poles in order to achieve a desired response. This requires the designer to decide exactly where the poles should be placed, which for somewhat complex systems can be 
+A Different approach is using the Linear Quadratic Regulator (LQR) method. This algorithm concerns the minimising of the cost of operating a linear system. 
+
+Since both of the these design methods are based on a linear model of the system, it is a prerequisite that a very accurate model of the plant, which is defined by the $A$ and $B$ matrices, is known. 
 
 \begin{figure}
     \centering
@@ -199,9 +193,9 @@ Thus the equivalent state space model of an integral controller with an observer
 \end{equation}
 where $r$ is the reference and $\Dot{\hat{x}}$ is described by equation \ref{eq:anti-windup_state_space} when saturation occurs.
 
-\subsection*{Modelling}
+\subsection*{Implementation}
 %modelling, continuous vs discrete
-Upon modelling and simulating the controllers and the system, it is important to keep in mind that an actual implementation of a controller is discrete rather than continuous. This can be done by directly designing the controller in discrete time. Another approach is designing a continuous controller and then approximating it in discrete time.
+Upon modelling and simulating the controllers and the system, it is important to keep in mind that an actual implementation of a controller is discrete rather than continuous when implemented in software. This can be done by directly designing the controller in discrete time. Another approach is designing a continuous controller and then approximating it in discrete time.
 
 A method to implement the controller is the Tustin's method, which dictates a certain way of describing the parameter for the controller. Equation \ref{eq:continuous_Vs_discrete} illustrates a continuous PID controller versus a discrete PID controller designed using the Tustin's method.
 \begin{equation}\label{eq:continuous_Vs_discrete}
@@ -212,9 +206,54 @@ A method to implement the controller is the Tustin's method, which dictates a ce
 \end{equation}
 where $u(s)$ is the control signal in continuous time and $u(kT+T)$ is the control signal in discrete time. $T$ is the sampling time, $e$ is the error and $k_p$, $k_I$ and $k_D$ are the PID gains. As seen from equation \ref{eq:continuous_Vs_discrete} the terms depend on the sampling time, thus it needs to be known. The sampling frequency for a discrete controller should be approximately 20 times larger than the closed-loop bandwidth of the system otherwise special care needs to be taken when designing the controller, which will not be discussed further. 
 
+%  In time-domain each term can be described as in equation \ref{eq:time-domain-PID-controller}.
+% \begin{equation}
+%     \label{eq:time-domain-PID-controller}
+%     u(t) = u_P(t) + u_I(t) + u_D(t)
+% \end{equation}
+% To discretize, each term will be evaluated at time $kT+T$, with $k$ being sample number.
+% \begin{equation}
+%     u(kT+T) = u_P(kT+T) + u_I(kT+T) + u_D(kT+T)
+% \end{equation}
+% By multiplying the error $e$ with gain $k_P$, the proportional term is:
+% \begin{equation}
+%     u_P(kT+T) = k_P e (kT+T)
+%     \label{eq:P-Term_discretized}
+% \end{equation}
+% To get the integral term a numerical integration of the error is necessary. To get the average error between the error at time $kT$ and $kT+T$ the trapezoidal method is used for integration, shown in equation \ref{eq:TrapezoidalIntegrationMethod}:
+% \begin{equation}
+% \label{eq:TrapezoidalIntegrationMethod}
+%     \int_{kT}^{kT+T}e(\tau) d\tau \approx T\left(\frac{e(kT+T) + e(kT)}{2} \right)
+% \end{equation}
+% To make sure the integral term keeps increasing while an error is present in the system, the integral at previous sample $kT$ is added. Now the integral term is as follows:
+% \begin{equation}
+%     u_I(kT+T) \approx u_I(kT) + k_I\frac{T}{2}(e(kT+T) + e(kT))
+%     \label{eq:I-term-Discretized}
+% \end{equation}
+% The derivative term is obtained by integrating equation \ref{eq:startDerivativeTerm}, to obtain equation \ref{eq:DerivativeTermPartiallyIntegrated}:
+% \begin{equation}
+%     \label{eq:startDerivativeTerm}
+%     u_D(t)=k_D\dot{e}(t)
+% \end{equation}
+% \begin{equation}
+% \label{eq:DerivativeTermPartiallyIntegrated}
+%     k_De(kT+T) = \int_{0}^{kT}u_D(\tau)d\tau + \int_{kT}^{kT+T}u_D(\tau)d\tau
+% \end{equation}
+% Which then can be written as:
+% \begin{equation}
+%     u_D(kT+T) \approx k_D\frac{2}{T}(e(kT+T)-e(kT)) -u_D(kT)
+%     \label{eq:D-Term_discretized}
+% \end{equation}
+% From equation \ref{eq:P-Term_discretized}, \ref{eq:I-term-Discretized} and \ref{eq:D-Term_discretized} the control output of the discrete system is:
+% \begin{equation}
+%     u(kT+T) = k_P e (kT+T) + u_I(kT) + k_I\frac{T}{2}(e(kT+T) + e(kT)) + k_D\frac{2}{T}(e(kT+T)-e(kT)) -u_D(kT)
+%     \label{eq:DisretizedModel}
+% \end{equation}
+
 \subsection*{Micro Controller}
-Implementing at least two controllers on the same micro controller and having to accommodate other tasks such as SPI and UART in parallel. It would be advantageously to implement some sort of scheduling algorithm. The easiest way of implementing a scheduling algorithm is by the use of an operating system (OS). Various types of operating systems exist, though in this project only two operating systems has been evaluated, Run To Complete Scheduler (RTCS) and FreeRTOS. The RTCS uses a cooperative scheduling algorithm, where the task voluntarily has to give up the CPU. This method provides a light weight overhead, though the risk of a task blocking the CPU is greater as no central allocation of resources exists. % The run to complete scheduler (RTCS) constitutes such an algorithm and is based on a cooperative scheduling where a running task wont be interrupted by other tasks, unless the task voluntarily yield control. Thus to achieve a seemingly multitasking system all tasks must cooperate to prevent starvation of tasks. 
-The FreeRTOS uses preemptive scheduling algorithm where a central master is responsible for the allocation of resources. The central master can preempt a task whenever it is wanted, therefore minimizing the probability of starvation occurring.
+Implementing at least two controllers on the same micro controller and having to accommodate other tasks such as SPI and UART in parallel. It would be advantageous to implement some sort of scheduling algorithm. The easiest way of implementing a scheduling algorithm is by the use of an operating system (OS). Various types of operating systems exist, though in this project only two operating systems has been evaluated, Run To Complete Scheduler (RTCS) and FreeRTOS. The RTCS uses a cooperative scheduling algorithm, where the task voluntarily has to give up the CPU. This method provides a light weight overhead, though the risk of a task blocking the CPU is greater as no master can reallocate resources while another task i running. 
+ % The run to complete scheduler (RTCS) constitutes such an algorithm and is based on a cooperative scheduling where a running task wont be interrupted by other tasks, unless the task voluntarily yield control. Thus to achieve a seemingly multitasking system all tasks must cooperate to prevent starvation of tasks. 
+The FreeRTOS as standard uses a preemptive scheduling algorithm where a central master is responsible for the allocation of resources. The central master can preempt a task whenever it is wanted, therefore minimising the probability of starvation occurring. FreeRTOS does however provide a greater overhead compared to the RTCS. If time-critical tasks exists in the system, it is preferred to use a OS providing real-time capabilities. A real-time system ensures that important tasks is guaranteed to complete within a given time frame from when the task is signaled to run. FreeRTOS provides functionalities to operate as a real-time system, such as prioritisation of tasks.   
 
 % could also be implemented, which opposed to the RTCS allow the scheduler to preempt tasks when the allocated CPU time of the task is used. Switching between tasks does however introduce overhead.\\
 
