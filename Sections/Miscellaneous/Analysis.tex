@@ -11,12 +11,12 @@ From initial experiments with the pan-tilt system it is found that significant f
 Each frame is actuated by a DC motor equipped with an incremental encoder \cite{}. The resolution of the encoders is 360 counts per revolution of the output shaft. The encoders make it possible to determine an offset from the initial position. Hall effect sensors \cite{} provide an index signal for each frame. The index signals are used to provide a reference point for the incremental encoders. From the change in position relative to the time, the velocity of the motor can be calculated. Both motors are connected to an H-bridge, which can be enabled with a PWM-signal to control the voltage over the motors. Furthermore the H-bridge also makes is possible to change the polarity of the voltage supplied, yielding a change in the motors turning direction.
 
 \subsection{Controller Design}
-The problem description states that a position controller has to be designed, however such a controller can take on many forms, leading to different design approaches and methods. Generally speaking, controller design can be divided into two categories, classical control which operates in the frequency domain and classical control which operates in the time domain. Both approaches will be examined in this section. First, however, some general crucial control theory concepts will be explored.
-When designing a 
+The problem description states that a position controller has to be designed, however such a controller can take on many forms, leading to different design approaches and methods. Generally speaking, controller design can be divided into two categories, classical control which operates in the frequency domain and modern control which operates in the time domain. Both approaches will be examined in this section. First, however, some general crucial control theory concepts will be explored.
+Figure \ref{}
 
 %Plant 
 %Controller
-Some important concepts in control theory is plant, which is a relation between an input signal and an output signal.  
+An important concept in control theory is the plant, which describes a relation between an input signal and an output signal with no feedback. It is also called an open loop system.   
 Two important concepts from control theory are open loop and closed loop. The difference between them is that in a closed loop system there is feedback from the output of the system to the input, while in an open loop system there is no feedback. This is also illustrated on figure \ref{fig:Open_Close_loop}.
 
 
@@ -72,7 +72,7 @@ Adding a controller dealing with the velocity and current and implementing the c
 A traditional method for designing a controller for a motor is to use a PID controller. Though many controller configurations using parts of the PID controllers design exists, only the full PID controller will be examined. The block diagram of a PID controller can be seen on figure \ref{fig:PID_controller}. As seen on the block diagram
 a PID controller utilises a feedback loop. The feedback is subtracted from the reference signal resulting in an error, which then is send to the controller. The controller consist of three terms: a proportional term, an integral term and a derivative term. Each evaluated separately and then combined to yield the output of the controller. If only the proportional term is used, a steady state error between the output and the reference will always be present. Therefore the integral term is introduced to eliminate the steady state error, as the integral will keep increasing until there is no steady state error. The derivative term is used to control the overshoot of the step response.
 
-Another way to correct steady state error is feedforward. Feedforward
+Another way to correct steady state error is by using feedforward. Feedforward
 \begin{figure}[]
     \centering
     \includegraphics[width=0.7\textwidth]{Sections/Miscellaneous/Images/PID-control-diagram.png}
@@ -120,14 +120,7 @@ where $A$ is the system matrix, $B$ is the input matrix, $x$ is the state, $u$ i
 
 An approach of controlling the system using state feedback, without the need to have an exact model, is integral control as seen on figure \ref{fig:Integral_Observer_Diagram}. The integral feedback provides zero steady state error by integrating the error. Taking basis in the state space form equation \ref{eq:gen_statespace} and adding an additional feedback, the input is given as described in equation \ref{eq:input_integral}.
 \begin{equation}\label{eq:input_integral}
-    u(t)=Fx(t)+F_Ix_I(t)=
-    \begin{bmatrix}
-        F & F_I
-    \end{bmatrix}
-    \begin{bmatrix}
-        x\\
-        x_I
-    \end{bmatrix}
+    u=Fx+F_Ix_I
 \end{equation}
 where $F$ is the state feedback matrix, $F_I$ is the integral matrix and $x_I(t)$ is given by:
 \begin{equation}
