@@ -15,8 +15,8 @@ The problem description states that a position controller has to be designed, ho
 
 Figure \ref{fig:Open_Close_loop} shows a simple controller setup. The plant is the system which is to be controlled. The controller outputs a control signal which is the input to the plant. An example of a plant is an electric motor for which the control signal could be a voltage and the output could be an angular velocity. The output from the plant can be used as a feedback for the controller. In this case it is a closed loop system. When there is no feedback the system is an open loop system. 
 
-Instead of a single controller for the plant, sometimes it can be beneficial to implement multiple controller in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is separated into multiple simpler plants that feed into each other, so that output from one plant feeds the input of the next plant. This way each can be controlled by 
-However the plants yield output at a different rate and need a separate controller each. In this case the controller design would need to be a cascaded design. This is illustrated on figure \ref{}.
+% Instead of a single controller for the plant, sometimes it can be beneficial to implement multiple controller in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is separated into multiple simpler plants that feed into each other, so that output from one plant feeds the input of the next plant. 
+% However the plants yield output at a different rate and need a separate controller each. In this case the controller design would need to be a cascaded design. This is illustrated on figure \ref{}.
 
 
 Instead of utilising the integral term to correct the steady state error, a feedforward loop can be introduced. Feedforward eliminates the steady state error by adding the error between the output and the reference at steady state. This however requires knowledge about the system at steady state, and can therefore not be applied if information about the system in steady state is not available. 
@@ -161,6 +161,7 @@ If saturation occur the dynamic of the observer controller changes to:
 Thus the equivalent state space model of an integral controller with an observer and anti-windup is as seen on equation \ref{eq:state_space_modern_control}.
 
 \begin{equation}\label{eq:state_space_modern_control}
+\begin{split}
 \begin{bmatrix}
         \dot{x} \\
         \dot{\hat{x}}\\
@@ -191,10 +192,11 @@ Thus the equivalent state space model of an integral controller with an observer
         \hat{x} \\
         x_I
     \end{bmatrix}, 
+    \end{split}
 \end{equation}
 where $r$ is the reference and $\Dot{\hat{x}}$ is described by equation \ref{eq:anti-windup_state_space} when saturation occurs.
 
-An algorithm  The LQR (Linear Quadratic Regulator) is method concerned with minimising the cost of operating a linear system. The LQR is an algorithm trying to find the optimal state feedback controller. The control of a system is said to be optimal, if it minimizes the cost function.
+Different approaches finding the appropiate state feedback are available. One of these is the LQR (Linear Quadratic Regulator) method. The aforementioned algorithm concerns the minimising of the cost of operating a linear system. 
 
 \subsection*{Modelling}
 %modelling, continuous vs discrete
