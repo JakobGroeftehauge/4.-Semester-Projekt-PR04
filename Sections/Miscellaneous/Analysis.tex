@@ -12,15 +12,16 @@ Each frame is actuated by a DC motor equipped with an incremental encoder \cite{
 
 \subsection{Controller Design}
 The problem description states that a position controller has to be designed, however such a controller can take on many forms, leading to different design approaches and methods. Generally speaking, controller design can be divided into two categories, classical control which operates in the frequency domain and modern control which operates in the time domain. Both approaches will be examined in this section. First, however, some general crucial control theory concepts will be explored.
-Figure \ref{}
 
-%Plant 
-%Controller
-An important concept in control theory is the plant, which describes a relation between an input signal and an output signal with no feedback. It is also called an open loop system.    
-Two important concepts from control theory are open loop and closed loop. The difference between them is that in a closed loop system there is feedback from the output of the system to the input, while in an open loop system there is no feedback. This is also illustrated on figure \ref{fig:Open_Close_loop}.
+Figure \ref{fig:Open_Close_loop} shows a simple controller setup. The plant is the system which is to be controlled. The controller outputs a control signal which is the input to the plant. An example of a plant is an electric motor for which the control signal could be a voltage and the output could be an angular velocity. The output from the plant can be used as a feedback for the controller. In this case it is a closed loop system. When there is no feedback the system is an open loop system. 
+
+Instead of a single controller for the plant, sometimes it can be beneficial to implement multiple controller in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is separated into multiple simpler plants that feed into each other, so that output from one plant feeds the input of the next plant. This way each can be controlled by 
+However the plants yield output at a different rate and need a separate controller each. In this case the controller design would need to be a cascaded design. This is illustrated on figure \ref{}.
 
 
-When it comes to controller design two methods, which are appropiate for
+Instead of utilising the integral term to correct the steady state error, a feedforward loop can be introduced. Feedforward eliminates the steady state error by adding the error between the output and the reference at steady state. This however requires knowledge about the system at steady state, and can therefore not be applied if information about the system in steady state is not available. 
+
+
 \textit{Controll oer} design can be divided into two methods, classical control and modern control. Different methods of designing the controllers are present such as \textit{PID controllers} and state feedback, while other methods exist, it is beyond the scope of this project to discuss those. The methods and techniques associated with those will be described further below. Two concepts are introduced working with control theory namely open loop and closed loop illustrated on figure  The difference in the concepts are the feedback in closed loop, while there is none in open loop.
 
 % introduktion til kontrol, keywords: open loop, closed loop, etc. 
@@ -72,8 +73,6 @@ Adding a controller dealing with the velocity and current and implementing the c
 A traditional method for designing a controller for a motor is to use a PID controller. Though many controller configurations using parts of the PID controllers design exists, only the full PID controller will be examined. The block diagram of a PID controller can be seen on figure \ref{fig:PID_controller}. As seen on the block diagram
 a PID controller utilises a feedback loop. The feedback is subtracted from the reference signal resulting in an error, which then is send to the controller. The controller consist of three terms: a proportional term, an integral term and a derivative term. Each evaluated separately and then combined to yield the output of the controller. If only the proportional term is used, a steady state error between the output and the reference will always be present. Therefore the integral term is introduced to eliminate the steady state error, as the integral will keep increasing until there is no steady state error. The derivative term is used to control the overshoot of the step response.
 
-Another way to correct steady state error is by using feedforward. Feeding forward the steady state error, it is simply 
-
 \begin{equation}\label{eq:feedforward}
     u_{ff}=\frac{1}{G(0)}r(t)
 \end{equation}
@@ -90,7 +89,7 @@ Another way to correct steady state error is by using feedforward. Feeding forwa
 % \end{equation}
 % However feedforward is sensitive to modelling uncertainties, due to it heavily relying on the design of the plant. Instead the integral term can be implemented, integrating the error thus eliminating the steady state error. To increase the settling time of the controller the derivative term can be added, which is an anticipatory term looking at the trend of the error, thus making it possible to change the direction of the signal, if overshoot or oscillating tendencies occurs. However the derivative term is vastly sensitive to noise, making it necessary to filter the signal upon implementation of the controller. 
 
-To achieve the desired response of the system, the different gains of the PID controller must be found. Finding the gains for the PID controller different methods are available each with different advantages. A method is pole placement, where the location of poles in the closed-loop system is analysed. This introduces the prerequisite, that the system must be known. If a model of the plant is not available other means for tuning is present. A method is the Ziegler-Nichols method, where the controller is tuned by examining the input and output of the system. By examining a step response of the actual system it is possible to deduct the \textit{lag} of the system, the amplitude and the rise time of a first order system. From these parameters its is possible to make an estimation for the gains of the PID controller.
+To achieve a desired response of the system, the different gains of the PID controller must be found. Finding gains for the PID controller different methods are available each with different advantages. A method is pole placement, where the location of poles in the closed-loop system is analysed. This introduces the prerequisite, that the system must be known. If a no model of the plant is available other means for tuning is present. A method is the Ziegler-Nichols method, where the controller is tuned by examining the input and output of the system. By examining a step response of the actual system and assuming it can be described as a first order delayed system, from where it possible to deduct the \textit{lag}, the amplitude and the rise time of the system. From these measurements it is possible to make an estimation for the gains of the PID controller.
 
 Having a transfer function of a given plant, $G(s,K)$, with an unknown parameter K, it is possible to describe the movement of the poles in the s-plane using the root locus method. By looking at the rise time, overshoot and settling time it is possible to estimate where in the s-plane the poles can be placed to ensure the desired behavior of the system. %Limitations for the placement of the poles can be found. 
 With the root locus method, it is possible to tweak the controller in such a manner, that the system satisfies the requirements.
@@ -132,21 +131,26 @@ where $F$ is the state feedback matrix, $F_I$ is the integral matrix and $x_I$ i
         x_I(t)=\int_0^t y(\tau)-r(\tau)\,d\tau
     \end{split}
 \end{equation}
-where $t$ is the time, $y$ is the output and $r$ is the reference. However this introduces more variables to tune, and requires that every state is known. Means to estimate states of a given system is available. The estimation can be achieved by introducing an observer to the system, which is illustrated on figure \ref{fig:Integral_Observer_Diagram}. The observer aims to mirror the plant and by that making it possible to estimate a given state. The observer introduces an observer gain, $L$, which is proportional with the difference between the output from the plant and the estimated observer output. The observer state space model is as seen in equation \ref{eq:Obs_state_space}, where $L$ is the observer gain and $\hat{x}$ is the estimated state and $\hat{y}$ is the estimated output.
+where $t$ is the time, $y$ is the output, $r$ is the reference and $\tau$ is the integral variable.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{Sections/Miscellaneous/Images/Integral_Observer_Anti_windup.png}
+    \caption{Block diagram of an integral controller with observer and anti-windup.}
+    \label{fig:Integral_Observer_Diagram}
+\end{figure}
+
+State feedback requires that every state is known, which is not always the case. However means to estimate states of a given system is available. The estimation can be achieved by introducing an observer to the system, which is illustrated on figure \ref{fig:Integral_Observer_Diagram}. The observer aims to mirror the plant and by that making it possible to approximate a given state.
+The observer introduces an observer gain, $L$, which is proportional with the difference between the output from the plant and the estimated observer output. The observer state space model is as seen in equation \ref{eq:Obs_state_space}, where $\hat{x}$ is the estimated state and $\hat{y}$ is the estimated output.
 \begin{equation}\label{eq:Obs_state_space}
     \begin{split}
         \Dot{\hat{x}}&=A\hat{x}+Bu+L(C\hat{x}-y)\\
         \hat{y}&=C\hat{x}
     \end{split}
 \end{equation}
-The observer gain is found by equation \ref{eq:observer_error} and to insure that the system is stable the eigenvalues should be placed in the left open half plane.
-\begin{equation}\label{eq:observer_error}
-    \Dot{e}=(A+LC)e
-\end{equation}
-where $e=\hat{x}-x$. However a prerequisite using the observer is making sure, that the system is observable. An observer cannot be implemented, if the system is unobservable. Another challenge using the observer is tuning the observer gain and generally estimating the plant. 
 
-To take in to account that there are psychical limitation in form of saturation an anti-windup in form of the gain M on figure \ref{fig:Integral_Observer_Diagram} can be added. The anti-wind looks at the difference between the control signal with and without saturation and if there is a different it prevent the integral term to windup. 
-If saturation happen the dynamic of the observer controller changes to:
+To take into account that there are psychical limitation in form of saturation an anti-windup in form of the gain $M$ on figure \ref{fig:Observer_Diagram} can be added. The anti-windup subtracts $v$ with the control signal, $u$ and multiplies it with the gain, $M$. and if there is a different it prevent the integral term to windup. 
+If saturation occur the dynamic of the observer controller changes to:
 \begin{equation}\label{eq:anti-windup_state_space}
     \begin{split}
         \Dot{\hat{x}}&=A\hat{x}+LC\hat{x}+MF\hat{x}\\
@@ -154,7 +158,44 @@ If saturation happen the dynamic of the observer controller changes to:
     \end{split}
 \end{equation}
 
-The LQR (Linear Quadratic Regulator) is method concerned with minimising the cost of operating a linear system. The LQR is an algorithm trying to find the optimal state feedback controller. The control of a system is said to be optimal, if it minimizes the cost function.
+Thus the equivalent state space model of an integral controller with an observer and anti-windup is as seen on equation \ref{eq:state_space_modern_control}.
+
+\begin{equation}\label{eq:state_space_modern_control}
+\begin{bmatrix}
+        \dot{x} \\
+        \dot{\hat{x}}\\
+        \dot{x}_I
+    \end{bmatrix} &=
+    \begin{bmatrix}
+        A & BF & BF_I \\
+        -LC & A+BF+LC & BF_I \\
+        C & 0 & 0
+    \end{bmatrix}
+    \begin{bmatrix}
+        x \\
+        \hat{x} \\
+        x_I
+    \end{bmatrix}
+    + 
+    \begin{bmatrix}
+    0\\
+    0\\
+    -I
+    \end{bmatrix}
+    r \\
+    y &= \begin{bmatrix}
+        C & 0 & 0
+    \end{bmatrix}     
+    \begin{bmatrix}
+        x \\
+        \hat{x} \\
+        x_I
+    \end{bmatrix}, 
+\end{equation}
+where $r$ is the reference and $\Dot{\hat{x}}$ is described by equation \ref{eq:anti-windup_state_space} when saturation occurs.
+
+An algorithm  The LQR (Linear Quadratic Regulator) is method concerned with minimising the cost of operating a linear system. The LQR is an algorithm trying to find the optimal state feedback controller. The control of a system is said to be optimal, if it minimizes the cost function.
+
 \subsection*{Modelling}
 %modelling, continuous vs discrete
 Upon modelling and simulating the controllers and the system, it is important to keep in mind that an actual implementation of a controller is discrete rather than continuous. This can be done by directly designing the controller in discrete time. Another approach is designing a continuous controller and then approximating it in discrete time.
