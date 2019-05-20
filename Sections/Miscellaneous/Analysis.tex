@@ -11,19 +11,20 @@ From initial experiments with the pan-tilt system it is found that significant f
 Each frame is actuated by a DC motor equipped with an incremental encoder \cite{}. The resolution of the encoders is 360 counts per revolution of the output shaft. The encoders make it possible to determine an offset from the initial position. Hall effect sensors \cite{} provide an index signal for each frame. The index signals are used to provide a reference point for the incremental encoders. From the change in position relative to the time, the velocity of the motor can be calculated. Both motors are connected to an H-bridge, which can be enabled with a PWM-signal to control the voltage over the motors. Furthermore the H-bridge also makes is possible to change the polarity of the voltage supplied, yielding a change in the motors turning direction.
 
 \subsection{Controller Design}
+
+Figure \ref{fig:Open_Close_loop} shows a simple \textit{controller} setup.
+The plant is the system which is to be controlled. The controller outputs a control signal which is the input to the plant. 
+An example of a plant is an electric motor for which the control signal could be a voltage and the output could be an angular velocity.
+If a perfect model of the plant exists, and no external disturbances act on the system, a controller can be designed that controls the plant purely based on a reference input. In reality, such a system cannot be obtained, so to properly control the system, it is beneficial to monitor the output of the plant. The output is subtracted from the reference, thereby providing a feedback for the system, making the system more robust. In this case it is a closed loop system. When there is no feedback the system is an open loop system.  
+
 The problem description states that a position controller has to be designed, however such a controller can take on many forms, leading to different design approaches and methods. Generally speaking, controller design can be divided into two categories, classical control which operates in the frequency domain and modern control which operates in the time domain. Both approaches will be examined in this section. First, however, some general crucial control theory concepts will be explored.
 
-Figure \ref{fig:Open_Close_loop} shows a simple controller setup.
 
-The plant is the system which is to be controlled. The controller outputs a control signal which is the input to the plant. An example of a plant is an electric motor for which the control signal could be a voltage and the output could be an angular velocity. If a perfect model of the plant exists, and no external disturbances act on the system, a controller can be designed that controls the plant purely based on a reference input. In reality, such a system cannot be obtained, so to properly control the system, it is beneficial to monitor the output of the plant. The output is subtracted from the reference, thereby providing a feedback for the system, making the system more robust. In this case it is a closed loop system. When there is no feedback the system is an open loop system. 
 
-% Instead of a single controller for the plant, sometimes it can be beneficial to implement multiple controller in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is separated into multiple simpler plants that feed into each other, so that output from one plant feeds the input of the next plant. 
-% However the plants yield output at a different rate and need a separate controller each. In this case the controller design would need to be a cascaded design. This is illustrated on figure \ref{}.
 
 
 % Instead of utilising the integral term to correct the steady state error, a feedforward loop can be introduced. Feedforward eliminates the steady state error by adding the error between the output and the reference at steady state. This however requires knowledge about the system at steady state, and can therefore not be applied if information about the system in steady state is not available. 
 
-\subsubsection*{Single controller vs. cascaded controllers}
 
 
 
@@ -33,12 +34,12 @@ The plant is the system which is to be controlled. The controller outputs a cont
 %Different approaches to anti-windup is available and is often related to the controller in question.
 
 % When controlling the pan-tilt system a user-input is required with a position for the motors. When 
-As a voltage is applied across a motor, a current will run through the coils of the motor, while the motor will start spinning with an angular velocity. Current and velocity are two aspects of the motors that change at a higher rate than the position of the motor, while also influencing the position of the motor. 
+% As a voltage is applied across a motor, a current will run through the coils of the motor, while the motor will start spinning with an angular velocity. Current and velocity are two aspects of the motors that change at a higher rate than the position of the motor, while also influencing the position of the motor. 
 
-Using a single \textit{controller} it is not a problem as long as the relation between the current and position remains the same. 
-However if any noise is introduced to the system altering the relation between the current and position, the response of the position controller is retarded. This is due to the current changing rapidly compared to the position. 
+% Using a single \textit{controller} it is not a problem as long as the relation between the current and position remains the same. 
+% However if any noise is introduced to the system altering the relation between the current and position, the response of the position controller is retarded. This is due to the current changing rapidly compared to the position. 
 
-Adding a controller dealing with the velocity and current and implementing the controllers in cascade, the outer controller is isolated from the faster changes of velocity and current, leaving the designated controllers to control them. When implementing the controllers in cascades, the position controller feeds the velocity controller with the velocity reference point and the velocity controller feeds the current controller, which results in the required current for the motor to achieve the desired position. This means that the velocity and current controller will deal with any noise such as friction, thus achieving a faster compensation to noise and a faster response overall. However this introduces three controllers, which have to be tuned individually, making the intuitive process of tuning more challenging \cite{CascadeControl}.
+%Adding a controller dealing with the velocity and current and implementing the controllers in cascade, the outer controller is isolated from the faster changes of velocity and current, leaving the designated controllers to control them. When implementing the controllers in cascades, the position controller feeds the velocity controller with the velocity reference point and the velocity controller feeds the current controller, which results in the required current for the motor to achieve the desired position. This means that the velocity and current controller will deal with any noise such as friction, thus achieving a faster compensation to noise and a faster response overall. However this introduces three controllers, which have to be tuned individually, making the intuitive process of tuning more challenging \cite{CascadeControl}.
 %Anti windup
 
 \begin{figure}[H]
@@ -53,6 +54,9 @@ Adding a controller dealing with the velocity and current and implementing the c
 
 
 \subsection*{Classical Control Methods}
+
+% Instead of a single controller for the plant, sometimes it can be beneficial to implement multiple controller in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is separated into multiple simpler plants that feed into each other, so that output from one plant feeds the input of the next plant. However the plants yield output at a different rate and need a separate controller each. In this case the controller design would need to be a cascaded design. This is illustrated on figure \ref{}.
+
 A traditional method for designing a controller for a motor is to use a PID controller. Though many controller configurations using parts of the PID controllers design exists, only the full PID controller will be examined. The block diagram of a PID controller can be seen on figure \ref{fig:PID_controller}. As seen on the block diagram
 a PID controller utilises a feedback loop. The feedback is subtracted from the reference signal resulting in an error, which then is send to the controller. The controller consist of three terms: a proportional term, an integral term and a derivative term. Each evaluated separately and then combined to yield the output of the controller. If only the proportional term is used, a steady state error between the output and the reference will always be present. Therefore the integral term is introduced to eliminate the steady state error, as the integral will keep increasing until there is no steady state error. The derivative term is used to control the overshoot of the step response.
 
@@ -74,7 +78,17 @@ a PID controller utilises a feedback loop. The feedback is subtracted from the r
 
 To achieve a desired response of the system, the different gains of the PID controller must be found. Finding gains for the PID controller different methods are available each with different advantages. A method is pole placement, where the location of poles in the closed-loop system is analysed. This introduces the prerequisite, that the system must be known. If a no model of the plant is available other means for tuning is present. A method is the Ziegler-Nichols method, where the controller is tuned by examining the input and output of the system. By examining a step response of the actual system and assuming it can be described as a first order delayed system, from where it possible to deduct the \textit{lag}, the amplitude and the rise time of the system. From these measurements it is possible to make an estimation for the gains of the PID controller.
 
-From the transfer function the poles and zeros of a system can be derived. The poles is defined as the roots of the denominator polynomial and the zeros as the roots of the numerator polynomial. By analysing the placement of the poles and zeros in the s-plane performance characteristics of the system can be derived. The root locus provides a method of analysing the pole movements as a gain  is applied to the system.    
+From the transfer function the poles and zeros of a system can be derived. The poles is defined as the roots of the denominator polynomial and the zeros as the roots of the numerator polynomial. By analysing the placement of the poles and zeros in the s-plane performance characteristics of the system can be derived. The root locus provides a method of analysing movement of the poles as an increasing gain is applied to the system. To achieve the desired system response, the gain tweaking
+
+the gain the until
+
+To achieve the desired system response
+
+With the root locus method, it is possible to tweak the controller in such a manner, that the system satisfies the requirements.
+By choosing a gain a desired response of This can be used to a
+
+
+This can be used choose a value of a parameter, in order to get a desired response.     
 
 In the transfer function the roots of the numerator determines the zeros while the roots of the denominator determines the poles. From these, important system response characteristics can be determined. By using root locus, movement of the poles in the s-lane can be described.
 
@@ -124,7 +138,7 @@ where $t$ is the time, $y$ is the output, $r$ is the reference and $\tau$ is the
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{Sections/Miscellaneous/Images/Anti_Windup_Integral_Observer.pdf}
+    \includegraphics[width=0.9\textwidth]{Sections/Miscellaneous/Images/Anti_Windup_Integral_Observer.pdf}
     \caption{Block diagram of an integral controller with observer and anti-windup.}
     \label{fig:Integral_Observer_Diagram}
 \end{figure}
