@@ -1,7 +1,7 @@
 \documentclass[../../main.tex]{subfiles}
 \begin{document}
 
-This section will concern the design and implementation of the functionality on the FPGA as well as the micro controller. The TM4C123GH6PMI micro controller is to handle the computation of the PID controllers, SPI communication and user-input. The Basys3 Artix-7 FPGA is to handle the PWM signal and direction of the motors and the data from the encoders used for the position and velocity. 
+This section will concern the design and implementation of the functionality on the FPGA as well as the microcontroller. The TM4C123GH6PMI microcontroller is to handle the computation of the PID-controllers, SPI communication and user-input. The Basys3 Artix-7 FPGA is to handle the PWM signal and direction of the motors and the data from the encoders used for the position and velocity. 
 
 
 
@@ -11,7 +11,7 @@ This section will concern the design and implementation of the functionality on 
 \begin{figure}
     \centering
     \includegraphics[width=0.6\textwidth]{Sections/System_Implementation/Images/Basys-3-kit.png}
-    \caption{Basys-3 development kit. The PMOD-connectors highlighted in red are used to interface with the robot. The PMOD-connector highlighted in green is used for interfacing with the micro controller. The PMOD-connector highlighted in yellow is used for the in-board analog-to-digital-converter, that would have been used for the current measurement, had the current controller been implemented. The pink box highlights the FPGA-chip. All other peripherals (switches, LEDs, buttons, etch) on the board is not used in the project.}
+    \caption{Basys-3 development kit. The PMOD-connectors highlighted in red are used to interface with the robot. The PMOD-connector highlighted in green is used for interfacing with the microcontroller. The PMOD-connector highlighted in yellow is used for the in-board analog-to-digital-converter, that would have been used for the current measurement, had the current controller been implemented. The pink box highlights the FPGA-chip. All other peripherals (switches, LEDs, buttons, etch) on the board is not used in the project.}
     \label{fig:Basys-3-kit}
 \end{figure}
 
@@ -35,7 +35,7 @@ gives an overview and a short description of each module and its function. Speed
         \hline
         Protocol & Used for determining which duty cycle is passed on to the PWM-module.\\
         \hline
-        SPI & Interfaces with the micro controller. Contains an SPI slave for each type of information going to or from the micro controller. \\
+        SPI & Interfaces with the microcontroller. Contains an SPI slave for each type of information going to or from the microcontroller. \\
         \hline
         PWM & Interfaces with the H-bridge. Takes in a 10 bit value used to determine the duty-cycle. The frequency of the pulse-width-modulated signal is 50 kHz.
     \end{tabular}    
@@ -54,7 +54,7 @@ gives an overview and a short description of each module and its function. Speed
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/SPILogicSimple.pdf}
-    \caption{Overview of the SPI-interface implemented on the FPGA, showing the seven slaves and the slave-select-module and logical MISO OR-module used to choose between the slaves. All colored signals interface with the micro controller which is the SPI Master. } % through just one PMOD-connector on the Basys 3 - kit }
+    \caption{Overview of the SPI-interface implemented on the FPGA, showing the seven slaves and the slave-select-module and logical MISO OR-module used to choose between the slaves. All colored signals interface with the microcontroller which is the SPI Master. } % through just one PMOD-connector on the Basys 3 - kit }
     \label{fig:SPILogicSimple}
 \end{figure}
 
@@ -91,7 +91,7 @@ As described in section \ref{sec:Analysis} the controllers needs a reference poi
 %
 
 \subsubsection*{Speed Logic}
-The Speed module calculates a speed given by the time period between two encoder ticks. As the Speed module is provided with a clock of \SI{100}{\kilo \hertz}, the units for the FPGA output speed is described by $\left[\dot{\theta}_{FPGA}\right] = \frac{\SI{10}{\micro \second}}{\mathrm{tick_{enc}}}$, where $\mathrm{tick_{enc}}$ is the encoder ticks. However a conversion is made in the micro controller to convert the result to have the units \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \] with respect to the motor. The motor encoder on the motor has 360 encoder ticks per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made micro controller is given by equation \ref{eq:velocity_motor}.
+The Speed module calculates a speed given by the time period between two encoder ticks. As the Speed module is provided with a clock of \SI{100}{\kilo \hertz}, the units for the FPGA output speed is described by $\left[\dot{\theta}_{FPGA}\right] = \frac{\SI{10}{\micro \second}}{\mathrm{tick_{enc}}}$, where $\mathrm{tick_{enc}}$ is the encoder ticks. However a conversion is made in the microcontroller to convert the result to have the units \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \] with respect to the motor. The motor encoder on the motor has 360 encoder ticks per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
 \begin{equation}\label{eq:velocity_motor}
     \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
 \end{equation}
@@ -118,7 +118,7 @@ The Speed module is also responsible for setting and clearing a flag, which indi
 \subsubsection*{Protocol decoder logic}
 
 
-The protocol decoder module is designed as seen in figure (\ref{fig:ProtocolDecoderLogic}). It determines which modules has access to the PWM module and thus controlling the robot. The two modules that need access are the Reset module and the SPI module. As default the SPI module controls the PWM and direction of the robot. As seen on figure \ref{fig:SPILogicSimple}, a separate SPI slave is connected to the protocol module which allows for the micro controller to transmit a signal telling the reset module, when to control the PWM and the direction of the motors. When the signal is received the SPI cannot change anything regarding the PWM or direction until the reset is completed. 
+The protocol decoder module is designed as seen in figure (\ref{fig:ProtocolDecoderLogic}). It determines which modules has access to the PWM module and thus controlling the robot. The two modules that need access are the Reset module and the SPI module. As default the SPI module controls the PWM and direction of the robot. As seen on figure \ref{fig:SPILogicSimple}, a separate SPI slave is connected to the protocol module which allows for the microcontroller to transmit a signal telling the reset module, when to control the PWM and the direction of the motors. When the signal is received the SPI cannot change anything regarding the PWM or direction until the reset is completed. 
 
 %\clearpage
 
@@ -135,7 +135,7 @@ The protocol decoder module is designed as seen in figure (\ref{fig:ProtocolDeco
 
 
 
-On figure \ref{fig:SPILogicSimple} an overview of the SPI module is shown. It contains seven internal slaves where four of them hold information needed by the micro controller, two hold the PWM and directed from the micro controller that is needed to control the motors and the last slave is used to give certain messages to the FPGA to initialise different states. When a specific kind of data is needed, the micro controller set the slave select, SS, according to the slave number, low and the decoder activates the slave requested. When transmitting data only one slave can be active at any time and as default the output of a slave is low witch enables that active slave to take over MISO when OR'ed together with the other slaves. The Slave Select Enable, SSEN, is controlled by the hardware of the micro controller and is used as an enable pin for the SPI. The values of the internal slaves is constantly updated and always contains the newest data, but when the data needs to be transmitted a latch is used to avoid the data changing while transmitting. 
+On figure \ref{fig:SPILogicSimple} an overview of the SPI module is shown. It contains seven internal slaves where four of them hold information needed by the microcontroller, two hold the PWM and directed from the microcontroller that is needed to control the motors and the last slave is used to give certain messages to the FPGA to initialise different states. When a specific kind of data is needed, the microcontroller set the slave select, SS, according to the slave number, low and the decoder activates the slave requested. When transmitting data only one slave can be active at any time and as default the output of a slave is low witch enables that active slave to take over MISO when OR'ed together with the other slaves. The Slave Select Enable, SSEN, is controlled by the hardware of the microcontroller and is used as an enable pin for the SPI. The values of the internal slaves is constantly updated and always contains the newest data, but when the data needs to be transmitted a latch is used to avoid the data changing while transmitting. 
 When data is transmitted to the FPGA the same method is used. Rhe decoder activates a specific slave and only the active slave can access the data on MOSI. The data received is first available to other modules on the FPGA when the transmission is complete. 
 
 \begin{figure}[h]

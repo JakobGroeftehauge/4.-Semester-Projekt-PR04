@@ -66,9 +66,9 @@ However it is also possible to get an estimation of the overhead of the system b
 It has been possible to achieve an average CPU utilisation time of approximately \SI{ 53,87}{\percent}, thus satisfying the project stated requirement of a maximum CPU utilisation of \SI{80}{\percent}. Furthermore an average overhead is estimated to approximately $\SI{42,6}{\mu\second}$.
 
 \subsection{Processing time - Controllers}
-It is wanted to examine the processing time of the controllers on the micro controller. Initially the micro controller was tested with only one controller, namely velocity controller described in section \ref{sec:System_Integration_N_Implementation}. The parameters changed during the testing was, number of tabs on the derivative-term filter, without the filter and last only with a PI-controller.  The requirement specification in section \ref{sec:Requirements} states:
+It is wanted to examine the processing time of the controllers on the microcontroller. Initially the microcontroller was tested with only one controller, namely velocity controller described in section \ref{sec:System_Integration_N_Implementation}. The parameters changed during the testing was, number of tabs on the derivative-term filter, without the filter and last only with a PI-controller.  The requirement specification in section \ref{sec:Requirements} states:
 \begin{itemize}
-    \item All PID controllers must be processed within a specified time frame to guarantee a minimum frequency. The minimum frequency and time period is to be determined.
+    \item All PID-controllers must be processed within a specified time frame to guarantee a minimum frequency. The minimum frequency and time period is to be determined.
 \end{itemize}
 To estimate a maximum allowed processing time for a controller, the CPU time is divided into five parts, four for the controllers and one for the remaining tasks. With a maximum CPU time utilisation of \SI{80}{\percent}, a single controller is to process within $\SI{160}{\mu\second}$.
 
@@ -76,12 +76,12 @@ The test is carried out driving an output-pin high in the begging of the control
 
 \subsubsection*{Results}
 
-As seen on table \ref{tab:Single_Controller_test} the PID controller has a maximum average processing time of $\SI{111,08}{\mu \second}$ with a 8th order derivative filter. In accordance with the requirement specification this is sufficient for a single controller. It was however desired to test the influence of the the derivative term and the additional filter on the derivative term. According to the test, the derivative term as implemented in the project adds an average of $\SI{16,68}{\mu\second}$ to the processing time.
+As seen on table \ref{tab:Single_Controller_test} the PID-controller has a maximum average processing time of $\SI{111,08}{\mu \second}$ with a 8th order derivative filter. In accordance with the requirement specification this is sufficient for a single controller. It was however desired to test the influence of the the derivative term and the additional filter on the derivative term. According to the test, the derivative term as implemented in the project adds an average of $\SI{16,68}{\mu\second}$ to the processing time.
 
 \begin{table}[H]
 \begin{tabular}{l|c|r|r|r|r|rl}
 \textbf{Controller (Velocity)} & \multicolumn{1}{l|}{\textbf{Filter order}} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \multicolumn{1}{r|}{\textbf{5}} & \multicolumn{1}{r}{\textbf{Unit}}                                  \\ \hline
-PID controller                    & 4                                 & 104,4 & 104,4 & 104,6 & 104,6 & \multicolumn{1}{r|}{117,8} & \SI{}{\mu\second}      \\
+PID-controller                    & 4                                 & 104,4 & 104,4 & 104,6 & 104,6 & \multicolumn{1}{r|}{117,8} & \SI{}{\mu\second}      \\
 PID with different number of tabs & 6                                 & 107,8 & 107,8 & 108   & 107,8 & \multicolumn{1}{r|}{108}   & \SI{}{\mu\second}        \\
 \multicolumn{1}{c|}{-}            & 8                                 & 111,2 & 111   & 110,8 & 111,2 & \multicolumn{1}{r|}{111,2} & \SI{}{\mu\second}        \\
 PID without filter                & -                                 & 95,2  & 95,6  & 94,6  & 94,2  & \multicolumn{1}{r|}{95,2}  & \SI{}{\mu\second}        \\
@@ -91,10 +91,10 @@ PI without D-term                 & -                                 & 94,4  & 
 \label{tab:Single_Controller_test}
 \end{table}
 \subsubsection*{Conclusion}
-A maximum allowed processing time for a single PID controller is determined to be of $\SI{160}{\mu\second}$. Furthermore the processing time of a single PID controller is tested with different parameters. A maximum processing time of $\SI{111,2}{\mu\second}$ is found, thus satisfying the requirement. 
+A maximum allowed processing time for a single PID-controller is determined to be of $\SI{160}{\mu\second}$. Furthermore the processing time of a single PID-controller is tested with different parameters. A maximum processing time of $\SI{111,2}{\mu\second}$ is found, thus satisfying the requirement. 
 
 \subsection{SPI Stress Test}
-Using SPI as the only communication between the FPGA and the micro controller it is essential to test the reliability of the system to assure that no information is lost. 
+Using SPI as the only communication between the FPGA and the microcontroller it is essential to test the reliability of the system to assure that no information is lost. 
 \begin{itemize}
     \item At a transmission frequency of 2KHz the FPGA are to receive 10000/10000 messages correct with no errors.
 \end{itemize}
@@ -113,7 +113,7 @@ As seen in table \ref{tab:SPI-stresstest} the five test resulted in the same out
 
 \subsection{Test of Controller Designs}
 %opdeling af afsnit
-This section concerns the test of the PID controllers using different methods for tuning and constellations. The parameters used in each test is shown in figure:
+This section concerns the test of the PID-controllers using different methods for tuning and constellations. The parameters used in each test is shown in figure:
 \begin{table}[H]
 \centering
 \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
@@ -175,7 +175,7 @@ The velocity controller is tested using the Ziegler-Nichols and pole placement m
 \end{figure}
 
 \subsubsection*{Cascade Controller Tilt Motor}
-The cascaded PID controller design is tested on the tilt motor using the Ziegler-Nichols and pole placement method with a reference point of $\frac{3\pi}{2}$. Figure \ref{fig:Cascade_ZN_tilt} shows that using the Ziegler-Nichols method, the measured signal resembles the simulated quite well. Using the pole placement method, illustrated on figure \ref{fig:cascade_model_tilt}, the measured signal has a lot more overshoot than the simulated. The results can be seen in table \ref{tab:controller_data}.
+The cascaded PID-controller design is tested on the tilt motor using the Ziegler-Nichols and pole placement method with a reference point of $\frac{3\pi}{2}$. Figure \ref{fig:Cascade_ZN_tilt} shows that using the Ziegler-Nichols method, the measured signal resembles the simulated quite well. Using the pole placement method, illustrated on figure \ref{fig:cascade_model_tilt}, the measured signal has a lot more overshoot than the simulated. The results can be seen in table \ref{tab:controller_data}.
 
 \begin{figure}[h]
      \centering
@@ -192,7 +192,7 @@ The cascaded PID controller design is tested on the tilt motor using the Ziegler
          \caption{Pole Placement method}
          \label{fig:cascade_model_tilt}
      \end{subfigure}
-        \caption{Stepresponse of a cascaded PID controller for the position of the tilt motor.}
+        \caption{Stepresponse of a cascaded PID-controller for the position of the tilt motor.}
         \label{fig:CascadeTilt}
 \end{figure}
 

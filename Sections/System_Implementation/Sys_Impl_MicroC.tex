@@ -23,7 +23,7 @@
 \subsubsection*{System overview}
 \label{subsec:SystemImplementationOperatingSystem}
 
-As described in the section \ref{} the microcontroller has to request data from the encoders.  Making it imperative for the microcontroller to be responsible for the overall timing of the system. It has been decided to accommodate cascaded (2. Order ) PID controller on each motor, yielding a total 4 task needed to be scheduled regarding the motor control. Furthermore the microcontroller also needs to handle the user interface 
+As described in the section \ref{} the microcontroller has to request data from the encoders.  Making it imperative for the microcontroller to be responsible for the overall timing of the system. It has been decided to accommodate cascaded (2. Order ) PID-controller on each motor, yielding a total 4 task needed to be scheduled regarding the motor control. Furthermore the microcontroller also needs to handle the user interface 
 
 has to obtain the data regarding the pan-tilt system. 
 
@@ -35,14 +35,14 @@ As described in section \ref{sec:ProblemDescription} the microcontroller has to 
 %Timing
 As described in section \ref{sec:ProblemDescription} the microcontroller is responsible for running the PID-controllers. To do this receiving the data collected by the FPGA is 
 
-As described in section \ref{sec:ProblemDescription} the microcontroller has to obtain data from the FPGA with a specific frequency, set by the microcontroller, to be able to run a proper PID controller. 
+As described in section \ref{sec:ProblemDescription} the microcontroller has to obtain data from the FPGA with a specific frequency, set by the microcontroller, to be able to run a proper PID-controller. 
 
 
-In order to control the robot using the designed PID controllers, it is imperative that the microcontroller can set and control a specific frequency of how often each of the controllers must be scheduled. Ideally the inner controllers i.e. the velocity controllers, should run and process velocity data received from the FPGA as it is received without any buffer delay. 
+In order to control the robot using the designed PID-controllers, it is imperative that the microcontroller can set and control a specific frequency of how often each of the controllers must be scheduled. Ideally the inner controllers i.e. the velocity controllers, should run and process velocity data received from the FPGA as it is received without any buffer delay. 
 
 As described in section \ref{sec:Requirements} it is wanted to implement controllers in cascade, thus two controllers are needed for each motor. This results in four tasks that need to run with predetermined time intervals in real-time. Furthermore a User interface (UI) task for handling user input and a SPI task for sending and receiving data, will need CPU time. By assigning a lower priority to the UI and SPI tasks it is ensured that tasks with higher priority is prioritised when scheduling. This would also keep timing of the time critical controller tasks intact. 
 
-For the PID controllers to be able to receive data from the FPGA, SPI is used as mentioned in section \ref{subsec:SystemImplemtationFPGA}. When data is received from the slaves, it is put in buffers accessible only by specific controllers in order for the cascade control to work. To avoid critical section problems with several tasks trying to access the same buffers at the same time, mutex' is implemented. Output from each cascade must then go back to SPI for it to be delivered to the correct slaves. Figure (\ref{fig:OverviewTaskDiagramSimple}) shows a simple overview of the tasks and how they are coupled. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}.
+For the PID-controllers to be able to receive data from the FPGA, SPI is used as mentioned in section \ref{subsec:SystemImplemtationFPGA}. When data is received from the slaves, it is put in buffers accessible only by specific controllers in order for the cascade control to work. To avoid critical section problems with several tasks trying to access the same buffers at the same time, mutex' is implemented. Output from each cascade must then go back to SPI for it to be delivered to the correct slaves. Figure (\ref{fig:OverviewTaskDiagramSimple}) shows a simple overview of the tasks and how they are coupled. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}.
 
 % System clock frequency set to 80Mhz
 \begin{figure}[H]
@@ -57,10 +57,10 @@ For the PID controllers to be able to receive data from the FPGA, SPI is used as
 
 
 
-\subsubsection*{Discrete PID Controller}
-To implement a PID controller on the microcontroller, it must be discretized. As described in section \ref{sec:Analysis} the Tustin's method is used.
+\subsubsection*{Discrete PID-controller}
+To implement a PID-controller on the microcontroller, it must be discretized. As described in section \ref{sec:Analysis} the Tustin's method is used.
 %Bodeplot til at finde cl båndbredde til at finde minimums samplings frequency
-From equation \ref{eq:continuous_Vs_discrete} it is apparent that the controller is dependant on the sampling time $T$, which on the microcontroller is determined by how often data is requested from the slaves. The minimum sampling time is controlled by how often data is sampled and updated on the FGPA. Velocity data is sampled on each encoder edge, with 1080 encoder ticks every revolution with a duration of \SI{0,88}{\second} \cite{} at maximum velocity, the minimum sampling time is:
+From equation \ref{eq:eq:discrete_control} it is apparent that the controller is dependant on the sampling time $T$, which on the microcontroller is determined by how often data is requested from the slaves. The minimum sampling time is controlled by how often data is sampled and updated on the FGPA. Velocity data is sampled on each encoder edge, with 1080 encoder ticks every revolution with a duration of \SI{0,88}{\second} \cite{} at maximum velocity, the minimum sampling time is:
 \begin{equation}
     T_{min} = \frac{0.88\,\mathrm{s}}{1080} = 0.814\,\mathrm{ms}
 \end{equation}
@@ -70,9 +70,9 @@ The maximum sampling time for a smooth response of the discrete controller, need
 \end{equation}
 In a cascade coupling the inner controller has to update faster than the outermost. To comply with this and making sure that $T_{min} > T > T_{max}$, the sampling time for the velocity controller is chosen to be $T_{vel} = 1\,\mathrm{ms}$ and the sampling time for the position controller is $T_{pos} = 5\,\mathrm{ms}$. \\
 
-\subsubsection*{PID Controller Tasks}
+\subsubsection*{PID-controller Tasks}
 % How and which values need to be transported where Reference output controlling PWM
-The PID controller tasks on the microcontroller are responsible for calculating the control signal, which is used to control the motors. For each controller to be able to function they need three buffers. One buffer holding a reference value and another providing a feedback value. The third buffer is responsible for storing the controller output. In case of a velocity controller the reference buffer contains output from a position controller, while the output buffer is a queue passing on values to SPI. Each buffer has a mutex attached which needs to be waited for or signaled upon using. Figure \ref{fig:OverviewTaskDiagramSimple} constitutes an illustration of the implementation of two PID controllers in cascade for a single motor. In the actual implementation there are two cascade controllers, one for each motor.
+The PID-controller tasks on the microcontroller are responsible for calculating the control signal, which is used to control the motors. For each controller to be able to function they need three buffers. One buffer holding a reference value and another providing a feedback value. The third buffer is responsible for storing the controller output. In case of a velocity controller the reference buffer contains output from a position controller, while the output buffer is a queue passing on values to SPI. Each buffer has a mutex attached which needs to be waited for or signaled upon using. Figure \ref{fig:OverviewTaskDiagramSimple} constitutes an illustration of the implementation of two PID-controllers in cascade for a single motor. In the actual implementation there are two cascade controllers, one for each motor.
 
 Following the controller task functionality described on figure  \ref{fig:PIDControllerFlowchart}, feedback to a controller is supplied whenever the controller sends a request to SPI. The request must contain a slave ID indicating which slave to receive data from. The controller task is then put in a blocked state, while waiting for data. Whenever SPI signals that the requested data is put in the feedback buffer associated with the requesting controller, the controller task is put back into running state. After that the error is calculated. Because of possible variance in feedback due to the imprecise separation of edges in the encoder, as mentioned in section \ref{subsec:SystemImplemtationFPGA}, a second order lowpass Finite Impulse Response (FIR) filter is applied to the error. Since the error ideally would consist of a DC frequency component, the filter was designed using a cutoff frequency at $0.5\,\mathrm{Hz}$. The filter transfer function used is:
 \begin{equation}
@@ -102,7 +102,7 @@ To make sure the integral term does not wind up when an error is present for an 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/PIDControllerFlowchart.pdf}
-    \caption{Flowchart describing the code execution in the PID controller-task on the microcontroller.}
+    \caption{Flowchart describing the code execution in the PID-controller-task on the microcontroller.}
     \label{fig:PIDControllerFlowchart}
 \end{figure}
 
@@ -165,7 +165,7 @@ The UI task is responsible for handling user inputs including set-points for the
 
 \subsection{Conclusion}
 
-Logic has been implemented on the FPGA to evaluate the position and speed of the motors, to provide a PWM-signal to control the motors and to communicate over SPI with the microcontroller. On the microcontroller FreeRTOS, a real-time operating system, has been implemented for easy separation of algorithms into tasks, that can be scheduled by a scheduling algorithm. Overall the embedded system includes a task to handle the SPI-communication with the FPGA, a task to handle UART-commands sent by the user and tasks to implement the four PID controllers.   
+Logic has been implemented on the FPGA to evaluate the position and speed of the motors, to provide a PWM-signal to control the motors and to communicate over SPI with the microcontroller. On the microcontroller FreeRTOS, a real-time operating system, has been implemented for easy separation of algorithms into tasks, that can be scheduled by a scheduling algorithm. Overall the embedded system includes a task to handle the SPI-communication with the FPGA, a task to handle UART-commands sent by the user and tasks to implement the four PID-controllers.   
 
 
 \end{document}
