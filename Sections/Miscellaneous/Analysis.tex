@@ -197,18 +197,29 @@ where $r$ is the reference and $\Dot{\hat{x}}$ is described by equation \ref{eq:
 \subsection*{Implementation}
 %modelling, continuous vs discrete
 %more implementing methods
-Upon modelling and simulating the controllers and the system, it is important to keep in mind that an actual implementation of a controller is discrete rather than continuous when implemented in software. This can be done by directly designing the controller in discrete time as seen in equation \ref{eq:discrete_control}.
-\begin{multline}\label{eq:discrete_control}
-        u(kT+T)=k_Pe(kT+T)+u_1(kT) + k_I\frac{T}{2} \\ \cdot (e(kT+T)+e(kT))+k_D \frac{2}{T}(e(kT+T)-e(kT))-u_D(kT) \quad ,
-\end{multline}
+Upon designing a controller it is important to keep in mind that an actual implementation is discrete rather than continuous when implemented in software. The plant for which the controller is designed is continuous making it difficult to match the requirements of the discrete controller. The controller can be designed continuous and then discretizised to render the possibility of implementation. Another approach is discretizising the plant and then designing the controller discrete. However this requires a method of mapping from the domains. Different means of mapping from the continuous domain (s-domain) to the discrete domain (z-domain) is available such as the trapezoidial rule, forward rectangular rule and the backward rectangular rule. 
+\begin{figure}
+    \centering
+    \includegraphics[width = 0.7\textwidth]{Sections/Miscellaneous/Images/Trapezoid_rule.jpeg}
+    \caption{Illustration of mapping from the continuous s-domain to the discrete z-domain using different approaches.}
+    \label{fig:mapping_s_to_z}
+\end{figure}
+Using the forward rectangular rule to map from the s to the z-domain, the entire left-half plane of the s domain is mapped into the z-domain into a rectangular shape. The forward rectangular rule maps the left-half plane of the s-domain into a circle placed in the right-half of the z-domain. The trapezoidial rule fits the left-half plane of the s-domain into the unit-circle of the z-domain. The phenomenons are illustrated on figure \ref{fig:mapping_s_to_z}.  
+
+Implementing the discrete controller can be done as seen in equation \ref{eq:discrete_control}, utilising the Tustins method. Tustins method is based on the trapezoidial rule, and dictates a certain way of implementing the integral and thereby the differential part.
+\begin{equation}[width=\textwidth]\label{eq:discrete_control}
+        u(kT+T)=k_Pe(kT+T)+u_1(kT) + k_I\frac{T}{2} \cdot (e(kT+T)+e(kT))+k_D \frac{2}{T}(e(kT+T)-e(kT))-u_D(kT) \quad ,
+\end{equation}
+\begin{equation}\label{eq1}
+\resizebox{0.5\hsize}{!}{$%
+0<a_{1}\leq a(X,t)\leq%
+a_{2}<+\infty, ~~~\forall X \in \Omega;~~~ 
+$%
+}%
+\end{equation}
 where $u(s)$ is the control signal in continuous time and $u(kT+T)$ is the control signal in discrete time. $T$ is the sampling time, $e$ is the error and $k_p$, $k_I$ and $k_D$ are the PID gains.
 
-Another approach is designing a continuous controller, equation \ref{eq:continuous_control}, and then approximating it in discrete time, equation \ref{eq:discrete_control}. 
-A method to implement the controller is the Tustin's method, which dictates a certain way of describing the implementation of the controller. Equation \ref{eq:continuous_control} and \ref{eq:discrete_control} illustrates a continuous PID-controller versus a discrete PID-controller designed using the Tustin's method.
-\begin{equation}\label{eq:continuous_control}
-        u(s) =\left(k_P+\frac{k_I}{s}+k_Ds\right)e(s)\\
-\end{equation}
-As seen from equation \ref{eq:continuous_Vs_discrete} the terms depend on the sampling time, thus it needs to be known. A rule of thump state that the sampling frequency for a discrete controller, should be approximately 20 times larger than the closed-loop bandwidth of the system \cite{Design_Of_Digital_Control_Systems_NOTE}. 
+As seen from equation \ref{eq:discrete_control} the terms depend on the sampling time, thus it needs to be known. A rule of thump state that the sampling frequency for a discrete controller, should be approximately 20 times larger than the closed-loop bandwidth of the system \cite{Design_Of_Digital_Control_Systems_NOTE}. 
 
 %  In time-domain each term can be described as in equation \ref{eq:time-domain-PID-controller}.
 % \begin{equation}

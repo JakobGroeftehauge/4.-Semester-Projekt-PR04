@@ -206,17 +206,17 @@ Table \ref{tab:controller_data} shows the data regarding the performance of the 
 \begin{table}[H]
     \centering
     \begin{tabular}{c|c|c|c|c|c}
-         Controller & Motor & Method & Overshoot & Settling Time  & Rise Time \\ \hline
-         Position & Pan & Pole placement & 14.3 \% & 8.27 s & 1.74 s \\
-         Position & Tilt & Pole placement & 0.8 \% & 2.86 s & 0.34 s \\
-         Velocity & Tilt & Ziegler-Nichols & 19.2 \% & - & 0.15 s \\
-         Velocity &Tilt & Pole placement & - & - & 7.8 s\\
-         Cascade & Tilt  & Pole placement & 52 \%  & 11.47 s  & 0.61 s\\
-         Cascade & Tilt & Ziegler-Nichols & 14 \% & 3.22 s & 0.38 s \\
-         Cascade & Pan & Ziegler-Nichols & 6.6 \% & 3.78 s & 1.13 s \\
+         Controller & Motor & Method & Overshoot (\%) & Settling Time (s)  & Rise Time (s) \\ \hline
+         Position & Pan & Pole placement & 14.3 & 8.27 & 1.74  \\
+         Position & Tilt & Pole placement & 0.8 & 2.86 & 0.34  \\
+         Velocity & Tilt & Ziegler-Nichols & 19.2 & N/A & 0.15  \\
+         Velocity &Tilt & Pole placement & N/A & N/A & 7.8 \\
+         Cascade & Tilt  & Pole placement & 52 & 11.47 & 0.61 \\
+         Cascade & Tilt & Ziegler-Nichols & 14 & 3.22 & 0.38  \\
+         Cascade & Pan & Ziegler-Nichols & 6.6 & 3.78 & 1.13  \\
          
     \end{tabular}
-    \caption{Step response specifications of the different controllers tested.}
+    \caption{Step response specifications of the different controllers tested. Entries marked with N/A could not be determined from the available data.}
     \label{tab:controller_data}
 \end{table}
 

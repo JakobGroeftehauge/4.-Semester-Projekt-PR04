@@ -1,43 +1,22 @@
 \documentclass[../../main.tex]{subfiles}
 \begin{document}
 
-% Key parts of the Microcontroller:
-% - Using freeRTOS 
-    %Why it a real time operaing system is needed
-    % - Timing of system/controllers
-    % How much real time is it?
-    
-% - Implementing a controller    
-    % What is needed to go from model to actual implementation(control design)
-    % 
-
-% - Send data to particular slave using SPI
-    % How its used with the controllers
-    % Speed
-
-% - Setpoints, protocol
-    % 
-
 \subsection{Microcontroller} \label{subsec:SystemImplementationMicroController}
 
 \subsubsection*{System overview}
 \label{subsec:SystemImplementationOperatingSystem}
 
-As described in the section \ref{subsec:SystemImplemtationFPGA} the microcontroller is responsible for getting data from specific slaves at the FPGA. Making it imperative that the microcontroller is in control of the overall timing of the system. As described in the requirements section \ref{sec:Requirements}, it is decided to accommodate cascaded controller consisting of two PID-controllers on each motor, yielding a total of 4 tasks needed to be scheduled regarding the motor control. Furthermore the microcontroller also needs to handle the user interface. 
+As described in the section \ref{subsec:SystemImplemtationFPGA} the microcontroller is responsible for getting data from specific slaves on the FPGA. Because of this it is imperative that the microcontroller is in control of the overall timing of the system. As described in the requirements section \ref{sec:Requirements}, it is decided to accommodate a cascaded controller design consisting of two PID-controllers on each motor. This yields a total of 4 tasks needed to be scheduled regarding the motor control. Furthermore the microcontroller also needs to handle the user interface. The program will be structured as seen on figure \ref{fig:OverviewTaskDiagramSimple}. The task diagram is simplified displaying only one of the cascaded controllers for controlling only one motor, as the second cascade controller is identical in structure. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}. In FreeRTOS tasks have assigned a priority, meaning that high priority tasks are ensured to be scheduled and completed before tasks of lower priority can be scheduled. To achieve a real-time system prioritisation of tasks is vital.
+
+% task will have presedence over lower priority tasks.. 
+
+% Since the PID-controllers need to be processed at a fixed time-interval, as mentioned in section \ref{}, they will have the highest priority after the SPI task.
 
 
 
-To implement the PID-controller on the microcontroller, the discretized controller must be.
+%This results in four tasks that need to run with predetermined time intervals in real-time. Furthermore a User interface (UI) task for handling user input and a SPI task for sending and receiving data, will need CPU time. By assigning a lower priority to the UI and SPI tasks it is ensured that tasks with higher priority is prioritised when scheduling. This would also keep timing of the time critical controller tasks intact. 
 
-In order for the discrete controllers to work the interval 
-
-The four controller tasks need to 
-
-
-
-This results in four tasks that need to run with predetermined time intervals in real-time. Furthermore a User interface (UI) task for handling user input and a SPI task for sending and receiving data, will need CPU time. By assigning a lower priority to the UI and SPI tasks it is ensured that tasks with higher priority is prioritised when scheduling. This would also keep timing of the time critical controller tasks intact. 
-
-For the PID-controllers to be able to receive data from the FPGA, SPI is used as mentioned in section \ref{subsec:SystemImplemtationFPGA}. When data is received from the slaves, it is put in buffers accessible only by specific controllers in order for the cascade control to work. To avoid critical section problems with several tasks trying to access the same buffers at the same time, mutex' is implemented. Output from each cascade must then go back to SPI for it to be delivered to the correct slaves. Figure (\ref{fig:OverviewTaskDiagramSimple}) shows a simple overview of the tasks and how they are coupled. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}.
+%For the PID-controllers to be able to receive data from the FPGA, SPI is used as mentioned in section \ref{subsec:SystemImplemtationFPGA}. When data is received from the slaves, it is put in buffers accessible only by specific controllers in order for the cascade control to work. To avoid critical section problems with several tasks trying to access the same buffers at the same time, mutex' is implemented. Output from each cascade must then go back to SPI for it to be delivered to the correct slaves. Figure (\ref{fig:OverviewTaskDiagramSimple}) shows a simple overview of the tasks and how they are coupled. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}.
 
 % System clock frequency set to 80Mhz
 \begin{figure}[H]
@@ -52,36 +31,33 @@ For the PID-controllers to be able to receive data from the FPGA, SPI is used as
 
 
 
-\subsubsection*{Discrete PID-controller}
-To implement a PID-controller on the microcontroller, it must be discretized. As described in section \ref{sec:Analysis} the Tustin's method is used.
-%Bodeplot til at finde cl båndbredde til at finde minimums samplings frequency
-From equation \ref{eq:eq:discrete_control} it is apparent that the controller is dependant on the sampling time $T$, which on the microcontroller is determined by how often data is requested from the slaves. The minimum sampling time is controlled by how often data is sampled and updated on the FGPA. Velocity data is sampled on each encoder edge, with 1080 encoder ticks every revolution with a duration of \SI{0,88}{\second} \cite{} at maximum velocity, the minimum sampling time is:
-\begin{equation}
-    T_{min} = \frac{0.88\,\mathrm{s}}{1080} = 0.814\,\mathrm{ms}
-\end{equation}
-The maximum sampling time for a smooth response of the discrete controller, need to be 20 to 30 times that of the closed-loop bandwidth(LINK). From figure (ref) $T_{max}$ is found to be:
-\begin{equation}
-    T_{max} = \frac{1}{\omega_b\cdot 30} = \frac{1}{3 \cdot 30} \approx 11.1\,\mathrm{ms}
-\end{equation}
-In a cascade coupling the inner controller has to update faster than the outermost. To comply with this and making sure that $T_{min} > T > T_{max}$, the sampling time for the velocity controller is chosen to be $T_{vel} = 1\,\mathrm{ms}$ and the sampling time for the position controller is $T_{pos} = 5\,\mathrm{ms}$. \\
+% \subsubsection*{Discrete PID-controller}
+% To implement a PID-controller on the microcontroller, it must be discretized. As described in section \ref{sec:Analysis} the Tustin's method is used.
+% %Bodeplot til at finde cl båndbredde til at finde minimums samplings frequency
+% From equation \ref{eq:eq:discrete_control} it is apparent that the controller is dependant on the sampling time $T$, which on the microcontroller is determined by how often data is requested from the slaves. The minimum sampling time is controlled by how often data is sampled and updated on the FGPA. Velocity data is sampled on each encoder edge, with 1080 encoder ticks every revolution with a duration of \SI{0,88}{\second} \cite{} at maximum velocity, the minimum sampling time is:
+% \begin{equation}
+%     T_{min} = \frac{0.88\,\mathrm{s}}{1080} = 0.814\,\mathrm{ms}
+% \end{equation}
+% The maximum sampling time for a smooth response of the discrete controller, need to be 20 to 30 times that of the closed-loop bandwidth(LINK). From figure (ref) $T_{max}$ is found to be:
+% \begin{equation}
+%     T_{max} = \frac{1}{\omega_b\cdot 30} = \frac{1}{3 \cdot 30} \approx 11.1\,\mathrm{ms}
+% \end{equation}
+% In a cascade coupling the inner controller has to update faster than the outermost. To comply with this and making sure that $T_{min} > T > T_{max}$, the sampling time for the velocity controller is chosen to be $T_{vel} = 1\,\mathrm{ms}$ and the sampling time for the position controller is $T_{pos} = 5\,\mathrm{ms}$. \\
 
 
-The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. The angle of the motor, $ \theta_{m} $, is described by equation \ref{eq:angle_of_motor}, where $FPGA_{pos}$ is the encoder value provided by the FPGA.
-\begin{equation}\label{eq:angle_of_motor}
-     \theta_{m} = \frac{\pi}{180} \cdot \mathrm{FPGA_{pos}}
-\end{equation}
 
-
-However a conversion is made in the microcontroller to convert the result to have the units \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \] with respect to the motor. The motor encoder on the motor has 360 encoder ticks per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
-\begin{equation}\label{eq:velocity_motor}
-    \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
-\end{equation}
 
 \subsubsection*{PID-controller Tasks}
 % How and which values need to be transported where Reference output controlling PWM
-The PID-controller tasks on the microcontroller are responsible for calculating the control signal, which is used to control the motors. For each controller to be able to function they need three buffers. One buffer holding a reference value and another providing a feedback value. The third buffer is responsible for storing the controller output. In case of a velocity controller the reference buffer contains output from a position controller, while the output buffer is a queue passing on values to SPI. Each buffer has a mutex attached which needs to be waited for or signaled upon using. Figure \ref{fig:OverviewTaskDiagramSimple} constitutes an illustration of the implementation of two PID-controllers in cascade for a single motor. In the actual implementation there are two cascade controllers, one for each motor.
+The PID-controller tasks on the microcontroller are responsible for calculating the control signal, which is used to control voltage supplied to the motors. As seen on figure \ref{fig:OverviewTaskDiagramSimple} each controller needs three state buffers, two for input and one for the output. The output buffer of the velocity controller is substituted by the SPI-queue. The PID-controller it self is responsible for requesting data when it is needed. To request feedback data the controller needs to signal the SPI task via the SPI-queue. When the feedback data is available, the controller task is signaled with sempahore connected to the feedback state buffer. When the controller is waiting for feedback data to be updated the task enters the blocked, using no CPU time. 
 
-Following the controller task functionality described on figure  \ref{fig:PIDControllerFlowchart}, feedback to a controller is supplied whenever the controller sends a request to SPI. The request must contain a slave ID indicating which slave to receive data from. The controller task is then put in a blocked state, while waiting for data. Whenever SPI signals that the requested data is put in the feedback buffer associated with the requesting controller, the controller task is put back into running state. After that the error is calculated. Because of possible variance in feedback due to the imprecise separation of edges in the encoder, as mentioned in section \ref{subsec:SystemImplemtationFPGA}, a second order lowpass Finite Impulse Response (FIR) filter is applied to the error. Since the error ideally would consist of a DC frequency component, the filter was designed using a cutoff frequency at $0.5\,\mathrm{Hz}$. The filter transfer function used is:
+
+% For each controller to be able to function they need three buffers. One buffer holding a reference value and another providing a feedback value. The third buffer is responsible for storing the controller output. In case of a velocity controller the reference buffer contains output from a position controller, while the output buffer is a queue passing on values to SPI. 
+% Each buffer has a mutex attached which needs to be waited for or signaled upon using. Figure \ref{fig:OverviewTaskDiagramSimple} constitutes an illustration of the implementation of two PID-controllers in cascade for a single motor. In the actual implementation there are two cascade controllers, one for each motor.
+
+% Following the controller task functionality described on figure  \ref{fig:PIDControllerFlowchart}, feedback to a controller is supplied whenever the controller sends a request to SPI. The request must contain a slave ID indicating which slave to receive data from. The controller task is then put in a blocked state, while waiting for data. Whenever SPI signals that the requested data is put in the feedback buffer associated with the requesting controller, the controller task is put back into running state. 
+
+The overall structure of the controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. When the feedback data is received, the error between the reference value and feedback value is calculated. As mentioned in section \ref{} the velocity feedback data ecause of possible variance in feedback due to the imprecise separation of edges in the encoder, as mentioned in section \ref{subsec:SystemImplemtationFPGA}, a second order lowpass Finite Impulse Response (FIR) filter is applied to the error. Since the error ideally would consist of a DC frequency component, the filter was designed using a cutoff frequency at $0.5\,\mathrm{Hz}$. The filter transfer function used is:
 \begin{equation}
     H(s) = \frac{1}{0.0249s^2 + 0.9502s + 0.0249}
 \end{equation}
@@ -130,6 +106,22 @@ As default the SPI task is in the BLOCKED state. Only when a request from one of
     \caption{Flowchart describing the code execution in the SPI task on the microcontroller.}
     \label{fig:SPIFlowchart}
 \end{figure}
+
+
+The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. The angle of the motor, $ \theta_{m} $, is described by equation \ref{eq:angle_of_motor}, where $FPGA_{pos}$ is the encoder value provided by the FPGA.
+\begin{equation}\label{eq:angle_of_motor}
+     \theta_{m} = \frac{\pi}{180} \cdot \mathrm{FPGA_{pos}}
+\end{equation}
+
+
+However a conversion is made in the microcontroller to convert the result to have the units \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \] with respect to the motor. The motor encoder on the motor has 360 encoder ticks per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
+\begin{equation}\label{eq:velocity_motor}
+    \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
+\end{equation}
+
+
+
+
 
 \subsubsection*{UI Task}
 The UI task is responsible for handling user inputs including set-points for the position controllers. Communication is initiated when the user transmits a command through UART to the microcontroller via the computer. The UI task is given lowest priority, meaning it is only given CPU time whenever no other tasks are scheduled. To facilitate user inputs a protocol has been defined for which the different commands are described in table \ref{tab:UART_UI_PROTOCOL}. With these commands the user is able to reset both motors, home a motor or command a motor to go to a given set-point. The UI-task consists of two states: "Waiting for command" and "Waiting for queue". The state machine is illustrated in figure
