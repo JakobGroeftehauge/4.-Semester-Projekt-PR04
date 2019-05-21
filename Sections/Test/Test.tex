@@ -141,14 +141,14 @@ $k_D$ & 0.900               & 1.200               & 0.003                   & 0.
          \caption{Tilt motor}
          \label{fig:StepTiltPos}
      \end{subfigure}
-        \caption{Stepresponse of the position using a single controller using pole placement.}
+        \caption{Step response of the position using a single controller with pole placement. The measured response being an average of five tests.}
         \label{fig:singlePosController}
 \end{figure}
-The tests are executed with a reference point of $\theta = \frac{7\pi}{6}$ for the pan motor and $\theta = \frac{3\pi}{2}$. As seen on figure \ref{fig:StepPanPos} the measured response resembles the simulated response in the first part of the transition period. As there is stationary point in the measured response, it could look like that the pan has stopped moving for a bit properly due to friction in the physical setup. On figure \ref{fig:singlePosController} the measure response resembles the simulated quite well. The data for the tests can be seen on table \ref{tab:controller_data}. Applicable for both measurements is that they have no overshoot and longer settling times than the simulated. 
+The tests are executed with a reference point of $\theta = \frac{7\pi}{6}$ for the pan motor and $\theta = \frac{3\pi}{2}$. As seen on figure \ref{fig:StepPanPos} the measured response resembles the simulated response in the first part of the transition period. As there is stationary point in the measured response, it could look like that the pan has stopped moving for a bit properly due to friction in the physical setup. On figure \ref{fig:StepTiltPos} the measured response resembles the simulated quite well. The data for the tests can be seen on table \ref{tab:controller_data}. Applicable for both measurements is that they have no overshoot and longer settling times than the simulated. 
 
 
-\subsubsection*{Velocity controller tilt motor}
-The velocity controller is tested using the Ziegler-Nichols and pole placement method on the tilt motor. A reference point of $\SI{20}{\mathrm{rad}/\second}$ is used. As seen on figure \ref{fig:StepVelZN} the measured response initially resembles the simulated signal using the Ziegler-Nichols method. As seen on figure \ref{fig:StepVelModel}, using pole placement a very slow response compared to the simulated is achieved. Applicable for both tests are that the measured signal oscillates to a point, where it never settles. Data is seen on table \ref{tab:controller_data}.
+\subsubsection*{Velocity Controller for the Tilt Motor}
+The velocity controller is tested using the Ziegler-Nichols and pole placement method on the tilt motor. A reference point of $\SI{20}{\mathrm{rad}/\second}$ is used. As seen on figure \ref{fig:StepVelZN} the measured response initially resembles the simulated signal using the Ziegler-Nichols method. Seen on figure \ref{fig:StepVelModel}, using pole placement a very slow response compared to the simulated is achieved. The reason for this behaviour is discussed in section \ref{sec:Discussion}. Applicable for both tests are that the measured signal oscillates to a point, where it never settles. Data regarding the performance of the controller is seen in table \ref{tab:controller_data}.
 
 \begin{figure}[h]
      \centering
@@ -165,7 +165,7 @@ The velocity controller is tested using the Ziegler-Nichols and pole placement m
          \caption{Pole Placement}
          \label{fig:StepVelModel}
      \end{subfigure}
-        \caption{Velocity step response using a single controller on the tilt motor. \ref{fig:StepVelZN} is tuned using Ziegler-Nichols and \ref{fig:StepVelModel} is tuned using the pole placement method.}
+        \caption{Step response of a single velocity controller on the tilt motor. \ref{fig:StepVelZN} is tuned using Ziegler-Nichols and \ref{fig:StepVelModel} is tuned using the pole placement method. The measured response being an average of five tests.}
         \label{fig:VelocityTilt}
 \end{figure}
 
@@ -187,7 +187,7 @@ The cascaded PID-controller design is tested on the tilt motor using the Ziegler
          \caption{Pole Placement method}
          \label{fig:cascade_model_tilt}
      \end{subfigure}
-        \caption{Stepresponse of a cascaded PID-controller for the position of the tilt motor.}
+        \caption{Stepresponse of a cascaded PID-controller for the position of the tilt motor. The measured response being an average of five tests.}
         \label{fig:CascadeTilt}
 \end{figure}
 
@@ -197,7 +197,7 @@ The cascaded controller on the pan motor is executed using a reference point of 
 \begin{figure}[h]
     \centering
     \includegraphics[width = 0.9 \textwidth]{Sections/Test/Images/cascade_ZN_pan.png}
-    \caption{Position step response using a cascaded controller on the pan motor. }
+    \caption{Position step response using a cascaded controller on the pan motor. The measured response being an average of five tests.}
     \label{fig:cascade_ZN_pan}
 \end{figure}
 

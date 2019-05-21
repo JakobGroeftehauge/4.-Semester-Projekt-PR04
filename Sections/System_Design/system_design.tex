@@ -276,6 +276,23 @@ The phase and gain margins are also examined for the velocity controller with th
 
 Looking at the step responses for the model based and Ziegler-Nichols based controller designs, shown in figure \ref{fig:vel_step}, it can be seen that as expected the model based controller meets the requirement of no overshoot, while the Ziegler-Nichols method does not. The latter does have a shorter rise time though.
 
+\begin{figure}[h]
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_polePlace_step_y_Sat.png}
+     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_polePlace_step_u_Sat.png}
+    \caption{Model based design.}
+    \label{fig:step_vel_model}
+\end{subfigure}\quad
+\begin{subfigure}{0.48\textwidth}
+    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_ZN_step_y_Sat.png}
+    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_ZN_step_u_Sat.png}
+    \caption{Ziegler-Nichols based design}
+    \label{fig:step_vel_ZN}
+\end{subfigure}
+\caption{Step responses of the designed control systems with and without saturation taken into account.}
+\label{fig:vel_step}
+\end{figure}
+
 
 %Present that the velocity will only be designed for the tilt motor. Define the specifications for velocity, basically try to avoid overshoot while still being fast. 
 % Present the root locus and then the bode plot and stability. The last two can maybe be omitted, although bode plot may show that a faster sampling rate could be relevant. Show the step response, maybe argue why the chosen reference, and compare to the specifications.
