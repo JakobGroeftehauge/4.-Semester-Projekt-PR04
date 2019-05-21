@@ -1,43 +1,42 @@
 \documentclass[../../main.tex]{subfiles}
 \begin{document}
 
-This section will concern the design and implementation of the functionality on the FPGA as well as the microcontroller. The TM4C123GH6PMI microcontroller is to handle the computation of the PID-controllers, SPI communication and user-input. The Basys3 Artix-7 FPGA is to handle the PWM signal and direction of the motors and the data from the encoders used for the position and velocity. 
+This section will concern the design and implementation of the functionality on the FPGA as well as the microcontroller. The microcontroller is to handle the computation of the PID-controllers, SPI communication and user-input. The FPGA is to handle the PWM signal, direction of the motors and the data from the encoders used for the position and velocity. 
 
 
 
 \subsection{FPGA} \label{subsec:SystemImplemtationFPGA}
-\subsubsection*{Description of the Robot}
+% \subsubsection*{Description of the Robot}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.6\textwidth]{Sections/System_Implementation/Images/Basys-3-kit.png}
-    \caption{Basys-3 development kit. The PMOD-connectors highlighted in red are used to interface with the robot. The PMOD-connector highlighted in green is used for interfacing with the microcontroller. The PMOD-connector highlighted in yellow is used for the in-board analog-to-digital-converter, that would have been used for the current measurement, had the current controller been implemented. The pink box highlights the FPGA-chip. All other peripherals (switches, LEDs, buttons, etch) on the board is not used in the project.}
-    \label{fig:Basys-3-kit}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.6\textwidth]{Sections/System_Implementation/Images/Basys-3-kit.png}
+%     \caption{Basys-3 development kit. The PMOD-connectors highlighted in red are used to interface with the robot. The PMOD-connector highlighted in green is used for interfacing with the microcontroller. The PMOD-connector highlighted in yellow is used for the in-board analog-to-digital-converter, that would have been used for the current measurement, had the current controller been implemented. The pink box highlights the FPGA-chip. All other peripherals (switches, LEDs, buttons, etch) on the board is not used in the project.}
+%     \label{fig:Basys-3-kit}
+% \end{figure}
 
-The system is implemented on a Basys-3 development kit shown in figure \ref{fig:Basys-3-kit}. The figure highlights the connectors used for interfacing with the robot and for interfacing with the micro-controller. For interfacing with the robot two PMOD-connectors are used, one dedicated to giving input to the robot and the other dedicated to receiving outputs from the robot. As described in section \ref{sec:ProblemDescription} the robot has two motors, each one requiring a H-bridge for control and each H-bridge requiring three inputs, yielding six inputs in total for the robot. 
+% The system is implemented on a Basys-3 development kit shown in figure \ref{fig:Basys-3-kit}. The figure highlights the connectors used for interfacing with the robot and for interfacing with the micro-controller. For interfacing with the robot two PMOD-connectors are used, one dedicated to giving input to the robot and the other dedicated to receiving outputs from the robot. As described in section \ref{sec:ProblemDescription} the robot has two motors, each one requiring a H-bridge for control and each H-bridge requiring three inputs, yielding six inputs in total for the robot. 
 
 \subsubsection*{Logic Implemented in the FPGA}
 
-The logic implemented in the FPGA is divided into modules. Table \ref{tab:FPGAModulesDescription}
-gives an overview and a short description of each module and its function. Speed, Encoder, PWM and Reset logic modules are implemented twice, one for each motor. Figure \ref{fig:FPGALogicBothMotors} illustrates the logic implemented on the FPGA and the relation between the different modules.     
+The logic implemented in the FPGA is divided into modules. Table \ref{tab:FPGAModulesDescription} gives an overview and a short description of each module and its function. Speed, Encoder, PWM and Reset logic modules are implemented twice, one for each motor. Figure \ref{fig:FPGALogicBothMotors} illustrates the logic implemented on the FPGA and the relation between the different modules.     
 \begin{table}[]
     \centering
     
-    \begin{tabular}{l|p{0.8\textwidth}} %{p{0.12\linewidth}p{0.4\textwidth}p{0.38\textwidth}}
+    \begin{tabular}{l|p{0.8\textwidth}}[] %{p{0.12\linewidth}p{0.4\textwidth}p{0.38\textwidth}}
         Module & Description \\
         \hline
-        Encoder & Interfaces with and takes inputs from the pan-tilt system. Channel A and B of the encoders are read continuously and from this information a signed position relative to the original reference is calculated, which is the output of the module. \\
+        Encoder Module & Interfaces with and takes inputs from the pan-tilt system. Channel A and B of the encoders are read continuously and from this information a signed position relative to the original reference is calculated, which is the output of the module. \\
         \hline
-        Speed & Calculates a speed related to the time period between two encoder pulses. Also provides a flag for determining when a frame is not moving.\\
+        Speed Module & Calculates a speed related to the time period between two encoder pulses. Also provides a flag for determining when a frame is not moving.\\
         \hline
-        Reset & Interfaces with the index signal of a frame and uses this signal to reset the frame. \\
+        Reset Module & Interfaces with the index signal of a frame and uses this signal to reset the frame. \\
         \hline
-        Protocol & Used for determining which duty cycle is passed on to the PWM-module.\\
+        Protocol Module & Used to determining which duty cycle is passed on to the PWM-module and enabling the reset routine. \\
         \hline
-        SPI & Interfaces with the microcontroller. Contains an SPI slave for each type of information going to or from the microcontroller. \\
+        SPI Module & Interfaces with the microcontroller. Contains an SPI slave for each type of information going to or from the microcontroller. \\
         \hline
-        PWM & Interfaces with the H-bridge. Takes in a 10 bit value used to determine the duty-cycle. The frequency of the pulse-width-modulated signal is 50 kHz.
+        PWM Module & Interfaces with the H-bridge. Takes in a 10 bit value used to determine the duty-cycle. The frequency of the pulse-width-modulated signal is 50 kHz.
     \end{tabular}    
     
     \caption{The different modules implemented in the FPGA.}
@@ -47,14 +46,14 @@ gives an overview and a short description of each module and its function. Speed
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{Sections/System_Implementation/Images/FPGALogicBothMotors.pdf}
-    \caption{Overview of the logic implemented on the FPGA and the relation between the different modules. Arrows indicate information flowing towards a module. Double arrows indicate information flows both ways between two modules}
+    \caption{Overview of the relation between the implemented modules on the FPGA. Arrows indicate information flowing towards a module. Double arrows indicate information flows both ways between two modules}
     \label{fig:FPGALogicBothMotors}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/SPILogicSimple.pdf}
-    \caption{Overview of the SPI-interface implemented on the FPGA, showing the seven slaves and the slave-select-module and logical MISO OR-module used to choose between the slaves. All colored signals interface with the microcontroller which is the SPI Master. } % through just one PMOD-connector on the Basys 3 - kit }
+    \caption{Overview of the SPI module implemented on the FPGA, showing the seven slaves and the slave-select-module and logical MISO OR-module used to choose between the slaves. All colored signals interface with the microcontroller which is the SPI Master. } % through just one PMOD-connector on the Basys 3 - kit }
     \label{fig:SPILogicSimple}
 \end{figure}
 
@@ -67,22 +66,19 @@ gives an overview and a short description of each module and its function. Speed
 
 \subsubsection*{Encoder Logic}
 
-Each motor is equipped with an encoder module. The encoder module is a quadrature incremental encoder with 360 pulses for one revolution of the motor shaft. The encoder provides information via its two outputs channel A and channel B, which yields a direction and a position relative to the previous position. The encoder is therefore not absolute, hence an index is provided where the frame is in a reset position to provide a fixed reference for initialising the position measurement.
-The encoder module looks at channel A and B continuously and enables a count whenever the two signals have different logic levels. This happens every time there is an edge in the encoder signal from one of the channels. The encoder logic is implemented based on the assumption that the accuracy of the encoder is high enough, that the distance between encoder edges relative to the angular velocity of the shaft is equal. However it is later found that distance between edges is not constant and equal relative to the angular velocity of the shaft. The consequences of this phenomenon will be further discussed in section \ref{sec:Discussion}.
+Each motor is equipped with an encoder module. The encoder module is a quadrature incremental encoder with 360 pulses for one revolution of the motor shaft. The encoder provides information via its two outputs channel A and channel B, from where a direction and a position relative to the previous position can be calculated. An index is provided, so a fixed reference is given for initialising the position measurement. The encoder module looks at channel A and B continuously and enables a count whenever a falling or rising edge occur on either of the channels. The angular velocity is calculated based on the assumption that change in position of the output shaft per encoder count is equal. Later this assumption was discovered to be wrong, the consequences will be discussed in section \ref{sec:Discussion}.
+
 
 % The distance between rising edges or falling edges of the same channel is the same, though still relative to the speed. However in between the falling edge and rising edge of one of the channels there must be an edge in either direction from the other channel and it is not guaranteed that this edge occurs with the same distance to the aforementioned rising and falling edge.  
-
-
-The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. The angle of the motor, $ \theta_{m} $, is described by equation \ref{eq:angle_of_motor}, where $FPGA_{pos}$ is the encoder value provided by the FPGA.
-\begin{equation}\label{eq:angle_of_motor}
-     \theta_{m} = \frac{\pi}{180} \cdot \mathrm{FPGA_{pos}}
-\end{equation}
 
 
 
 
 \subsubsection*{Reset Logic}
-As described in section \ref{sec:Analysis} the controllers needs a reference point to be able to go to a desired position. The Reset module is responsible for resetting the pan or tilt frame to its index position providing the functionality of finding a reference point. The module is enabled from the Protocol module whereafter it drives the motors with a constant low duty cycle until it receives a pulse from the index hall sensor. Figure \ref{fig:FPGAFlowchartsResetLatchAndIndex} shows the flow in the process that receives the pulse from the index hall sensor. When it receives the pulse the module immediately brakes the motors while pulsing the Encoder module to reset its encoder value to 0. The Reset module has logic to drive the motors in the opposite direction when the speed of the motors has been zero for a set time-period as is necessary for the pan frame. Figure \ref{fig:FPGAFlowchartsResetDirection} shows a flowchart of the logic that is responsible for changing the direction. 
+The controllers needs a reference point to initialise position measurement.
+The Reset module is responsible for resetting the pan or tilt frame to its index position. When a reset routine is enabled from the protocol module, the motors drives the pan-tilt frames with constant low duty cycle until a pulse from the index hall sensor is received.
+
+ Figure \ref{fig:FPGAFlowchartsResetLatchAndIndex} shows the flow in the process that receives the pulse from the index hall sensor. When it receives the pulse the module immediately brakes the motors while pulsing the Encoder module to reset its encoder value to 0. The Reset module has logic to drive the motors in the opposite direction when the speed of the motors has been zero for a set time-period as is necessary for the pan frame. Figure \ref{fig:FPGAFlowchartsResetDirection} shows a flowchart of the logic that is responsible for changing the direction. 
 
 
 

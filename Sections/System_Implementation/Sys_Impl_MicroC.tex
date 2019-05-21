@@ -70,6 +70,13 @@ The maximum sampling time for a smooth response of the discrete controller, need
 \end{equation}
 In a cascade coupling the inner controller has to update faster than the outermost. To comply with this and making sure that $T_{min} > T > T_{max}$, the sampling time for the velocity controller is chosen to be $T_{vel} = 1\,\mathrm{ms}$ and the sampling time for the position controller is $T_{pos} = 5\,\mathrm{ms}$. \\
 
+
+The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. The angle of the motor, $ \theta_{m} $, is described by equation \ref{eq:angle_of_motor}, where $FPGA_{pos}$ is the encoder value provided by the FPGA.
+\begin{equation}\label{eq:angle_of_motor}
+     \theta_{m} = \frac{\pi}{180} \cdot \mathrm{FPGA_{pos}}
+\end{equation}
+
+
 \subsubsection*{PID-controller Tasks}
 % How and which values need to be transported where Reference output controlling PWM
 The PID-controller tasks on the microcontroller are responsible for calculating the control signal, which is used to control the motors. For each controller to be able to function they need three buffers. One buffer holding a reference value and another providing a feedback value. The third buffer is responsible for storing the controller output. In case of a velocity controller the reference buffer contains output from a position controller, while the output buffer is a queue passing on values to SPI. Each buffer has a mutex attached which needs to be waited for or signaled upon using. Figure \ref{fig:OverviewTaskDiagramSimple} constitutes an illustration of the implementation of two PID-controllers in cascade for a single motor. In the actual implementation there are two cascade controllers, one for each motor.

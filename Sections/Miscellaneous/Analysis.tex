@@ -8,7 +8,7 @@ The pan-tilt system is made of aluminium extrusions and can be divided into two 
 
 From initial experiments with the pan-tilt system it is found that significant friction is present in joints and bearings. It is also found that the friction varies according to the position of the frame. Probably these irregularities stem from the physical setup being poorly constructed, as it is visibly skewed.  
 
-Each frame is actuated by a DC motor equipped with an incremental encoder \cite{}. The resolution of the encoders is 360 counts per revolution of the output shaft. The encoders make it possible to determine an offset from the initial position. Hall effect sensors \cite{} provide an index signal for each frame. The index signals are used to provide a reference point for the incremental encoders. From the change in position relative to the time, the velocity of the motor can be calculated. Both motors are connected to an H-bridge, which can be enabled with a PWM-signal to control the voltage over the motors. Furthermore the H-bridge also makes is possible to change the polarity of the voltage supplied, yielding a change in the motors turning direction.
+Each frame is actuated by a DC motor equipped with an incremental encoder \cite{}. The resolution of the encoders is 360 counts per revolution of the output shaft. The encoders make it possible to determine an offset from the initial position. The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. Hall effect sensors \cite{} provide an index signal for each frame. The index signals are used to provide a reference point for the incremental encoders. From the change in position relative to the time, the velocity of the motor can be calculated. Both motors are connected to an H-bridge, which can be enabled with a PWM-signal to control the voltage over the motors. In accordance with the datasheet of the H-Bridge, L6203 \ref{sec:digital_appendix}, it requires a PWM frequency typically around 30 KHz and up to 100 KHz to function. Furthermore the H-bridge also makes is possible to change the polarity of the voltage supplied, yielding a change in the motors turning direction.
 
 \subsection{Controller Design}
 
@@ -53,7 +53,7 @@ The problem description states that a position controller has to be designed, ho
 
 
 
-\subsection*{Classical Control Methods}
+\subsection*{Classical Control Methods}\label{subsec:classic_control}
 
 
 A traditional method for designing a controller for a motor is to use a PID-controller. Though many controller configurations using parts of the PID-controllers design exists, only the full PID-controller will be examined. The block diagram of a PID-controller can be seen on figure \ref{fig:PID_controller}. As seen on the block diagram
@@ -147,7 +147,7 @@ The observer introduces an observer gain, $L$, which is proportional with the di
     \end{split}
 \end{equation}
 
-To take into account that there are psychical limitation in form of saturation an anti-windup in form of the gain $M$ on figure \ref{fig:Integral_Observer_Diagram} can be added. The anti-windup subtracts $v$ with the control signal, $u$ and multiplies it with the gain, $M$. and if there is a different it prevent the integral term to windup. 
+To take into account that there are physical limitation in form of saturation an anti-windup in form of the gain $M$ on figure \ref{fig:Integral_Observer_Diagram} can be added. The anti-windup subtracts $v$ with the control signal, $u$ and multiplies it with the gain, $M$. and if there is a different it prevent the integral term to windup. 
 If saturation occur the dynamic of the observer controller changes to:
 \begin{equation}\label{eq:anti-windup_state_space}
     \begin{split}
@@ -196,6 +196,7 @@ where $r$ is the reference and $\Dot{\hat{x}}$ is described by equation \ref{eq:
 
 \subsection*{Implementation}
 %modelling, continuous vs discrete
+%more implementing methods
 Upon modelling and simulating the controllers and the system, it is important to keep in mind that an actual implementation of a controller is discrete rather than continuous when implemented in software. This can be done by directly designing the controller in discrete time as seen in equation \ref{eq:discrete_control}.
 \begin{multline}\label{eq:discrete_control}
         u(kT+T)=k_Pe(kT+T)+u_1(kT) + k_I\frac{T}{2} \\ \cdot (e(kT+T)+e(kT))+k_D \frac{2}{T}(e(kT+T)-e(kT))-u_D(kT) \quad ,

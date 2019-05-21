@@ -1,7 +1,7 @@
 \documentclass[../../main.tex]{subfiles}
 
 \begin{document}
-In order to analyse and tune the system a mathematical model describing the dynamics of a DC motor has to be derived. First the electric equivalent circuit of the DC motor is analysed. As seen in figure \ref{fig:Armature_Circuit} the motor can be described as a voltage source in series with a resistor, R, an inductor, L, and another voltage source representing the back emf. To setup the system equation it is assumed that the torque is proportional to the motors shaft's angular velocity. Furthermore it is assumed that the magnetic field introduced is constant, and therefore the motor torque is only proportional to the current \textit{i}. If the motor torque and the back emf constant is represented in SI units, it is seen that they are equal to each other. This constant will henceforward be denoted as one constant, K. The system equations is derived using figure \ref{fig:Armature_Circuit} as well as Newtons's second law and Kirchoff's voltage law. The equations can be seen in equation \ref{eq:sysEq1} and \ref{eq:sysEq2}.
+In order to analyse and tune the system a mathematical model describing the dynamics of a DC motor has to be derived. First the electric equivalent circuit of the DC motor is analysed. As seen in figure \ref{fig:Armature_Circuit} the motor can be described as a voltage source in series with a resistor, $R$, an inductor, $L$, and another voltage source representing the \textit{back emf}. To setup the system equation it is assumed that the torque is proportional to the angular velocity of the motor shaft. Furthermore it is assumed that the magnetic field introduced is constant, and therefore the motor torque is only proportional to the current, $i$. If the motor torque and the back emf constant is represented in SI units, it is seen that they are equal to each other \cite{universityofmichigan2019}. This constant will henceforward be denoted as one constant, $K$. The system equations is derived using figure \ref{fig:Armature_Circuit} as well as Newtons's second law and Kirchoff's voltage law. The equations can be seen in equation \ref{eq:sysEq1} and \ref{eq:sysEq2}.
 
 \begin{equation}
     J\ddot{\theta}+b\theta = K i
@@ -25,9 +25,9 @@ In order to analyse and tune the system a mathematical model describing the dyna
 \subsubsection*{Moment of Inertia}
 Moment of inertia, sometimes referred to as mass moment of inertia, is the angular motion analogue to mass in a translational system. It determines proportionality between the applied torque and the angular acceleration. An estimation for the value of the moment of inertia will be calculated based on measurements and information from data sheets. 
 
-To simplify the estimation of the inertia, a simplified representation of the pan and tilt system, shown in figure \ref{} is considered. This representation ignores bolts, brackets, gears, etc. Furthermore, the extrusions are considered as solid boxes, thus ignoring the profile shape.
+To estimate the inertia, a simplified representation of the pan and tilt system, in figure \ref{}, is considered. This representation ignores bolts, brackets, gears, etc. Furthermore, the extrusions are considered as solid boxes, thus ignoring the profile shape.
 
-Based on the simplified representation, the inertia accruing to the tilt frame around the axis $a_{tilt}$ can be found by using a formula to calculate the inertia of a box with dimensions $w_t\times l_t\times h_t$ and subtracting the inertia of a box of dimensions $w_{ct}\times l_{ct}\times h_t$, yielding equation \ref{eq:J_tilt}, Where $\rho_t$ is the density of the tilt frame.
+Based on the simplified representation, the inertia accruing to the tilt frame around the axis $a_{tilt}$ can be found. Using a formula to calculate the inertia of a box with dimensions $w_t\times l_t\times h_t$ and subtracting the inertia of the inner box of dimensions $w_{ct}\times l_{ct}\times h_t$, equation \ref{eq:J_tilt} is found, where $\rho_t$ is the density of the tilt frame.
 
 \begin{equation} \label{eq:J_tilt}
     J_{a_{tilt}} =  w_{t} \,h_{t}\, l_{t}\,\rho_{t}\frac{1}{12}(l_{t}^2+h_{t}^2)-w_{ct}\, h_{t} \, l_{ct} \, \rho_{t}\frac{1}{12}(h_{t}^2+l_{ct}^2)
@@ -35,18 +35,18 @@ Based on the simplified representation, the inertia accruing to the tilt frame a
 
 The inertia of the pan frame can be found in a similar manner, however to properly estimate the inertia accruing to the pan motor, the tilt frame must be considered as well. The inertia of the tilt frame about the axis $a_{pan}$ also depends on the angle, $\theta$, at which the tilt motor is positioned.
 
-The same approach of subtracting the inertia of an inner box from an outer box can be used, but since no formula is readily available for calculating the inertia of an inclined box, integration must instead be used. The inertia of a point mass is defined as $J=m\cdot r^2$ \cite{PrincipalsOfPhysics} where $m$ is the mass of the point and $r$ is the distance from the point to the axis of rotation. Thus the inertia of a volume $V$ can be found as $\iiint_V \rho r^2 dV$, where $\rho$ is the density of the volume and $r$ is a function that describes the distance to the axis of rotation at each point in the volume. In the case of the box positioned as in figure \ref{}, $r$ can be described as in equation \ref{eq:r_function}.
+The same approach of subtracting the inertia of an inner box from an outer box can be used, but since no formula is readily available for calculating the inertia of an inclined box, integration must instead be used. The inertia of a point mass is defined as $J=m\cdot r^2$ \cite{PrincipalsOfPhysics}, where $m$ is the mass of the point and $r$ is the distance from the point to the axis of rotation. Thus the inertia of a volume, $V$, can be found as $\iiint_V \rho r^2 dV$, where $\rho$ is the density of the volume and $r$ is a function that describes the distance to the axis of rotation at each point in the volume. In the case of the box positioned as in figure \ref{}, $r$ can be described as in equation \ref{eq:r_function}.
 \begin{equation}\label{eq:r_function}
     r = \sqrt{x^2\cos{\theta}^2+x^2\sin{\theta}^2+(y\cos{\theta}-z\sin{\theta})^2}
 \end{equation}
-Integrating over the dimensions of the box, the inertia can be found in equation \ref{eq:inc_box_inertia}
+Integrating over the dimensions of the inclined box, $J_{inc}$, the inertia can be found in equation \ref{eq:inc_box_inertia}.
 \begin{equation}\label{eq:inc_box_inertia}
     J_{inc} = \int_{-\frac{w}{2}}^{\frac{w}{2}}
         \int_{-\frac{h}{2}}^{\frac{h}{2}}
         \int_{-\frac{l}{2}}^{\frac{l}{2}}
         \rho \cdot r^2 \,dz \,dx \,dy = \frac{1}{24}h\,l\,w\, \rho (h^2+l^2+2w^2+(h^2-l^2)\cos{2\theta})
 \end{equation}
-Since this function is non-linear, it will not be useful when analysing the system and designing controllers. Therefore it is chosen to evaluate the system at the point $\theta = \frac{\pi}{4}$, to get a value which is right in the middle of the two extremes. The result is shown in equation \ref{eq:inertia_lin}.
+Since this function is non-linear, it will not be useful when analysing the system and designing controllers. The resulting effect of the position of the tilt frame is at a maximum, when the angle is $\theta_{t}=\frac{\pi}{2}$ and a minimum at $\theta_t=0$. Therefore it is chosen to evaluate the system at the point $\theta_t = \frac{\pi}{4}$, to get a value which is right in the middle of the two extremes. The result is shown in equation \ref{eq:inertia_lin}.
 
 \begin{equation}\label{eq:inertia_lin}
     J_{inc,\,lin} = \frac{1}{24}h\,l\,w\, \rho (h^2+l^2+2w^2)
@@ -62,13 +62,11 @@ The total inertia, $J_{a_{pan}}$, can then be found in equation \ref{eq:pan_axis
         J_{a_{pan}} &= J_{p\,a_{pan}} + J_{t\,a_{pan}}
 \end{split}
 \end{equation}
-The densities $\rho_t = \SI{987.7 }{\kilo \gram \per \cubic \meter }$ and $\rho_p = \SI{996.3 }{\kilo \gram \per \cubic \meter } $ are based on values found from technical data of similar aluminium extrusions. \cite{extrusion45x45} \cite{extrusion40x40}
+The densities $\rho_t = \SI{987.7 }{\kilo \gram \per \cubic \meter }$ and $\rho_p = \SI{996.3 }{\kilo \gram \per \cubic \meter } $ are based on values found from technical data of similar aluminium extrusions \cite{extrusion45x45} \cite{extrusion40x40}.
 Evaluating using these values, and the measurements in figure \ref{} it is found that $J_{a_{pan}} = \SI{0.0602}{\kilo \gram \square \meter } $ and $J_{a_{tilt}} = \SI{0.0169}{\kilo \gram \square \meter }$. Since the model is based on the angular motion for the motor shaft, and not the angular motion of the pan and tilt frames, these values will have to be divided by three. This is because of the gear ratios which dictate that the pan and tilt frames have one third the angular velocity of the motor shaft for the respective frames.
 
 \subsubsection*{ Motor Coefficients }
-The coefficients for the motor are found experimentally. The approach described in \cite{PalleAndersenModeldannelse} is used. In this approach, the angular velocity and current is measured for different voltages. The different voltages are achieved by means of varying the duty cycle. The following equations can be used to describe the relationship between the angular velocity, current and voltage and the different coefficients for the motor:
-
-
+The coefficients of the motor are found experimentally, with the approach described in \cite{PalleAndersenModeldannelse}. In this approach, the angular velocity and current is measured for different voltages by varying the duty cycle. The following equations can be used to describe the relationship between the angular velocity, current and voltage, the armature voltage, $u_a$, and the external load, $\tau_b$ for the motor:
 \begin{align*}
     \omega_{1} K + i_{a1} R_{a} &= u_{a1}  \\
     i_{a1} K - \tau_{c} - \omega_{1} b &= \tau_{b1} \\
@@ -76,8 +74,7 @@ The coefficients for the motor are found experimentally. The approach described 
     i_{a2} K - \tau_{c} - \omega_{2} b &= \tau_{b2} \qquad ,
 \end{align*}
 
-where $K$ i a coefficient related to the torque of the motor, $\tau_{c}$ is the static friction, that mostly originates from the axle bearings, $b$ is the dynamic friction in the system and $R_{a}$ is the internal resistance in the motor windings. $\tau_{b1} = \tau_{b2} = 0$ when the motor is not operating with a load and the voltage is varied. $\omega_{1}$ and $i_{a1}$ are the angular velocity and current respectively at the voltage $u_{a1}$, while $\omega_{2}$ and $i_{a2}$ are a different set of angular velocity and current measurements at the voltage $u_{a2}$. For the experiment 7 different sets of angular velocity, voltage and current measurements are taken and a linear expression is fitted to the results. From the linear expression two sets of values for voltage, current and angular velocity is extracted for the computation of the motor coefficients. With this method the following values for the different coefficients are estimated:
-
+where $K$ is a coefficient related to the torque of the motor, $\tau_{c}$ is the static friction, $b$ is the dynamic friction in the system and $R_{a}$ is the internal resistance in the motor windings. $\tau_{b1} = \tau_{b2} = 0$ when the motor is not operating with a load and the voltage is varied. $\omega_{1}$ and $i_{a1}$ are the angular velocity and current respectively at the voltage $u_{a1}$, while $\omega_{2}$ and $i_{a2}$ are a different set of angular velocity and current measurements at the voltage $u_{a2}$. For the experiment 7 different sets of angular velocity, voltage and current measurements are taken and a linear expression is fitted to the results. From the linear expression two sets of values for voltage, current and angular velocity is extracted for the computation of the motor coefficients. Further results and calculations can be seen in the digital appendix section \ref{sec:digital_appendix}. With this method the following values for the different coefficients are estimated:
 \begin{align*}
     K &= 0.4903 \\
     \tau_{c} &= 0.139 \\
@@ -86,7 +83,7 @@ where $K$ i a coefficient related to the torque of the motor, $\tau_{c}$ is the 
 \end{align*}
 
 \subsection{Analysis of the Modelled Plant}
-It is wanted to model the motor including the load applied by the physical setup. Therefore the inertia, J, used for modelling is the inertia of the part of the robot manipulated by the specific motor. The calculation of the inertia can be seen in section \ref{}. The velocity, $\dot{\theta}$, is still in relation to the motor shaft. The other parameters used for modelling can be seen in table \ref{tab:modellingParam}. 
+It is wanted to model the motor including the load applied by the physical setup. Therefore the inertia used for modelling, is the inertia of the part of the robot manipulated by the specific motor. The calculation of the inertia can be seen in section \ref{}. The angular velocity, $\dot{\theta}$, is still in relation to the motor shaft. The other parameters used for modelling can be seen in table \ref{tab:modellingParam}. 
 
 \begin{table}[]
     \centering
@@ -100,17 +97,18 @@ It is wanted to model the motor including the load applied by the physical setup
         Viscous friction constant & b & $7.38\cdot 10^{-4}$ & $7.38\cdot 10^{-4}$  \\
         
     \end{tabular}
-    \caption{Parameters used for modelling pan and tilt motor}
+    \caption{Parameters used for modelling pan and tilt motor.}
     \label{tab:modellingParam}
 \end{table}
 
-Using equation \ref{eq:sysEq1} and \ref{eq:sysEq2} the system is represented on state space form seen in equation \ref{eq:stateSpaceSys1} and \ref{eq:stateSpaceSys2}.
-\begin{align}
+Using equation \ref{eq:sysEq1} and \ref{eq:sysEq2} the system is represented on state space form seen in equation \ref{eq:stateSpaceSys1}.
+\begin{equation}\label{eq:stateSpaceSys1}
+\begin{split}
 \begin{bmatrix}
 \dot{\theta}\\
 \ddot{\theta}\\
 \dot{i}
-\end{bmatrix} =
+\end{bmatrix} &=
 \begin{bmatrix}
 0 & 1 & 0 \\
 0 & \frac{-b}{J} & \frac{K}{J}\\
@@ -126,12 +124,8 @@ i
 0 \\
 0 \\
 \frac{1}{L}
-\end{bmatrix} 
-\label{eq:stateSpaceSys1}
-\end{align}
-
-\begin{equation}
-    y = 
+\end{bmatrix} \\
+    y &= 
     \begin{bmatrix}
     1 & 0 & 0\\
     0 & 1 & 0
@@ -141,25 +135,25 @@ i
     \dot{\theta}\\
     i
     \end{bmatrix}
-    \label{eq:stateSpaceSys2}
+    \end{split}
 \end{equation}
 
-The state space model combined with the model parameters from table \ref{tab:modellingParam} is then used to calculate the stepresponse and placement of poles for the plant seen in figure \ref{fig:polesPlant} and \ref{fig:StepVelPlant}. Analyzing the location of the poles, it is obvious to see that the plant consist of one fast pole and two slower poles. This also complies well with the fact that the plant is comprised of an electrical part and a mechanical part. The electrical part is by nature significantly faster than the mechanical part, therefore yielding the fastest pole. Looking at the zoomed in plot in figure \ref{fig:polesPlant} it can also be seen that the change in inertia between the two plant manipulate the second fastest pole. It can be seen that the system becomes faster as the moment of inertia decreases, which also complies with general laws of physics. 
+The state space model combined with the model parameters from table \ref{tab:modellingParam} is then used to calculate the stepresponse and placement of poles for the plant seen in figure \ref{fig:polesPlant} and \ref{fig:StepVelPlant}. Analysing the location of the poles, it is apparent that the plant consist of one fast pole and two slower poles. This also complies well with the fact that the plant is comprised of an electrical part and a mechanical part. The electrical part is by nature significantly faster than the mechanical part, therefore yielding the fastest pole. Looking at the zoomed in plot in figure \ref{fig:polesPlant} it can also be seen that the difference in inertia between the two plants manipulates the second fastest pole. Since the tilt has a lower moment of inertia, it can be seen that the system becomes faster as the moment of inertia decreases. This also complies with general laws of physics. 
 
 \begin{figure}
     \centering
     \includegraphics[width = 0.9\textwidth]{Sections/System_Modelling/Images/polesPlant.png}
-    \caption{Placement of poles for the unrestrained plant}
+    \caption{Placement of poles for the unrestrained plant.}
     \label{fig:polesPlant}
 \end{figure}
 
-Analyzing the stepresponse for both the plants it resembles that both plants are of first order. Though on figure \ref{fig:polesPlant} it was seen that both plants has three poles and is therefore of second order. This behavior is due to the pole introduced by the electrical system being placed so far from the other poles, that this pole becomes insignificant. As expected the pan plant is slower than the tilt due to the increased moment of inertia.  
+Analysing the stepresponse for both the plants it resembles that both plants are of first order. Though on figure \ref{fig:polesPlant} it is seen that both plants has three poles and is therefore of second order. This behavior is due to the pole introduced by the electrical system being placed so far from the other poles, that this pole becomes insignificant. Looking at figure \ref{fig:StepVelPlant}, it is seen that the pan plant is slower than the tilt due to the increased moment of inertia.  
  
 
 \begin{figure}
     \centering
     \includegraphics[width = 0.9 \textwidth]{Sections/System_Modelling/Images/stepResponseVelPlant.png}
-    \caption{Velocity stepresponse for the unstrained plant}
+    \caption{Velocity stepresponse for the unstrained plant.}
     \label{fig:StepVelPlant}
 \end{figure}
 
@@ -167,7 +161,7 @@ Analyzing the stepresponse for both the plants it resembles that both plants are
 
 \subsection{Conclusion}
 
-A mathematical model of the dynamics of the DC-motors in the pan-tilt system has been derived. The coefficients describing the behaviour of the DC-motor has been determined experimentally by evaluating cognate measurements of current, voltage and angular velocity. From the mathematical model the system is put on state space form in order to calculate step response and analyse the location of the poles.  The moment of inertia has been estimated from equations that describe the moment of inertia for shapes similar to the ones found in the pan-tilt system. 
+ A mathematical model of the dynamics of the DC-motors in the pan-tilt system has been derived. The moment of inertia has been estimated from equations, which describe the moment of inertia for shapes similar to the ones found in the pan-tilt system. The coefficients describing the behaviour of the DC-motor has been determined experimentally by evaluating cognate measurements of current, voltage and angular velocity. From the mathematical model the system is put on state space form in order to calculate step response and analyse the location of the poles.
 
 
 

@@ -1,15 +1,16 @@
 \documentclass[../../main.tex]{subfiles}
 \begin{document}
-Section \ref{sec:Requirements} prompts a range of tests. These test will examine whether it has been possible to comply with the requirement specifications. This section will introduce the tests and present the results. Additional data from the tests can be seen in the digital appendix. 
+This section will introduce the tests prompted by the requirements in section \ref{sec:Requirements} and present the results. These results will determine whether it has been possible to comply with the requirement specifications. Additional data from the tests can be seen in the digital appendix. 
 
-To ease access to the data from the FPGA a micro blaze has been implemented, which utilises UART to communicate directly with a computer. This allows for direct access to the position and velocity of the pan and tilt motor making data processing easier. 
+To ease access to data from the FPGA during tests, a \textit{micro blaze} has been implemented, which utilises UART to communicate directly with a computer. This allows for direct access to the position and velocity of the pan and tilt motor making data processing easier. 
+
 \subsection{Microcontroller Timing Test}
-Running multiple tasks on one microcontroller it is imperative to know, how much of the CPU time is utilised. If the CPU utilises too much time the risk of starvation is introduced, thus it is of great importance, that the CPU does not utilise too much cpu time. Thus it is wantet to test whether the system can satisfy the requirement from section \ref{sec:Requirements}: 
+Running multiple tasks on one microcontroller it is imperative to know, how much of the CPU time is utilised. If the CPU utilises too much time the risk of starvation is introduced, thus it is wanted to test whether the system can satisfy the requirement from section \ref{sec:Requirements}: 
 \begin{itemize}
-    \item The CPU is not to utilise more than 80\% of the total cpu time.
+    \item The microcontroller is not to utilise more than 80\% of the total CPU time.
 \end{itemize}
 
-The test is executed with four controllers, the UART task, the SPI task and the UI task running with freeRTOS. The position controllers are scheduled at a frequency of \SI{200}{\hertz} and the velocity controllers at \SI{1000}{\hertz}. The timing of the tasks is done by driving pins high upon start and finish of all tasks, thus enabling the possibility of timing the tasks with an oscilloscope.
+The test is executed with four controllers, the UART task, the SPI task and the UI task running with freeRTOS. The position controllers are scheduled at a frequency of \SI{200}{\hertz} and the velocity controllers at \SI{1000}{\hertz}. The timing of the tasks is done by driving pins high upon start and low finish of all tasks, thus enabling the possibility of timing the tasks with an oscilloscope.
 
 \subsubsection*{Results}
 Table \ref{tab:CPU_utilisation_test} shows the timing of running the controllers including the UART, SPI and UI task. Table \ref{tab:Task_Timing} shows the timing of the UART, SPI and UI respectively. Timing the duration of the tasks from the first task initiates to the last terminates the "Task start to tasks end" is determined. The "Task start to task start" is defined by being the time from the first stask initiates to the cycle begins again, as seen on figure \ref{fig:Schedueling_controllers}. This makes it possible to estimate the average duty cycle of the system:
