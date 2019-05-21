@@ -207,16 +207,12 @@ Upon designing a controller it is important to keep in mind that an actual imple
 Using the forward rectangular rule to map from the s to the z-domain, the entire left-half plane of the s domain is mapped into the z-domain into a rectangular shape. The forward rectangular rule maps the left-half plane of the s-domain into a circle placed in the right-half of the z-domain. The trapezoidial rule fits the left-half plane of the s-domain into the unit-circle of the z-domain. The phenomenons are illustrated on figure \ref{fig:mapping_s_to_z}.  
 
 Implementing the discrete controller can be done as seen in equation \ref{eq:discrete_control}, utilising the Tustins method. Tustins method is based on the trapezoidial rule, and dictates a certain way of implementing the integral and thereby the differential part.
-\begin{equation}[width=\textwidth]\label{eq:discrete_control}
-        u(kT+T)=k_Pe(kT+T)+u_1(kT) + k_I\frac{T}{2} \cdot (e(kT+T)+e(kT))+k_D \frac{2}{T}(e(kT+T)-e(kT))-u_D(kT) \quad ,
+\begin{equation}\label{eq:discrete_control}
+\begin{split}
+        u(kT+T)=&k_Pe(kT+T)+u_1(kT)\\ &+ k_I\frac{T}{2} \cdot (e(kT+T)+e(kT))\\ &+k_D \frac{2}{T}(e(kT+T)-e(kT))-u_D(kT) \quad ,
+\end{split}
 \end{equation}
-\begin{equation}\label{eq1}
-\resizebox{0.5\hsize}{!}{$%
-0<a_{1}\leq a(X,t)\leq%
-a_{2}<+\infty, ~~~\forall X \in \Omega;~~~ 
-$%
-}%
-\end{equation}
+
 where $u(s)$ is the control signal in continuous time and $u(kT+T)$ is the control signal in discrete time. $T$ is the sampling time, $e$ is the error and $k_p$, $k_I$ and $k_D$ are the PID gains.
 
 As seen from equation \ref{eq:discrete_control} the terms depend on the sampling time, thus it needs to be known. A rule of thump state that the sampling frequency for a discrete controller, should be approximately 20 times larger than the closed-loop bandwidth of the system \cite{Design_Of_Digital_Control_Systems_NOTE}. 

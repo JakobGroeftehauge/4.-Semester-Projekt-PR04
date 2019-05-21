@@ -57,7 +57,9 @@ The PID-controller tasks on the microcontroller are responsible for calculating 
 
 % Following the controller task functionality described on figure  \ref{fig:PIDControllerFlowchart}, feedback to a controller is supplied whenever the controller sends a request to SPI. The request must contain a slave ID indicating which slave to receive data from. The controller task is then put in a blocked state, while waiting for data. Whenever SPI signals that the requested data is put in the feedback buffer associated with the requesting controller, the controller task is put back into running state. 
 
-The overall structure of the controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. When the feedback data is received, the error between the reference value and feedback value is calculated. As mentioned in section \ref{} the velocity feedback data ecause of possible variance in feedback due to the imprecise separation of edges in the encoder, as mentioned in section \ref{subsec:SystemImplemtationFPGA}, a second order lowpass Finite Impulse Response (FIR) filter is applied to the error. Since the error ideally would consist of a DC frequency component, the filter was designed using a cutoff frequency at $0.5\,\mathrm{Hz}$. The filter transfer function used is:
+The overall structure of the controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. When the feedback data is received, the error between the reference value and feedback value is calculated. As mentioned in section \ref{subsec:SystemImplemtationFPGA}, because of possible variance in velocity feedback due to the imprecise separation of edges in the encoder, a second order lowpass Finite Impulse Response (IIR) filter is applied to the error. 
+
+Since the error ideally would consist of a DC frequency component, the filter was designed using a cutoff frequency at $0.5\,\mathrm{Hz}$. The filter transfer function used is:
 \begin{equation}
     H(s) = \frac{1}{0.0249s^2 + 0.9502s + 0.0249}
 \end{equation}
