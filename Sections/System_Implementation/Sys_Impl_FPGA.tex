@@ -76,7 +76,7 @@ Each motor is equipped with an encoder module. The encoder module is a quadratur
 
 \subsubsection*{Reset Logic}
 The controllers needs a reference point to initialise position measurement.
-The Reset module is responsible for resetting the pan or tilt frame to its index position. When a reset routine is enabled from the protocol module, the motors drives the pan-tilt frames with constant low duty cycle until a pulse from the index hall sensor is received.
+The Reset module is responsible for resetting the pan or tilt frame to its index position. When a reset routine is enabled from the protocol module, the motors drives the pan-tilt frames with constant low duty cycle until a pulse from the respective index hall sensors are received.
 
  Figure \ref{fig:FPGAFlowchartsResetLatchAndIndex} shows the flow in the process that receives the pulse from the index hall sensor. When it receives the pulse the module immediately brakes the motors while pulsing the Encoder module to reset its encoder value to 0. The Reset module has logic to drive the motors in the opposite direction when the speed of the motors has been zero for a set time-period as is necessary for the pan frame. Figure \ref{fig:FPGAFlowchartsResetDirection} shows a flowchart of the logic that is responsible for changing the direction. 
 
