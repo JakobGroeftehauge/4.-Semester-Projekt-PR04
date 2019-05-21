@@ -66,7 +66,7 @@ The logic implemented in the FPGA is divided into modules. Table \ref{tab:FPGAMo
 
 \subsubsection*{Encoder Logic}
 
-Each motor is equipped with an encoder module. The encoder module is a quadrature incremental encoder with 360 pulses for one revolution of the motor shaft. The encoder provides information via its two outputs channel A and channel B, from where a direction and a position relative to the previous position can be calculated. An index is provided, so a fixed reference is given for initialising the position measurement. The encoder module looks at channel A and B continuously and enables a count whenever a falling or rising edge occur on either of the channels. The angular velocity is calculated based on the assumption that change in position of the output shaft per encoder count is equal. Later this assumption was discovered to be wrong, the consequences will be discussed in section \ref{sec:Discussion}.
+Each motor is equipped with an Encoder module. The Encoder module is a quadrature incremental encoder with 360 pulses for one revolution of the motor shaft. The encoder provides information via its two outputs channel A and channel B, from where a direction and a position relative to the previous position can be calculated. An index is provided, so a fixed reference is given for initialising the position measurement. The Encoder module looks at channel A and B continuously and enables a count whenever a falling or rising edge occur on either of the channels. The angular velocity is calculated based on the assumption that change in position of the output shaft per encoder count is equal. Later this assumption was discovered to be wrong, the consequences will be discussed in section \ref{sec:Discussion}.
 
 
 % The distance between rising edges or falling edges of the same channel is the same, though still relative to the speed. However in between the falling edge and rising edge of one of the channels there must be an edge in either direction from the other channel and it is not guaranteed that this edge occurs with the same distance to the aforementioned rising and falling edge.  
@@ -76,9 +76,11 @@ Each motor is equipped with an encoder module. The encoder module is a quadratur
 
 \subsubsection*{Reset Logic}
 The controllers needs a reference point to initialise position measurement.
-The Reset module is responsible for resetting the pan or tilt frame to its index position. When a reset routine is enabled from the protocol module, the motors drives the pan-tilt frames with constant low duty cycle until a pulse from the respective index hall sensors are received.
+The Reset module is responsible for resetting the pan or tilt frame to its index position. When a reset routine is enabled from the Protocol module, the motors drives the pan-tilt frames with constant low duty cycle until a pulse from the respective index hall sensors are received. If the pan frame is stopped during a reset, due to physical limitations in the setup, the frame reverts the direction of rotation. When it receives the pulse the Reset module brakes the motors while pulsing the Encoder module to reset its encoder value to 0. Figure 
 
- Figure \ref{fig:FPGAFlowchartsResetLatchAndIndex} shows the flow in the process that receives the pulse from the index hall sensor. When it receives the pulse the module immediately brakes the motors while pulsing the Encoder module to reset its encoder value to 0. The Reset module has logic to drive the motors in the opposite direction when the speed of the motors has been zero for a set time-period as is necessary for the pan frame. Figure \ref{fig:FPGAFlowchartsResetDirection} shows a flowchart of the logic that is responsible for changing the direction. 
+
+ Figure \ref{fig:FPGAFlowchartsResetLatchAndIndex} shows the flow in the process that receives the pulse from the index hall sensor. When it receives the pulse the module immediately brakes the motors while pulsing the Encoder module to reset its encoder value to 0. 
+ The Reset module has logic to drive the motors in the opposite direction when the speed of the motors has been zero for a set time-period as is necessary for the pan frame. Figure \ref{fig:FPGAFlowchartsResetDirection} shows a flowchart of the logic that is responsible for changing the direction. 
 
 
 
