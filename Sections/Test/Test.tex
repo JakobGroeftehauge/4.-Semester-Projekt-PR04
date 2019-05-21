@@ -112,9 +112,9 @@ As seen in table \ref{tab:SPI-stresstest} the five test resulted in the same out
 This section concerns the test of the PID-controllers using different methods for tuning and constellations. The parameters used in each test is shown in figure:
 \begin{table}[H]
 \centering
-\begin{tabular}{l|l|l|l|l|l|l|l|l|}
+\begin{tabular}{c|c|c|c|c|c|c|c|c|}
       & \multicolumn{2}{l|}{Position Controllers} & \multicolumn{2}{l|}{Velocity Controller (tilt)} & \multicolumn{4}{c|}{Cascade Controller (tilt)}                                                                                                                                                                                \\ \hline
-      & Tilt                & Pan                 & ZN                      & PP                    & \begin{tabular}[c]{@{}l@{}}ZN\\ Position\end{tabular} & \begin{tabular}[c]{@{}l@{}}ZN\\ Velocity\end{tabular} & \begin{tabular}[c]{@{}l@{}}PP\\ Position\end{tabular} & \begin{tabular}[c]{@{}l@{}}PP\\ Velocity\end{tabular} \\
+      & Tilt                & Pan                 & ZN                      & PP                    & \begin{tabular}[c]{@{}c@{}}ZN\\ Position\end{tabular} & \begin{tabular}[c]{@{}c@{}}ZN\\ Velocity\end{tabular} & \begin{tabular}[c]{@{}c@{}}PP\\ Position\end{tabular} & \begin{tabular}[c]{@{}c@{}}PP\\ Velocity\end{tabular} \\
 $k_P$ & 9.450               & 4.920               & 0.519                   & 1.422                 & 8.740                                                 & 0.519                                                 & 7.528                                                 & 1.420                                                 \\ 
 $k_I$ & 8.550               & 3.170               & 22.860                  & 7.800                 & 7.640                                                 & 22.860                                                & 7.589                                                 & 7.800                                                 \\ 
 $k_D$ & 0.900               & 1.200               & 0.003                   & 0.065                 & 1.220                                                 & 0.003                                                 & 1.030                                                 & 0.065                                                 \\ 
@@ -205,7 +205,7 @@ The cascaded controller on the pan motor is executed using a reference point of 
 Table \ref{tab:controller_data} shows the data from the different tests. As it is seen none of the designed controllers satisfies all of the specifications of \SI{5}{\percent} overshoot, \SI{1,5}{\second} settling time and \SI{0,5}{\second} rise time, however some achieved better results than others. However the single PID position controller seems to have the overall best performance in relation the the requirement specifications. The reason for the deviations comparing the simulation and the measured are discussed in section \ref{sec:Discussion}.
 \begin{table}[H]
     \centering
-    \begin{tabular}{l|c c c}
+    \begin{tabular}{l|c|c|c}
          Controller & Overshoot & Settling Time  & Rise Time \\ \hline
          Position controller/pan motor/pole placement & 14.3 \% & 8.27 & 1.74 s \\
          Position controller/tilt motor/pole placement & 0.8 \% & 2.86 s & 0.34 s \\
@@ -216,7 +216,7 @@ Table \ref{tab:controller_data} shows the data from the different tests. As it i
          Cascade controller/pan motor/Ziegler-Nichols & 6.6 \% & 3.78 s & 1.13 s \\
          
     \end{tabular}
-    \caption{Controller performance. Test data described by "controller type/motor/method".}
+    \caption{Controller performance. Test data described by controller type/motor/method.}
     \label{tab:controller_data}
 \end{table}
 
