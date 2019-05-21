@@ -132,41 +132,34 @@ The Protocol decoder logic block act as an interface between the SPI connection 
 
 \subsubsection*{SPI Logic}
 
-On figure \ref{fig:SPILogicSimple} an overview of the SPI module is shown. The module contains seven internal slaves. Four slaves hold the information used for the controllers in the microcontroller. Two holds the PWM provided by the microcontroller, needed to control the voltage supplied to the motors. The last slave is used for the Protocol module. The microcontroller is the master device controlling the slaves. The microcontrolle can access the slaves via a 4 -  
+On figure \ref{fig:SPILogicSimple} an overview of the SPI module is shown. The module contains seven internal slaves. Four slaves hold the information used for the controllers in the microcontroller. Two holds the PWM provided by the microcontroller, needed to control the voltage supplied to the motors. The last slave is used for the Protocol module. The microcontroller is the master device controlling the slaves and can access a specific slave by using a 4-bit address. The address is decoded in the FPGA by the slave select decoder, seen on figure \ref{fig:SPILogicSimple}. SSEN is used to enable the decoder, where as SS1-SS4 is for the address. Master-out-slave-in (MOSI) transfers data from the microcontroller to the slaves. Master-in-slave-out (MISO) transfers data from the FPGA to the microcontroller. A data transfer is controlled by the serial clock (SCK) by shifting data from the slave to the master and vice versa at the same time. The SCK is controlled by microcontroller, why the FPGA only has to keep the slave registers updated with newest value. This only holds for the slave registers containing velocity and position data. 
 
-In order for the microcontroller to access a specfic slave, it asks for an address
-
-the microcontroller can select one of four slaves by  wires. 
-
-
-
-The timing of the SPI connection is regulated by the microcontroller, why the FPGA is only responsible for storing the sampled values in the 
 
 
 
 %It contains seven internal slaves where four of them hold information needed by the microcontroller, two hold the PWM and directed from the microcontroller that is needed to control the motors and the last slave is used to give certain messages to the FPGA to initialise different states.
 
-When a specific kind of data is needed, the microcontroller set the slave select, SS, according to the slave number, low and the decoder activates the slave requested. When transmitting data only one slave can be active at any time and as default the output of a slave is low witch enables that active slave to take over MISO when OR'ed together with the other slaves. The Slave Select Enable, SSEN, is controlled by the hardware of the microcontroller and is used as an enable pin for the SPI. The values of the internal slaves is constantly updated and always contains the newest data, but when the data needs to be transmitted a latch is used to avoid the data changing while transmitting. 
-When data is transmitted to the FPGA the same method is used. Rhe decoder activates a specific slave and only the active slave can access the data on MOSI. The data received is first available to other modules on the FPGA when the transmission is complete. 
+% When transmitting data only one slave can be active at any time and as default the output of a slave is low witch enables that active slave to take over MISO when OR'ed together with the other slaves. The Slave Select Enable, SSEN, is controlled by the hardware of the microcontroller and is used as an enable pin for the SPI. The values of the internal slaves is constantly updated and always contains the newest data, but when the data needs to be transmitted a latch is used to avoid the data changing while transmitting. 
+% When data is transmitted to the FPGA the same method is used. Rhe decoder activates a specific slave and only the active slave can access the data on MOSI. The data received is first available to other modules on the FPGA when the transmission is complete. 
 
-\begin{figure}[h]
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Implementation/Images/FPGAStateDiagramReceiveSPI.pdf}
-    \caption{SPI receive state diagram}
-    \label{subfig:FPGAStateDiagramReceiveSPI}
-\end{subfigure}\quad
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Implementation/Images/FPGAStateDiagramTransmitSPI.pdf}
-    \caption{SPI transmit state diagram}
-    \label{subfig:FPGAStateDiagramTransmitSPI}
-\end{subfigure}
-\caption{State diagrams for the SPI-module on the FPGA}
-\label{fig:FPGAStateDiagramsSPI}
-\end{figure}
+% \begin{figure}[h]
+% \begin{subfigure}{0.48\textwidth}
+%     \includegraphics[width = 0.97\textwidth]{Sections/System_Implementation/Images/FPGAStateDiagramReceiveSPI.pdf}
+%     \caption{SPI receive state diagram}
+%     \label{subfig:FPGAStateDiagramReceiveSPI}
+% \end{subfigure}\quad
+% \begin{subfigure}{0.48\textwidth}
+%     \includegraphics[width = 0.97\textwidth]{Sections/System_Implementation/Images/FPGAStateDiagramTransmitSPI.pdf}
+%     \caption{SPI transmit state diagram}
+%     \label{subfig:FPGAStateDiagramTransmitSPI}
+% \end{subfigure}
+% \caption{State diagrams for the SPI-module on the FPGA}
+% \label{fig:FPGAStateDiagramsSPI}
+% \end{figure}
 
 \clearpage
 
-Figure \ref{ig:FPGAStateDiagramsSPI} illustrates the implementation of SPI on the FPGA. A SPI slave is activated when the associated slave select goes low. Using the clock received from the master, the SPI slave is notified when to transmit and ready data on MOSI. This is done simultaneously utilising the multitasking abilities of the FPGA. Two events can trigger the Slave to change state to ready again, either the slave is done transmitting and receiving or the slave select goes high again. When this happens the module resets and is ready to be used when triggered.
+% Figure \ref{ig:FPGAStateDiagramsSPI} illustrates the implementation of SPI on the FPGA. A SPI slave is activated when the associated slave select goes low. Using the clock received from the master, the SPI slave is notified when to transmit and ready data on MOSI. This is done simultaneously utilising the multitasking abilities of the FPGA. Two events can trigger the Slave to change state to ready again, either the slave is done transmitting and receiving or the slave select goes high again. When this happens the module resets and is ready to be used when triggered.
 
 % \begin{figure}[]
 %     \centering

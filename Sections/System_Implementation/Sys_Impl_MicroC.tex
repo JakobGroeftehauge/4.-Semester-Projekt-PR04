@@ -23,24 +23,17 @@
 \subsubsection*{System overview}
 \label{subsec:SystemImplementationOperatingSystem}
 
-As described in the section \ref{} the microcontroller has to request data from the encoders.  Making it imperative for the microcontroller to be responsible for the overall timing of the system. It has been decided to accommodate cascaded (2. Order ) PID-controller on each motor, yielding a total 4 task needed to be scheduled regarding the motor control. Furthermore the microcontroller also needs to handle the user interface 
+As described in the section \ref{subsec:SystemImplemtationFPGA} the microcontroller is responsible for getting data from specific slaves at the FPGA. Making it imperative that the microcontroller is in control of the overall timing of the system. As described in the requirements section \ref{sec:Requirements}, it is decided to accommodate cascaded controller consisting of two PID-controllers on each motor, yielding a total of 4 tasks needed to be scheduled regarding the motor control. Furthermore the microcontroller also needs to handle the user interface. 
 
-has to obtain the data regarding the pan-tilt system. 
+To implement the PID-controller on the micocro
 
+In order for the discrete controllers to work the interval 
 
-As described in the analysis section \ref{sec:ProblemDescription} the microcontroller has to receive data from the FPGA, and with that be able to control the robot using PID-controllers. To ensure that the controllers
-
-
-As described in section \ref{sec:ProblemDescription} the microcontroller has to receive the data collected by the FPGA, in order to run the PID-controllers. 
-%Timing
-As described in section \ref{sec:ProblemDescription} the microcontroller is responsible for running the PID-controllers. To do this receiving the data collected by the FPGA is 
-
-As described in section \ref{sec:ProblemDescription} the microcontroller has to obtain data from the FPGA with a specific frequency, set by the microcontroller, to be able to run a proper PID-controller. 
+The four controller tasks need to 
 
 
-In order to control the robot using the designed PID-controllers, it is imperative that the microcontroller can set and control a specific frequency of how often each of the controllers must be scheduled. Ideally the inner controllers i.e. the velocity controllers, should run and process velocity data received from the FPGA as it is received without any buffer delay. 
 
-As described in section \ref{sec:Requirements} it is wanted to implement controllers in cascade, thus two controllers are needed for each motor. This results in four tasks that need to run with predetermined time intervals in real-time. Furthermore a User interface (UI) task for handling user input and a SPI task for sending and receiving data, will need CPU time. By assigning a lower priority to the UI and SPI tasks it is ensured that tasks with higher priority is prioritised when scheduling. This would also keep timing of the time critical controller tasks intact. 
+This results in four tasks that need to run with predetermined time intervals in real-time. Furthermore a User interface (UI) task for handling user input and a SPI task for sending and receiving data, will need CPU time. By assigning a lower priority to the UI and SPI tasks it is ensured that tasks with higher priority is prioritised when scheduling. This would also keep timing of the time critical controller tasks intact. 
 
 For the PID-controllers to be able to receive data from the FPGA, SPI is used as mentioned in section \ref{subsec:SystemImplemtationFPGA}. When data is received from the slaves, it is put in buffers accessible only by specific controllers in order for the cascade control to work. To avoid critical section problems with several tasks trying to access the same buffers at the same time, mutex' is implemented. Output from each cascade must then go back to SPI for it to be delivered to the correct slaves. Figure (\ref{fig:OverviewTaskDiagramSimple}) shows a simple overview of the tasks and how they are coupled. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}.
 

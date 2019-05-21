@@ -159,7 +159,7 @@ To verify the performance of the controllers, the tilt and pan motor systems, wi
 \end{figure}
 
 
-\subsection{Velocity Controller Design}
+\subsection{Velocity Controller Design} \label{subsec:vel_controller_design}
 As mentioned in section \ref{sec:Delimination}, it is wanted to explore the performance of a cascaded controller design. To achieve this, a velocity controller must be designed. The range of motion for the pan motor is physically fairly limited. Therefore it has been prioritised to focus on designing a velocity controller for the tilt motor, as the unlimited range makes testing the velocity controller possible, without jeopardising the pan-tilt system. Two different methods of designing velocity controllers will be explored. One will use the pole placement approach used in section \ref{subsec:position_control_model}, the other will utilise the Ziegler-Nichols approach, which can be used without a mathematical model of the system to be controlled.
 When working with a cascaded control design, it is desired that any inner controllers are faster than the outer loop, as well as critically or over damped. It is therefore worked towards designing a controller yielding no overshoot while still achieving a fast rise time.
 
@@ -274,7 +274,7 @@ The phase and gain margins are also examined for the velocity controller with th
 % \label{fig:vel_stability_plots}
 % \end{figure}
 
-Looking at the step responses for the model based and Ziegler-Nichols based controller designs, shown in figure \ref{fig:vel_step}, it can be seen that as expected the model based controller meets the requirement of no overshoot, while the Ziegler-Nichols method does not. The latter does have a shorter rise time though.
+Looking at the step responses for the model based and Ziegler-Nichols based controller designs, shown in figure \ref{fig:vel_step}, it can be seen that as expected the model based controller meets the requirement of no overshoot, while the Ziegler-Nichols method does not. It must be noted however, that the model based design asks for a much larger control signal, $u$, which can lead to saturation issues when larger references are introduced.
 
 \begin{figure}[h]
 \begin{subfigure}{0.48\textwidth}
@@ -301,54 +301,57 @@ Looking at the step responses for the model based and Ziegler-Nichols based cont
 %Maybe quickly introduce the idea behind cascade, or refer to the section where it is mentioned. Show a block diagram. Argue why, if the case, only the tilt motor is examined (should we include both?).
 
 \subsection{Cascaded Controller Design}
-A cascaded controller utilizes multiple PID for controllers to control a plant. The cascade controller has a outer controller feeding an inner controller, a cascade controller can consist of more than than one nested controller, though this project will only focus on cascaded controllers with one nested controller. Each controller will regulate different parameters, therefore it is a prerequisite that there is a correlation between the parameters controlled by the different controllers. The advantages of using a cascade controller compared to a single controller, is better disturbance rejection and lower sensitivity to parameter variation. 
+% A cascaded controller utilises multiple PID for controllers to control a plant. The cascade controller has an outer controller feeding an inner controller, a cascade controller can consist of more than than one nested controller, though this project will only focus on cascaded controllers with one nested controller. Each controller will regulate different parameters, therefore it is a prerequisite that there is a correlation between the parameters controlled by the different controllers. The advantages of using a cascade controller compared to a single controller, is better disturbance rejection and lower sensitivity to parameter variation. 
 \begin{figure}[H]
     \centering
     \includegraphics[width = 0.7 \textwidth]{Sections/System_Design/Images/cascade_controller.pdf}
     \caption{Block diagram of a cascaded controller. $K_{Pos}$ being the position controller, $K_{Vel}$ being the velocity controller, $P_{Vel}$ returns the velocity of the plant and $P_{Pos}$ returns the position of the plant.}
     \label{fig:cascaded_design}
 \end{figure}
-Figure \ref{fig:cascaded_design} shows the principles of the cascaded controller design. Designing the inner controller, i.e. the velocity controller has been described above. From the figure it can be seen that when designing the outer position controller, the inner controller has to be regarded as part of the plant. From figure \ref{fig:cascaded_design} the transfer function in equation \ref{eq:tf_cascaded_design} can be derived.
-\begin{equation} \label{eq:tf_cascaded_design}
-    \frac{\theta}{V}=\frac{K_{pos}\cdot\frac{K_{vel}\cdot P_{vel}}{1+K_{vel}\cdot P_{vel}}\cdot P_{pos}}{1+ K_{pos}\cdot\frac{K_{vel}\cdot P_{vel}}{1+K_{vel}\cdot P_{vel}}\cdot P_{pos}}
-\end{equation}
-Since it has been decided to focus on only designing velocity controllers for the tilt motor, it only makes sense to also focus the cascaded design on the tilt motor.
-When considering the plant as the combination of the closed-loop velocity control system and an integrator to transfer from velocity to position, the design approach is going to be the same as have been used throughout most of this section. 
-Figure \ref{fig:RL_cascade} shows that as expected, the poles and zeros accruing to the closed-loop velocity control systems, appear as open-loop poles and zeros in the root locus plot of the position control system. To design the PID position controllers, very similar zero placements methods  are used. In the case of the model based velocity controller, zeros are placed at $s = 6.1$ and $s = 1.2$ while for the Ziegler-Nichols based controller zeros are placed at $s = 6.2$ and $s = 1$. Even though the zeros accruing to the PID-controllers are placed almost identically, the root loci are quite different due to the different poles and zeros accruing to the velocity controllers. From the closed-loop pole locations, it is expected that the response from the control system based on the Ziegler-Nichols tuning will have a faster response, but also quite a bit more overshoot. From the bode plots in figure \ref{fig:cascade_bode} it can be seen that the sampling frequency of \SI{1000}{\hertz} is still easily sufficient. From the phase and gain margins shown in figure \ref{fig:cascade_stability} it can be seen that the Ziegler-Nichols based design has a slightly smaller phase margin at \SI{75.7}{\degree} to the \SI{118}{\degree} of the model based design.
+Figure \ref{fig:cascaded_design} shows the principles of the cascaded controller design. Designing the inner controller, i.e. the velocity controller has been described in section \ref{subsec:vel_controller_design}. From the figure it can be seen that when designing the outer position controller, the inner controller has to be regarded as part of the plant. 
+%From figure \ref{fig:cascaded_design} the transfer function in equation \ref{eq:tf_cascaded_design} can be derived.
+
+% \begin{equation} \label{eq:tf_cascaded_design}
+%     \frac{\theta}{V}=\frac{K_{pos}\cdot\frac{K_{vel}\cdot P_{vel}}{1+K_{vel}\cdot P_{vel}}\cdot P_{pos}}{1+ K_{pos}\cdot\frac{K_{vel}\cdot P_{vel}}{1+K_{vel}\cdot P_{vel}}\cdot P_{pos}}
+% \end{equation}
+
+Since it has been decided to focus on only designing velocity controllers for the tilt motor, it is only relevant to focus the cascaded design on the tilt motor. 
+When considering the plant as the combination of the closed-loop velocity control system and an integrator to transfer from velocity to position, the design approach is identical as have been used throughout most of this section. 
+Figure \ref{fig:RL_cascade} shows that as expected, the poles and zeros stemming from the closed-loop velocity control systems, appear as open-loop poles and zeros in the root locus plot of the position control system. To design the PID position controllers, very similar zero placements methods  are used. In the case of the model based velocity controller, zeros are placed at $s = 6.1$ and $s = 1.2$ while for the Ziegler-Nichols based controller zeros are placed at $s = 6.2$ and $s = 1$. Even though the zeros stemming from the PID-controllers are placed almost identically, the root loci are quite different due to the different poles and zeros stemming from the velocity controllers. From the closed-loop pole locations, it is expected that the response from the control system based on the Ziegler-Nichols tuning will have a faster response, but also quite a bit more overshoot. From the bode plots to be found in the digital appendix, outlined in section \ref{sec:digital_appendix} it can be seen that the sampling frequency of \SI{1000}{\hertz} is sufficient. From the phase and gain margins plot, also to be found in the digital appendix, it can be seen that the Ziegler-Nichols based design has a slightly smaller phase margin at \SI{75.7}{\degree} to the \SI{118}{\degree} of the model based design.
 % If both the pole placement and Ziegler-Nichols approaches are examined, maybe they should be presented in the same plots.
 
 \begin{figure}[h]
 \begin{subfigure}{0.48\textwidth}
     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/RL_cascadePP.png}
-    \caption{Controller design based on model.}
+    \caption{Cascade control with velocity controller based on model.}
     \label{fig:RL_cascade_PP}
 \end{subfigure}\quad
 \begin{subfigure}{0.48\textwidth}
     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/RL_cascadeNZ.png}
-    \caption{Maybe add the bode plot the ziegler nichols here.}
+    \caption{Cascade control with velocity controller based on Ziegler-Nichols.}
     \label{fig:RL_cascade_NZ}
 \end{subfigure}
-\caption{Bode plots of the closed-loop system with velocity controllers designed using the model and using the Ziegler-Nichols method.}
+\caption{Root locus plots for the cascade control systems based on velocity controllers designed using the model and Ziegler-Nichols.}
 \label{fig:RL_cascade}
 \end{figure}
 
-Looking at the step responses for the two designs, shown in figure \ref{fig:cascade_step}, it can be seen that, ideally, both methods perform quite well in regards to the specifications in table \ref{tab:performanceSpec}, although the settling time requirement cannot quite be met. The Ziegler-Nichols based design gives slightly less overshoot, but does give a strange and unwanted transient response. This is only the case when saturation is not considered. In the case when saturation is considered, the Ziegler-Nichols based design performs better in terms of overshoot, while both give a settling time which does not quite comply with the specifications.
+Looking at the step responses for the two designs, shown in figure \ref{fig:cascade_step}, it can be seen that, ideally, both methods perform quite well in regards to the specifications in table \ref{tab:performanceSpec}, although the settling time requirement cannot quite be met. The Ziegler-Nichols based design gives slightly less overshoot, but does give an unwanted transient response. This is only the case when saturation is not considered. In the case when saturation is considered, the Ziegler-Nichols based design performs better in terms of overshoot, while both give a settling time which does not quite comply with the specifications.
 
 \begin{figure}[h]
 \begin{subfigure}{0.48\textwidth}
     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_y_sat.png}
     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_u_sat.png}
     \caption{Systems with saturation included.}
-    \label{fig:RL_cascade_PP}
+    \label{fig:cascade_step_PP}
 \end{subfigure}\quad
 \begin{subfigure}{0.48\textwidth}
     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_y_NoSat.png}
     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_u_NoSat.png}
     \caption{Systems without saturation.}
-    \label{fig:RL_cascade_NZ}
+    \label{fig:cascade_step_NZ}
 \end{subfigure}
 \caption{Bode plots of the closed-loop system with velocity controllers designed using the model and using the Ziegler-Nichols method.}
-\label{fig:RL_cascade}
+\label{fig:cascade_step}
 \end{figure}
 
 % Present the root locus, maybe the bode plot, and the stability margins.
@@ -358,5 +361,5 @@ Looking at the step responses for the two designs, shown in figure \ref{fig:casc
 
 
 \subsection{Conclusion}
-
+Controller gains have been determined for PID-controllers based on different design methods. Based on a single controller design, position controllers have been designed for the pan and the tilt motors. This has been done purely based on the mathematical models of the motors. Furthermore, velocity controllers have been designed for the tilt motor, allowing for the design of a cascaded design. One velocity controller has been designed based on the model and another based on the heuristic Ziegler-Nichols method. Using the designed velocity controllers as inner loops, cascaded position controllers have been designed.
 \end{document}

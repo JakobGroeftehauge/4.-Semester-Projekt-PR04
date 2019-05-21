@@ -25,29 +25,29 @@ As described in section \ref{subsec:SystemImplemtationFPGA} the encoder provided
 
 The difference as seen from equation \ref{eq:PercantageIncreaseEncoderProblem} is significant. In this section the consequences of this encoder behaviour and the fact that little is done to compensate for the behaviour and what could have been done is discussed.
 
-\begin{wraptable}{R}{0.3\textwidth}
+\begin{table}[H]
     \centering
-    \begin{tabular}{c}
-         Time period (ms) \\
-         \hline
-         1.28 \\
-         1.52 \\
-         1.42 \\
-         1.4 \\
-         1.34 \\
-         1.66 \\
-         1.04 \\
-         1.66 \\
-         1.26 \\
-         1.38 \\
-         1.34 \\
-         1.6 \\
-         1.22 \\
-         \hline
+    \begin{tabular}{c c c c c c c c c c c c c c c}
+         \multicolumn{13}{c}{Time period (ms)} \\ \hline
+         
+         1.28 &
+         1.52 &
+         1.42 &
+         1.4  &
+         1.34 &
+         1.66 &
+         1.04 &
+         1.66 &
+         1.26 &
+         1.38 &
+         1.34 &
+         1.6  &
+         1.22 
+       
     \end{tabular}
-    \caption{The time period between encoder edges, measured in milliseconds with a duty cycle of \SI{77}{\percent} }
+    \caption{The time period between encoder edges measured in milliseconds with a duty cycle of \SI{77}{\percent}.}
     \label{tab:EncoderDifferenceBetweenEdges}
-\end{wraptable}
+\end{table}
 
 There is basically two ways to determine the speed from encoder readings. One way is to count the encoder ticks within
 a constant time period, providing more precise readings when the speed is high, because the amount of encoder ticks is higher. The other way is to count time ticks between encoder ticks, providing more precise readings when the speed is low, as the amount of time ticks between encoder ticks is higher. In this project the latter method is chosen, though the issue with the inconsistent distance between encoder ticks is relevant for both methods.      
