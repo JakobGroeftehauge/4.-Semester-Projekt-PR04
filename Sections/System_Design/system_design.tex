@@ -86,7 +86,7 @@ Through experimentation it has been found that placing zeros at $9.5$ and $1$ fo
         Cascade Ziegler-Nichols     & 8.78 & 7.64 & 1.22    \\
         \hline
     \end{tabular}
-    \caption{Controller gains found from the different design methods }
+    \caption{Controller gains found from the different design methods. }
     \label{tab:pos_controller_gains}
 \end{table}
 
@@ -161,6 +161,7 @@ To verify the performance of the controllers, the tilt and pan motor systems, wi
 
 \subsection{Velocity Controller Design}
 As mentioned in section \ref{sec:Delimination}, it is wanted to explore the performance of a cascaded controller design. To achieve this, a velocity controller must be designed. The range of motion for the pan motor is physically fairly limited. Therefore it has been prioritised to focus on designing a velocity controller for the tilt motor, as the unlimited range makes testing the velocity controller possible, without jeopardising the pan-tilt system. Two different methods of designing velocity controllers will be explored. One will use the pole placement approach used in section \ref{subsec:position_control_model}, the other will utilise the Ziegler-Nichols approach, which can be used without a mathematical model of the system to be controlled.
+When working with a cascaded control design, it is desired that any inner controllers are faster than the outer loop, as well as critically or over damped. It is therefore worked towards designing a controller yielding no overshoot while still achieving a fast rise time.
 
 \subsubsection{Ziegler-Nichols Tuning}
 %The Ziegler-Nichols tuning method provides a method for tuning a PID-controller without knowing specific information about the dynamics of the plant. 
@@ -172,12 +173,16 @@ The Ziegler-Nichols method uses the step response of the physical system to calc
 \end{equation}
 
 where $A$ is a steady-state magnitude, $\tau$ is a time constant and $t_{d}$ is time delay.
-To calculate the controller gains a set of equations are provided. The equations differ depending on the controller type, the equations used for calculating the gains for a PID-controller can be seen in equations \ref{eq:controllerGains}. The constants $R$ and $L$ are identified from the step response. $R$ is found by drawing the tangent to the steepest part of the transition between zero and the reference. The gradient of the tangent is equal to $R$. $L$ is equal to the latency of the system, and is defined as the distance between the y-axis and the intersection between the tangent and the x-axis. 
+To calculate the controller gains a set of equations are provided. The equations differ depending on the controller type, the equations used for calculating the gains for a PID-controller can be seen in equations \ref{eq:controllerGains},
 
 \begin{equation}
-k_p = \frac{1.2}{RL}, \quad k_i = \frac{k_p}{2L}, \quad k_d = \frac{k_p}{0.5L}
+k_p = \frac{1.2}{RL}\;, \quad k_i = \frac{k_p}{2L}\;, \quad k_d = \frac{k_p}{0.5L} \qquad ,
 \label{eq:controllerGains}
 \end{equation}
+
+where the constants $R$ and $L$ are identified from the step response. $R$ is found by drawing the tangent to the steepest part of the transition between zero and the reference. The gradient of the tangent is equal to $R$. $L$ is equal to the latency of the system, and is defined as the distance between the y-axis and the intersection between the tangent and the x-axis. 
+
+
 
 \begin{figure}
     \centering
@@ -186,10 +191,10 @@ k_p = \frac{1.2}{RL}, \quad k_i = \frac{k_p}{2L}, \quad k_d = \frac{k_p}{0.5L}
     \label{fig:stepPlantNZ}
 \end{figure}
 
-In figure \ref{fig:stepPlantNZ} the data point sampled from the step response of the physically  system is plotted. The Curve Fitting tool in MATLAB has then been used to fit a curve that fits the points, it is displayed as the red line. The red line is described as the expression introduced in equation \ref{eq:NZ_plant_eq}. Using MATLAB, $R$ and $L$ are found as seen in equation \ref{eq:R_and_L}.
+In figure \ref{fig:stepPlantNZ} the data point sampled from the step response of the physically  system is plotted. The Curve Fitting tool in MATLAB has then been used to fit a curve that fits the points, it is displayed as the red line. The red line is described as the expression introduced in equation \ref{eq:NZ_plant_eq}. Using MATLAB, $R$ and $L$ are found as seen in equation \ref{eq:R_and_L},
 
 \begin{equation}
-    R = 203.4 \quad L = 11.4 \cdot 10^{-3} 
+    R = 203.4 \;, \quad L = 11.4 \cdot 10^{-3} \qquad .
     \label{eq:R_and_L}
 \end{equation}
 
@@ -201,21 +206,19 @@ Using the found values for R and L from equation \ref{eq:R_and_L} and the equati
 % \end{equation}
 
 
-\begin{figure}
-    \centering
-    \includegraphics[width = 1\textwidth]{Sections/System_Design/Images/Step_Implemented_NZ.png}
-    \caption{Closed-loop velocity step response of the controller tuned using Ziegler-Nichols.}
-    \label{fig:NZ_implemented}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width = 1\textwidth]{Sections/System_Design/Images/Step_Implemented_NZ.png}
+%     \caption{Closed-loop velocity step response of the controller tuned using Ziegler-Nichols.}
+%     \label{fig:NZ_implemented}
+% \end{figure}
 
 
-In figure \ref{fig:NZ_implemented} the measured step response using the calculated gains seen in equation \ref{eq:controllerGainsCal} is plotted. 
+%In figure \ref{fig:NZ_implemented} the measured step response using the calculated gains seen in equation \ref{eq:controllerGainsCal} is plotted. 
 
-(Kom med forklaring på, hvorfor der er steady state error)
 
-\subsubsection{Model Based Controller Design}
-When working with a cascaded control design, it is desired that any inner controllers are faster than the outer loop, as well as critically or over damped. It is therefore worked towards designing a controller yielding no overshoot while still achieving a fast rise time.
-The procedure for designing the velocity controller based on the model is very similar to the approach used for designing the position controllers above. The main difference is that open-loop system now has one less pole at the origin, as the only pole at the origin originates from the integral term of the PID-controller. As seen on figure \ref{fig:vel_root_locus}, it has been found that placing the zeros accruing to the PID-controller at $s = -10$ and $s = -12$, yields adequate root loci. This placement allows the close loop poles to be moved fairly far into the left half plane, while still remaining directly on the real axis. A gain value of $0.065$ is chosen. The closed-loop pole locations are also visible from the figure. The closed-loop pole and zero locations can be compared to the pole and zero locations given by the Ziegler-Nichols tuning shown in figure \ref{fig:ZN_pole_zero}.
+\subsubsection{Model Based Velocity Controller Design}
+The procedure for designing the velocity controller based on the model is very similar to the approach used for designing the position controllers mentioned in section \ref{subsec:position_control_model}. The main difference is that the open-loop system now has one less pole at the origin, as the only pole at the origin originates from the integral term of the PID-controller. As seen on figure \ref{fig:vel_root_locus}, it has been found that placing the zeros accruing to the PID-controller at $s = -10$ and $s = -12$, yields adequate root loci. This placement allows the close loop poles to be moved fairly far into the left half plane, while still remaining directly on the real axis. A gain value of $0.065$ is chosen. The closed-loop pole locations are also visible from the figure. The closed-loop pole and zero locations can be compared to the pole and zero locations given by the Ziegler-Nichols tuning shown in figure \ref{fig:ZN_pole_zero}.
 
 \begin{figure}[h]
 \begin{subfigure}{0.48\textwidth}

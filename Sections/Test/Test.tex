@@ -2,7 +2,7 @@
 \begin{document}
 This section will introduce the tests prompted by the requirements in section \ref{sec:Requirements} and present the results. These results will determine whether it has been possible to comply with the requirement specifications. Additional data from the tests can be seen in the digital appendix. 
 
-To ease access to data from the FPGA during tests, a \textit{micro blaze} has been implemented, which utilises UART to communicate directly with a computer. This allows for direct access to the position and velocity of the pan and tilt motor making data processing easier. 
+To ease access to data from the FPGA during tests, a \textit{microblaze} has been implemented, which utilises UART to communicate directly with a computer. This allows for direct access to the position and velocity of the pan and tilt motor making data processing easier. 
 
 \subsection{Microcontroller Timing Test}
 Running multiple tasks on one microcontroller it is imperative to know, how much of the CPU time is utilised. If the CPU utilises too much time the risk of starvation is introduced, thus it is wanted to test whether the system can satisfy the requirement from section \ref{sec:Requirements}: 
@@ -72,32 +72,32 @@ Initially the microcontroller was tested with only one controller, namely veloci
 
 \subsubsection*{Results}
 
-As seen on table \ref{tab:Single_Controller_test} the PID-controller has a maximum average processing time of $\SI{111,08}{\mu \second}$ with a 8th order derivative filter. In accordance with the requirement specification this is sufficient for a single controller. It was however desired to test the influence of the the derivative term and the additional filter on the derivative term. According to the test, the derivative term as implemented in the project adds an average of $\SI{16,68}{\mu\second}$ to the processing time.
+As seen on table \ref{tab:Single_Controller_test} the PID-controller has an average processing time of $\SI{111,08}{\mu \second}$ with an 8th order derivative filter. In accordance with the requirement specification this is sufficient for a single controller. %It was however desired to test the influence of the derivative term and the additional filter on the derivative term. According to the test, the derivative term as implemented in the project adds an average of $\SI{16,68}{\mu\second}$ to the processing time.
 
 \begin{table}[H]
 \begin{tabular}{l|c|r|r|r|r|rl}
 \textbf{Controller (Velocity)} & \multicolumn{1}{l|}{\textbf{Filter order}} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \multicolumn{1}{r|}{\textbf{5}} & \multicolumn{1}{r}{\textbf{Unit}}                                  \\ \hline
 PID-controller                    & 4                                 & 104,4 & 104,4 & 104,6 & 104,6 & \multicolumn{1}{r|}{117,8} & \SI{}{\mu\second}      \\
-PID with different number of tabs & 6                                 & 107,8 & 107,8 & 108   & 107,8 & \multicolumn{1}{r|}{108}   & \SI{}{\mu\second}        \\
+\multicolumn{1}{c|}{-}  & 6                                 & 107,8 & 107,8 & 108   & 107,8 & \multicolumn{1}{r|}{108}   & \SI{}{\mu\second}        \\
 \multicolumn{1}{c|}{-}            & 8                                 & 111,2 & 111   & 110,8 & 111,2 & \multicolumn{1}{r|}{111,2} & \SI{}{\mu\second}        \\
-PID without filter                & -                                 & 95,2  & 95,6  & 94,6  & 94,2  & \multicolumn{1}{r|}{95,2}  & \SI{}{\mu\second}        \\
-PI without D-term                 & -                                 & 94,4  & 94,4  & 94,6  & 94,2  & 94,4                       & \SI{}{\mu\second}     
+% PID without filter                & -                                 & 95,2  & 95,6  & 94,6  & 94,2  & \multicolumn{1}{r|}{95,2}  & \SI{}{\mu\second}        \\
+% PI without D-term                 & -                                 & 94,4  & 94,4  & 94,6  & 94,2  & 94,4                       & \SI{}{\mu\second}     
 \end{tabular}
-\caption{Data regarding the duration of processing the position controller. The filter order is regarding the filter filtering the derivative term of the controller. All tests are made with a third order filter of the input.}
+\caption{Data regarding the duration of processing the position controller. The filter order is regarding the filter filtering the derivative term of the controller. All tests are made with a third order filter for the input.}
 \label{tab:Single_Controller_test}
 \end{table}
 \subsubsection*{Conclusion}
 A maximum allowed processing time for a single PID-controller is determined to be of $\SI{160}{\mu\second}$. Furthermore the processing time of a single PID-controller is tested with different parameters. A maximum processing time of $\SI{111,2}{\mu\second}$ is found, thus satisfying the requirement. 
 
 \subsection{SPI Stress Test}
-Using SPI as the only communication between the FPGA and the microcontroller it is essential to test the reliability of the system to assure that no information is lost. 
+Using SPI as the only communication between the FPGA and the microcontroller, it is essential to test the reliability of the system to assure that no information is lost during transmission. 
 \begin{itemize}
-    \item At a transmission frequency of 2KHz the FPGA are to receive 10000/10000 messages correct with no errors.
+    \item Using SPI with a transmission frequency of \SI{2}{\kilo\hertz}, the FPGA is to receive 10000/10000 messages correct with no errors.
 \end{itemize}
-The test was preformed by sending 10000 messages from the microcontroller to the FPGA. Each messages contain the value of a counter, stating with 0 and going to 9999. Each message is then sent out to a computer with the help of the micro blaze and processed to check if all values are present and in the right sequence.    
+The test was preformed by sending 10000 messages from the microcontroller to the FPGA. Each message contains the value of a counter, starting at 0 and incrementing to 9999. Subsequent is each message transmitted to a computer with the help of the microblaze, and processed to check if all values are present and in the correct sequence.    
 \begin{table}[H]
 \centering
-\begin{tabular}{cccc}
+\begin{tabular}{c|c|c|c}
 Test no. & Transmission Rate {[}kHz{]} & Msg. sent & Msg. received \\ \hline
 1-5 & 2 & 10000 & 10000
 \end{tabular}
@@ -105,20 +105,19 @@ Test no. & Transmission Rate {[}kHz{]} & Msg. sent & Msg. received \\ \hline
 \label{tab:SPI-stresstest}
 \end{table}
 
-As seen in table \ref{tab:SPI-stresstest} the five test resulted in the same outcome, with all messages being received and in the correct sequence as sent. 
+As seen in table \ref{tab:SPI-stresstest} the five test resulted in the same outcome, with all messages being received and in the correct sequence. 
 
 \subsection{Test of Controller Designs}
 %opdeling af afsnit
 This section concerns the test of the PID-controllers using different methods for tuning and constellations. The parameters used in each test is shown in figure:
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|l|l|l|l|l|l|l|}
-\hline
+\begin{tabular}{l|l|l|l|l|l|l|l|l|}
       & \multicolumn{2}{l|}{Position Controllers} & \multicolumn{2}{l|}{Velocity Controller (tilt)} & \multicolumn{4}{c|}{Cascade Controller (tilt)}                                                                                                                                                                                \\ \hline
-      & Tilt                & Pan                 & ZN                      & PP                    & \begin{tabular}[c]{@{}l@{}}ZN\\ Position\end{tabular} & \begin{tabular}[c]{@{}l@{}}ZN\\ Velocity\end{tabular} & \begin{tabular}[c]{@{}l@{}}PP\\ Position\end{tabular} & \begin{tabular}[c]{@{}l@{}}PP\\ Velocity\end{tabular} \\ \hline
-$k_P$ & 9.450               & 4.920               & 0.519                   & 1.422                 & 8.740                                                 & 0.519                                                 & 7.528                                                 & 1.420                                                 \\ \hline
-$k_I$ & 8.550               & 3.170               & 22.860                  & 7.800                 & 7.640                                                 & 22.860                                                & 7.589                                                 & 7.800                                                 \\ \hline
-$k_D$ & 0.900               & 1.200               & 0.003                   & 0.065                 & 1.220                                                 & 0.003                                                 & 1.030                                                 & 0.065                                                 \\ \hline
+      & Tilt                & Pan                 & ZN                      & PP                    & \begin{tabular}[c]{@{}l@{}}ZN\\ Position\end{tabular} & \begin{tabular}[c]{@{}l@{}}ZN\\ Velocity\end{tabular} & \begin{tabular}[c]{@{}l@{}}PP\\ Position\end{tabular} & \begin{tabular}[c]{@{}l@{}}PP\\ Velocity\end{tabular} \\
+$k_P$ & 9.450               & 4.920               & 0.519                   & 1.422                 & 8.740                                                 & 0.519                                                 & 7.528                                                 & 1.420                                                 \\ 
+$k_I$ & 8.550               & 3.170               & 22.860                  & 7.800                 & 7.640                                                 & 22.860                                                & 7.589                                                 & 7.800                                                 \\ 
+$k_D$ & 0.900               & 1.200               & 0.003                   & 0.065                 & 1.220                                                 & 0.003                                                 & 1.030                                                 & 0.065                                                 \\ 
 \end{tabular}
 \caption{Parameters used for each test. ZN is from using the Zielger-Nichols method and PP is from using poleplacement.}
 \label{tab:TestParameters}

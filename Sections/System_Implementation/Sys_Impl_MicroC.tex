@@ -77,6 +77,11 @@ The gearing between the motor and the frame on the robot is 1:3, so the frame ex
 \end{equation}
 
 
+However a conversion is made in the microcontroller to convert the result to have the units \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \] with respect to the motor. The motor encoder on the motor has 360 encoder ticks per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
+\begin{equation}\label{eq:velocity_motor}
+    \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
+\end{equation}
+
 \subsubsection*{PID-controller Tasks}
 % How and which values need to be transported where Reference output controlling PWM
 The PID-controller tasks on the microcontroller are responsible for calculating the control signal, which is used to control the motors. For each controller to be able to function they need three buffers. One buffer holding a reference value and another providing a feedback value. The third buffer is responsible for storing the controller output. In case of a velocity controller the reference buffer contains output from a position controller, while the output buffer is a queue passing on values to SPI. Each buffer has a mutex attached which needs to be waited for or signaled upon using. Figure \ref{fig:OverviewTaskDiagramSimple} constitutes an illustration of the implementation of two PID-controllers in cascade for a single motor. In the actual implementation there are two cascade controllers, one for each motor.
