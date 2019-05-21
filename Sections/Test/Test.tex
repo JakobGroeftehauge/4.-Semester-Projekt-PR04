@@ -109,7 +109,7 @@ As seen in table \ref{tab:SPI-stresstest} the five test resulted in the same out
 
 \subsection{Test of Controller Designs}
 %opdeling af afsnit
-This section concerns the test of the PID-controllers using different methods for tuning and constellations. The parameters used in each test is shown in figure:
+This section concerns the test of the PID-controllers using different methods for tuning and constellations. The parameters used in each test is shown in table \ref{tab:TestParameters}, and a deduced using the design requirements of \SI{5}{\percent} overshoot, \SI{1,5}{\second} settling time and \SI{0,5}{\second} rise time as described in section \ref{sec:System_Design}.
 \begin{table}[H]
 \centering
 \begin{tabular}{c|c|c|c|c|c|c|c|c|}
@@ -119,7 +119,7 @@ $k_P$ & 9.450               & 4.920               & 0.519                   & 1.
 $k_I$ & 8.550               & 3.170               & 22.860                  & 7.800                 & 7.640                                                 & 22.860                                                & 7.589                                                 & 7.800                                                 \\ 
 $k_D$ & 0.900               & 1.200               & 0.003                   & 0.065                 & 1.220                                                 & 0.003                                                 & 1.030                                                 & 0.065                                                 \\ 
 \end{tabular}
-\caption{Parameters used for each test. ZN is from using the Zielger-Nichols method and PP is from using poleplacement.}
+\caption{Parameters used for each test. ZN is deduced using the Zielger-Nichols method and PP is deduced using pole placement.}
 \label{tab:TestParameters}
 \end{table}
 
@@ -144,7 +144,7 @@ $k_D$ & 0.900               & 1.200               & 0.003                   & 0.
         \caption{Stepresponse of the position using a single controller using pole placement.}
         \label{fig:singlePosController}
 \end{figure}
-The tests are executed with a set-point of $\frac{7\pi}{6}$ for the pan motor and $\frac{3\pi}{2}$. As seen on figure \ref{fig:StepPanPos} the measured response resembles the simulated response in the first part of the transition period. As there is stationary point in the measured response, it could look like that the pan has stopped moving for a bit properly due to friction in the physical setup. On figure \ref{fig:singlePosController} the measure response resembles the simulated quite well. The data for the tests can be seen on table \ref{tab:controller_data}. Applicable for both measurements is that they have no overshoot and longer settling times than the simulated. 
+The tests are executed with a reference point of $\theta = \frac{7\pi}{6}$ for the pan motor and $\theta = \frac{3\pi}{2}$. As seen on figure \ref{fig:StepPanPos} the measured response resembles the simulated response in the first part of the transition period. As there is stationary point in the measured response, it could look like that the pan has stopped moving for a bit properly due to friction in the physical setup. On figure \ref{fig:singlePosController} the measure response resembles the simulated quite well. The data for the tests can be seen on table \ref{tab:controller_data}. Applicable for both measurements is that they have no overshoot and longer settling times than the simulated. 
 
 
 \subsubsection*{Velocity controller tilt motor}

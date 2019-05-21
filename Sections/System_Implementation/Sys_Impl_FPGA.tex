@@ -23,7 +23,7 @@ The logic implemented in the FPGA is divided into modules. Table \ref{tab:FPGAMo
 \begin{table}[]
     \centering
     
-    \begin{tabular}{l|p{0.8\textwidth}}[] %{p{0.12\linewidth}p{0.4\textwidth}p{0.38\textwidth}}
+    \begin{tabular}{l|p{0.8\textwidth}} %{p{0.12\linewidth}p{0.4\textwidth}p{0.38\textwidth}}
         Module & Description \\
         \hline
         Encoder Module & Interfaces with and takes inputs from the pan-tilt system. Channel A and B of the encoders are read continuously and from this information a signed position relative to the original reference is calculated, which is the output of the module. \\
@@ -72,8 +72,7 @@ Each motor is equipped with an Encoder module. The Encoder module is a quadratur
 % The distance between rising edges or falling edges of the same channel is the same, though still relative to the speed. However in between the falling edge and rising edge of one of the channels there must be an edge in either direction from the other channel and it is not guaranteed that this edge occurs with the same distance to the aforementioned rising and falling edge.  
 
 \subsubsection*{Speed Logic}
-The Speed module is provided with a clock of \SI{100}{\kilo \hertz}. The velocity is found by finding how many clock ticks there are between two encoder counts, yielding the result in the unit $\left[\dot{\theta_{FPGA}}\right] = \frac{\SI{10}{\micro \second}}{\mathrm{tick_{enc}}}$.   
-The angular velocity is calculated based on the assumption that change in position of the output shaft per encoder count is equal. Later this assumption was discovered to be wrong, the consequences will be discussed in section \ref{sec:Discussion}.
+The Speed module is provided with a clock of \SI{100}{\kilo \hertz}. As seen on figure \ref{fig:FPGAProcessSpeedFlowcharts}, the velocity is found by finding how many clock ticks there are between two encoder counts, yielding the result in the unit $\left[\dot{\theta_{FPGA}}\right] = \frac{\SI{10}{\micro \second}}{\mathrm{tick_{enc}}}$. The angular velocity is calculated based on the assumption that change in position of the output shaft per encoder count is equal. Later this assumption was discovered to be wrong, the consequences will be discussed in section \ref{sec:Discussion}.
 % the units for the FPGA output speed is described by $\left[\dot{\theta}_{FPGA}\right] = \frac{\SI{10}{\micro \second}}{\mathrm{tick_{enc}}}$, where $\mathrm{tick_{enc}}$ is the encoder counts.
 
 %However a conversion is made in the microcontroller to convert the result to have the units \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \] with respect to the motor. The motor encoder on the motor has 360 encoder ticks per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
@@ -106,7 +105,7 @@ For the system to know if the angular velocity of the pan-tilt frames are zero, 
 
 \subsubsection*{Reset Logic}
 The controllers needs a reference point to initialise position measurement.
-The Reset module is responsible for resetting the pan or tilt frame to its index position. When a reset routine is enabled from the Protocol module, the motors drives the pan-tilt frames with constant low duty cycle until a pulse from the respective index hall sensors are received. If the pan frame is stopped during a reset, due to physical limitations in the setup, the frame reverts the direction of rotation. The physical limitations is detected when the zero-flag is signaled from the Speed module. When it receives the pulse the Reset module brakes the motors while pulsing the Encoder module to reset its encoder value to 0. 
+The Reset module is responsible for resetting the pan or tilt frame to its index position. When a reset routine is enabled from the Protocol module, the motors drives the pan-tilt frames with constant low duty cycle, until a pulse from the respective index hall sensors are received. If the pan frame is stopped during a reset, due to physical limitations in the setup, the frame reverts the direction of rotation. The physical limitations is detected when the zero-flag is signaled from the Speed module. When it receives the pulse from the hall sensor, the Reset module brakes the motors while pulsing the Encoder module to reset its encoder value to 0. 
 
 
 %  Figure \ref{fig:FPGAFlowchartsResetLatchAndIndex} shows the flow in the process that receives the pulse from the index hall sensor. When it receives the pulse the module immediately brakes the motors while pulsing the Encoder module to reset its encoder value to 0. 
@@ -115,24 +114,23 @@ The Reset module is responsible for resetting the pan or tilt frame to its index
 
 
 \subsubsection*{Protocol decoder logic}
+The Protocol decoder logic block act as an interface between the SPI connection to the microcontroller, and the logic on the FPGA. This enables the microcontroller to control the voltage supplied to the motors as well as direction of rotation. The module also offers the possibility of controlling the reset routine. It not possible for the microcontroller to change voltage supplied to the motors or direction of rotation when the reset routine is running.  
 
-
-The protocol decoder module is designed as seen in figure (\ref{fig:ProtocolDecoderLogic}). It determines which modules has access to the PWM module and thus controlling the robot. The two modules that need access are the Reset module and the SPI module. As default the SPI module controls the PWM and direction of the robot. As seen on figure \ref{fig:SPILogicSimple}, a separate SPI slave is connected to the protocol module which allows for the microcontroller to transmit a signal telling the reset module, when to control the PWM and the direction of the motors. When the signal is received the SPI cannot change anything regarding the PWM or direction until the reset is completed. 
+% The protocol decoder module is designed as seen in figure \ref{fig:ProtocolDecoderLogic}. It determines which modules has access to the PWM module and thus controlling the robot. The two modules that need access are the Reset module and the SPI module. As default the SPI module controls the PWM and direction of the robot. As seen on figure \ref{fig:SPILogicSimple}, a separate SPI slave is connected to the protocol module which allows for the microcontroller to transmit a signal telling the reset module, when to control the PWM and the direction of the motors. When the signal is received the SPI cannot change anything regarding the PWM or direction until the reset is completed. 
 
 %\clearpage
 
 
-\begin{wrapfigure}[24]{R}{0.4\textwidth}
-\centering
-    \caption{process in FPGA that handles latching a reset and sending a signal to reset the encoder-module}
-    \includegraphics[width=0.35\textwidth]{Sections/System_Implementation/Images/FPGAFlowchartsResetLatchAndIndex.pdf}
-    \label{fig:FPGAFlowchartsResetLatchAndIndex}
-\end{wrapfigure}
+% \begin{wrapfigure}[24]{R}{0.4\textwidth}
+% \centering
+%     \caption{process in FPGA that handles latching a reset and sending a signal to reset the encoder-module}
+%     \includegraphics[width=0.35\textwidth]{Sections/System_Implementation/Images/FPGAFlowchartsResetLatchAndIndex.pdf}
+%     \label{fig:FPGAFlowchartsResetLatchAndIndex}
+% \end{wrapfigure}
+
+
 
 \subsubsection*{SPI Logic}
-
-
-
 
 On figure \ref{fig:SPILogicSimple} an overview of the SPI module is shown. It contains seven internal slaves where four of them hold information needed by the microcontroller, two hold the PWM and directed from the microcontroller that is needed to control the motors and the last slave is used to give certain messages to the FPGA to initialise different states. When a specific kind of data is needed, the microcontroller set the slave select, SS, according to the slave number, low and the decoder activates the slave requested. When transmitting data only one slave can be active at any time and as default the output of a slave is low witch enables that active slave to take over MISO when OR'ed together with the other slaves. The Slave Select Enable, SSEN, is controlled by the hardware of the microcontroller and is used as an enable pin for the SPI. The values of the internal slaves is constantly updated and always contains the newest data, but when the data needs to be transmitted a latch is used to avoid the data changing while transmitting. 
 When data is transmitted to the FPGA the same method is used. Rhe decoder activates a specific slave and only the active slave can access the data on MOSI. The data received is first available to other modules on the FPGA when the transmission is complete. 
@@ -156,11 +154,11 @@ When data is transmitted to the FPGA the same method is used. Rhe decoder activa
 
 Figure \ref{ig:FPGAStateDiagramsSPI} illustrates the implementation of SPI on the FPGA. A SPI slave is activated when the associated slave select goes low. Using the clock received from the master, the SPI slave is notified when to transmit and ready data on MOSI. This is done simultaneously utilising the multitasking abilities of the FPGA. Two events can trigger the Slave to change state to ready again, either the slave is done transmitting and receiving or the slave select goes high again. When this happens the module resets and is ready to be used when triggered.
 
-\begin{figure}[]
-    \centering
-    \includegraphics[width=0.5\textwidth]{Sections/System_Implementation/Images/FPGAflowcharts-protocol.pdf}
-    \caption{Flowchart of the logic in the Protocol decoder module}
-    \label{fig:ProtocolDecoderLogic}
-\end{figure}
+% \begin{figure}[]
+%     \centering
+%     \includegraphics[width=0.5\textwidth]{Sections/System_Implementation/Images/FPGAflowcharts-protocol.pdf}
+%     \caption{Flowchart of the logic in the Protocol decoder module}
+%     \label{fig:ProtocolDecoderLogic}
+% \end{figure}
 
 \end{document}

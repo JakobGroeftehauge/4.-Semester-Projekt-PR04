@@ -163,7 +163,7 @@ To verify the performance of the controllers, the tilt and pan motor systems, wi
 As mentioned in section \ref{sec:Delimination}, it is wanted to explore the performance of a cascaded controller design. To achieve this, a velocity controller must be designed. The range of motion for the pan motor is physically fairly limited. Therefore it has been prioritised to focus on designing a velocity controller for the tilt motor, as the unlimited range makes testing the velocity controller possible, without jeopardising the pan-tilt system. Two different methods of designing velocity controllers will be explored. One will use the pole placement approach used in section \ref{subsec:position_control_model}, the other will utilise the Ziegler-Nichols approach, which can be used without a mathematical model of the system to be controlled.
 When working with a cascaded control design, it is desired that any inner controllers are faster than the outer loop, as well as critically or over damped. It is therefore worked towards designing a controller yielding no overshoot while still achieving a fast rise time.
 
-\subsubsection{Ziegler-Nichols Tuning}
+\subsubsection*{Ziegler-Nichols Tuning}
 %The Ziegler-Nichols tuning method provides a method for tuning a PID-controller without knowing specific information about the dynamics of the plant. 
 The Ziegler-Nichols method uses the step response of the physical system to calculate the controller gains. When using the Ziegler-Nichols method it is not possible to dictate performance specification. Instead, the method aims to achieve a decay ratio, $\zeta$, of approximately 0.25, for the closed loop system. The method assumes that the plant can be described by a delayed first order system of the form seen in equation \ref{eq:NZ_plant_eq},
 
@@ -217,8 +217,8 @@ Using the found values for R and L from equation \ref{eq:R_and_L} and the equati
 %In figure \ref{fig:NZ_implemented} the measured step response using the calculated gains seen in equation \ref{eq:controllerGainsCal} is plotted. 
 
 
-\subsubsection{Model Based Velocity Controller Design}
-The procedure for designing the velocity controller based on the model is very similar to the approach used for designing the position controllers mentioned in section \ref{subsec:position_control_model}. The main difference is that the open-loop system now has one less pole at the origin, as the only pole at the origin originates from the integral term of the PID-controller. As seen on figure \ref{fig:vel_root_locus}, it has been found that placing the zeros stemming from the PID-controller at $s = -10$ and $s = -12$, yields adequate root loci. This placement allows the close loop poles to be moved far into the left half plane, while still remaining directly on the real axis. A gain value of $0.065$ is chosen. The closed-loop pole locations are also visible from the figure . The closed-loop pole and zero locations can be compared to the pole and zero locations given by the Ziegler-Nichols tuning shown in figure \ref{fig:ZN_pole_zero}.
+\subsubsection*{Model Based Velocity Controller Design}
+The procedure for designing the velocity controller based on the model is very similar to the approach used for designing the position controllers mentioned in section \ref{subsec:position_control_model}. The main difference is that the open-loop system now has one less pole at the origin, as the only pole at the origin originates from the integral term of the PID-controller. As seen on figure \ref{fig:vel_root_locus}, it has been found that placing the zeros stemming from the PID-controller at $s = -10$ and $s = -12$, yields adequate root loci. This placement allows the close loop poles to be moved far into the left half plane, while still remaining directly on the real axis. A gain value of $0.065$ is chosen. The closed-loop pole locations are also visible from the figure \ref{fig:vel_root_locus}. The closed-loop pole and zero locations can be compared to the pole and zero locations given by the Ziegler-Nichols tuning shown in figure \ref{fig:ZN_pole_zero}.
 
 \begin{figure}[h]
 \begin{subfigure}{0.48\textwidth}
@@ -235,9 +235,11 @@ The procedure for designing the velocity controller based on the model is very s
 \label{fig:vel_poles_zeros}
 \end{figure}
 
-As with the position controller, the bandwidth of the closed-loop velocity controller systems are evaluated. The cut off frequencies are found to be at just about \SI{11}{\radian \per \second} for the model based design, and just about \SI{28}{\radian \per \second} for the Ziegler-Nichols based design. Therefore it can be concluded that the chosen sampling frequency of \SI{1000}{\hertz} is again more than sufficient. It is worth mentioning however, that a higher band width would have been preferable, especially for the model based controller. 
-The phase and gain margins are also examined for the velocity controller, again with the delay introduced to emulate the discrete controller. 
-From figure \ref{fig:vel_stability_plot} it can be seen that both design approaches gives an infinite gain margin, as the phase never crosses \SI{-180}{\degree}. It is worth noting however, that the Ziegler-Nichols based design has significantly less phase margin. The \SI{50}{\degree} phase margin is still deemed sufficient though.
+\subsubsection*{Performance Evaluation of Velocity Controllers}
+
+As with the position controller, the bandwidth of the closed-loop velocity controller systems are evaluated. The cutoff frequencies are found to be at approximately \SI{11}{\radian \per \second} for the model based design, and approximately \SI{28}{\radian \per \second} for the Ziegler-Nichols based design. Therefore it can be concluded that the chosen sampling frequency of \SI{1000}{\hertz} is again more than sufficient. 
+%It is worth mentioning however, that a higher bandwidth would have been preferable, especially for the model based controller. 
+The phase and gain margins are also examined for the velocity controller with the delay introduced to emulate the discrete controller. The phase and gain margins have been plotted and can be found in the digital appendix, outlined in section \ref{sec:digital_appendix}. From these figures, it can be seen that both design approaches gives an infinite gain margin, as the phase never crosses \SI{-180}{\degree}. It is worth noting however, that the Ziegler-Nichols based design has significantly less phase margin. The \SI{50}{\degree} phase margin is still deemed sufficient though.
 % As seen in figure \ref{fig:vel_stability_plot}, large stability margins are obtained. The gain margin is infinite as the phase never crosses \SI{-180}{\degree} and the phase margin is found to be \SI{145}{\degree}. It is worth mentioning though, that the magnitude plot does show a flat band just around a gain of \SI{0}{\deci \bel}. This means that the phase margin could be quite different given just a slight change in gain. Looking at the figure however, it can be seen that the phase margin would still remain about the same, or even increase.
 % comment on the bode plot and stability
 % comment on the step response that the goal are reached.
@@ -257,20 +259,21 @@ From figure \ref{fig:vel_stability_plot} it can be seen that both design approac
 % \label{fig:vel_bode_plots}
 % \end{figure}
 
-\begin{figure}[h]
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/SM_TiltMotorVel_polePlace.png}
-    \caption{Controller design based on model.}
-    \label{fig:vel_PP_stability_plot}
-\end{subfigure}\quad
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/SM_TiltMotorVel_NZ.png}
-    \caption{Controller design based on Ziegler-Nichols.}
-    \label{fig:vel_ZN_stabilty_plot}
-\end{subfigure}
-\caption{Bode plots of the closed-loop system with velocity controllers designed using the model and using the Ziegler-Nichols method.}
-\label{fig:vel_stability_plots}
-\end{figure}
+% \begin{figure}[h]
+% \begin{subfigure}{0.48\textwidth}
+%     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/SM_TiltMotorVel_polePlace.png}
+%     \caption{Controller design based on model.}
+%     \label{fig:vel_PP_stability_plot}
+% \end{subfigure}\quad
+% \begin{subfigure}{0.48\textwidth}
+%     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/SM_TiltMotorVel_NZ.png}
+%     \caption{Controller design based on Ziegler-Nichols.}
+%     \label{fig:vel_ZN_stabilty_plot}
+% \end{subfigure}
+% \caption{Bode plots of the closed-loop system with velocity controllers designed using the model and using the Ziegler-Nichols method.}
+% \label{fig:vel_stability_plots}
+% \end{figure}
+
 Looking at the step responses for the model based and Ziegler-Nichols based controller designs, shown in figure \ref{fig:vel_step}, it can be seen that as expected the model based controller meets the requirement of no overshoot, while the Ziegler-Nichols method does not. The latter does have a shorter rise time though.
 
 
