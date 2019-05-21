@@ -95,14 +95,9 @@ To make sure the integral term does not wind up when an error is present for an 
 
 
 \subsubsection*{SPI Task}
-The microcontroller have build in hardware that enables it to transmit and receive data using SPI. The microcontroller is set up as a master, described in section \ref{subsec:SystemImplemtationFPGA}. The microcontroller uses a 4-bit address to select the desired slave, which is setup by using four 
+The microcontroller have build in hardware that enables it to transmit and receive data using SPI. The microcontroller is set up as a master, described in section \ref{subsec:SystemImplemtationFPGA}. To select a desired slave, the microcontroller uses a 4-bit address. Four general purpose input output pins on the Tiva-C launchpad are used for selecting a slave, while a hardware controlled pin connected to SPI, is used to enable the slaves. The microcontroller uses a transmissionrate of \SI{13.3}{\mega bit} when communicating with the slaves on the FPGA. 
 
-
-The microcontroller uses a transmissionrate of \SI{13.3}{\mega bit} when communicating with the slaves on the FPGA. 
-
-To address the different slaves on the FPGA four pins are used as slave select which are used in parallel with the hardware controlled SS.
-
-As default the SPI task is in the BLOCKED state. Only when a request from one of the controllers enters the SPI-queue, as seen on figure \ref{fig:OverviewTaskDiagramSimple}, the task is given CPU time. Following figure \ref{fig:SPIFlowchart} the request taken from the queue contains a slave ID and data. When the appropriate slave is selected as determined by the slave ID, both data is transmitted and received. If the slave ID has an associated buffer e.g. a velocity feedback buffer, then the received data is put in that buffer.  
+As default the SPI task is in the BLOCKED state. Only when a request from one of the controllers enters the SPI-queue, as seen on figure \ref{fig:OverviewTaskDiagramSimple}, the task is given CPU time. Following figure \ref{fig:SPIFlowchart} the request taken from the queue contains a slave ID and data. When the appropriate slave is selected as determined by the slave ID, both data is transmitted and received. If the slave ID has an associated buffer, then the received data is put in that buffer signaling a PID-controller.  
 
 \begin{figure}[H]
     \centering
@@ -110,6 +105,11 @@ As default the SPI task is in the BLOCKED state. Only when a request from one of
     \caption{Flowchart describing the code execution in the SPI task on the microcontroller.}
     \label{fig:SPIFlowchart}
 \end{figure}
+
+The SPI task is responsible for providing the PID-controllers with values with units same as the reference value. A conversion has to happen so the units match \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \]. The motor encoder on the motor has 360 encoder counts per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
+\begin{equation}\label{eq:velocity_motor}
+    \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
+\end{equation}
 
 
 The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. The angle of the motor, $ \theta_{m} $, is described by equation \ref{eq:angle_of_motor}, where $FPGA_{pos}$ is the encoder value provided by the FPGA.
