@@ -15,22 +15,20 @@ The test is executed with four controllers, the UART task, the SPI task and the 
 
 \subsubsection*{Results}
 Table \ref{tab:CPU_utilisation_test} shows the timing of running the controllers including the UART, SPI and UI task. Table \ref{tab:Task_Timing} shows the timing of the UART, SPI and UI respectively. 
-Timing the duration of the tasks from the first task initiates to the last task terminates the duration of the cycle is determined. The time between cycles are given by T, and the  is defined by being the time from the first stask initiates to the cycle begins again, as seen on figure \ref{fig:Schedueling_controllers}.
-
-This makes it possible to estimate the average duty cycle of the system:
+Timing the duration of the tasks from the first task initiates to the last task terminates the duration of cycle is determined. T is the duration between the first cycle starts to the next cycle begins, as seen on figure \ref{fig:Schedueling_controllers}. This makes it possible to estimate the average duty cycle of the system:
 \begin{equation}
-    D_c=100-\left(\frac{T_{se}}{T_{ss}}\right)\cdot 100=100-\left(\frac{\SI{457,6}{\mu\second}}{\SI{992}{\mu\second}}\right)\cdot 100\approx 53,87\%
+    D_c=100-\left(\frac{T_{c1,avg}}{T_{avg}}\right)\cdot 100=100-\left(\frac{\SI{457,6}{\mu\second}}{\SI{992}{\mu\second}}\right)\cdot 100\approx 53,87\%
 \end{equation}
-where $T_{se}$ is the average time of "Task start to tasks end" and $T_{ss}$ the average time of "Task start to task start". 
+where $T_{c1,avg}$ is the average duration of cycle 1 and $T_{avg}$ is the average time of T on figure \ref{fig:Schedueling_controllers}. 
 \begin{table}[H]
 \centering
 \begin{tabular}{l|r|r|r|r|r|l}
 & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \multicolumn{1}{r}{\textbf{Unit}}                                  \\ \hline
-Task start to tasks end               & 458        & 456        & 456        & 460        & 458        & \SI{}{\mu\second} \\
-Task start to task start              & 990        & 988        & 994        & 994        & 994        & \SI{}{\mu\second} \\
+Duration of cycle 1               & 458        & 456        & 456        & 460        & 458        & \SI{}{\mu\second} \\
+T             & 990        & 988        & 994        & 994        & 994        & \SI{}{\mu\second} \\
 Duty cycle                            & 53,73      & 53,85      & 54,12      & 53,72      & 53,92      & \%                   
 \end{tabular}
-\caption{Data regarding the duty cycle of the controller process run with two position and two velocity controllers, the UART, SPI and UI task. The position controllers are run at a rate of \SI{200}{\hertz} and the velocity controllers at \SI{1000}{\hertz}. Figure \ref{fig:Schedueling_controllers} illustrates the test.}
+\caption{Data regarding the duty cycle of the controller process scheduled with two position and two velocity controllers, the UART, SPI and UI task. The position controllers are scheduled at a rate of \SI{200}{\hertz} and the velocity controllers at \SI{1000}{\hertz}. Figure \ref{fig:Schedueling_controllers} illustrates the test.}
 \label{tab:CPU_utilisation_test}
 \end{table}
 
@@ -47,16 +45,9 @@ SPI\_receive  & 5                                      & 5,44       & 5,44      
 UART          & 1                                      & 458        & 500        & 500        & 500        & 501        &  \SI{}{\mu\second}                     \\
 UI            & 1                                      & NA         & NA         & NA         & NA         & NA         & \multicolumn{1}{c}{-}
 \end{tabular}
-\caption{Timing of SPI upon transmission and receiving, the UART task and UI, however the UI task was not able to be timed do to it being so quick.}
+\caption{Timing of SPI upon transmission and receiving, the UART task and UI, however the UI task was not able to be timed due to it being too quick.}
 \label{tab:Task_Timing}
 \end{table}
-
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=0.7\textwidth]{Sections/Test/Images/Four_controllers_revised.png}
-%     \caption{Illustration of the scheduling of the four controllers running with two position and two velocity controllers, the UART, SPI and UI task. The yellow and the green are the position controllers run at a rate of \SI{200}{\hertz}. The blue and the red are the velocity controllers run at a rate of \SI{1000}{\hertz}.}
-%     \label{fig:Schedueling_controllers}
-% \end{figure}
 
 \begin{figure}
     \centering
@@ -71,13 +62,13 @@ However it is also possible to get an estimation of the overhead of the system b
 It has been possible to achieve an average CPU utilisation time of approximately \SI{ 53,87}{\percent}, thus satisfying the project stated requirement of a maximum CPU utilisation of \SI{80}{\percent}. Furthermore an average overhead is estimated to approximately $\SI{42,6}{\mu\second}$, hence not deemed to compromise the timing of the system.
 
 \subsection{Processing time - Controllers}
-It is wanted to examine the processing time of the controllers on the microcontroller. Initially the microcontroller was tested with only one controller, namely velocity controller described in section \ref{sec:System_Integration_N_Implementation}. The parameters changed during the testing was, number of tabs on the derivative-term filter, without the filter and last only with a PI-controller.  The requirement specification in section \ref{sec:Requirements} states:
+It is wanted to examine the processing time of the controllers on the microcontroller. The requirement specification in section \ref{sec:Requirements} states:
 \begin{itemize}
     \item All PID-controllers must be processed within a specified time frame to guarantee a minimum frequency. The minimum frequency and time period is to be determined.
 \end{itemize}
-To estimate a maximum allowed processing time for a controller, the CPU time is divided into five parts, four for the controllers and one for the remaining tasks. With a maximum CPU time utilisation of \SI{80}{\percent}, a single controller is to process within $\SI{160}{\mu\second}$.
+To estimate a maximum allowed processing time for a controller, the CPU time is divided into five parts, four for the controllers and one for the remaining tasks. With a maximum CPU time utilisation of \SI{80}{\percent}, a single controller is to be processed within $\SI{160}{\mu\second}$.
 
-The test is carried out driving an output-pin high in the begging of the controller task and low in the end, enabling the possibility of timing the task with an oscilloscope. The result of the test is seen in table \ref{tab:Single_Controller_test} and will be discussed further.
+Initially the microcontroller was tested with only one controller, namely velocity controller described in section \ref{sec:System_Integration_N_Implementation}. The parameters changed during the testing was, number of tabs on the derivative-term filter, without the filter and last only with a PI-controller. The test is carried out driving an output-pin high in the beginning of the controller task and low in the end, enabling the possibility of timing the task with an oscilloscope. The result of the test is seen in table \ref{tab:Single_Controller_test}.
 
 \subsubsection*{Results}
 

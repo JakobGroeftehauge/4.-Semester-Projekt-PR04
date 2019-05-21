@@ -21,7 +21,7 @@ As mentioned in section \ref{sec:Delimination}, the controllers designed in this
 \end{table}
 
 \subsection{Position Control System Design Based on Mathematical Model}
-
+\label{subsec:position_control_model}
 % Position 
 % Present the bode plot of closed-loop and argue that the chosen sampling rate is sufficient.
 % Inserting a delay to emulate the discrete controller, present the stability margins
@@ -139,7 +139,7 @@ With this delay added, the phase and gain margins are evaluated by drawing the b
 \label{fig:pos_stability_plot}
 \end{figure}
 
-To verify the performance of the controllers, the tilt and pan motor systems, with added PID-controllers, are simulated using a step reference of magnitude 1. To properly emulate the physical system, saturation and associated anti wind-up must be added as described in section \ref{subsec:classic_control}, since the physical system can only respond to a limited control signal. Figure \ref{fig:PosStepSat} and \ref{fig:PosStepNoSat} show the difference that the saturation makes. The figure shows that ideally, the controller for the tilt motor honours the specifications, however the specifications for settling time and overshoot are not quite met when saturation is introduced. Also, even without the saturation, the step response of the pan motor controller does not quite live up to the  requirements, but through experimenting with different zero placement and gains, it was found to be the best compromise between a relatively fast rise and settling time, while still keeping the overshoot reasonable.
+To verify the performance of the controllers, the tilt and pan motor systems, with added PID-controllers, are simulated using a step reference of magnitude 1. To properly emulate the physical system, saturation and associated anti wind-up must be added as described in section \ref{subsec:classic_control}, since the physical system can only respond to a limited control signal. Figure \ref{fig:PosStepSat} and \ref{fig:PosStepNoSat} show the difference that the saturation makes. The figure shows that ideally, the controller for the tilt motor honours the specifications, however the specifications for settling time and overshoot are not quite met when saturation is introduced. Even without the saturation, the step response of the pan motor controller does not quite live up to the  requirements, but through experimenting with different zero placement and gains, it was found to be the best compromise between a relatively fast rise and settling time, while still keeping the overshoot reasonable.
 
 \begin{figure}[h]
 \begin{subfigure}{0.48\textwidth}
@@ -160,47 +160,45 @@ To verify the performance of the controllers, the tilt and pan motor systems, wi
 
 
 \subsection{Velocity Controller Design}
-As mentioned in section \ref{sec:Delimination}, it is wanted to explore the performance of a cascaded controller design. To achieve this, a velocity controller must be designed. The range of motion for the pan motor is physically fairly limited. Therefore it has been prioritised to focus on designing a velocity controller for the tilt motor, as the unlimited range makes testing the velocity controller, without jeopardising the pan/tilt system, easier. Two different methods of designing velocity controllers will be explored. One will use the pole placement approach used above, the other will utilise the Ziegler-Nichols approach, which can be used without a mathematical model of the system to be controlled.
+As mentioned in section \ref{sec:Delimination}, it is wanted to explore the performance of a cascaded controller design. To achieve this, a velocity controller must be designed. The range of motion for the pan motor is physically fairly limited. Therefore it has been prioritised to focus on designing a velocity controller for the tilt motor, as the unlimited range makes testing the velocity controller possible, without jeopardising the pan-tilt system. Two different methods of designing velocity controllers will be explored. One will use the pole placement approach used in section \ref{subsec:position_control_model}, the other will utilise the Ziegler-Nichols approach, which can be used without a mathematical model of the system to be controlled.
 
 \subsubsection{Ziegler-Nichols Tuning}
 %The Ziegler-Nichols tuning method provides a method for tuning a PID-controller without knowing specific information about the dynamics of the plant. 
-Instead of analysing a mathematical model of the plant, the Ziegler-Nichols method uses the step response of the physical system to calculate the controller gains. When using the Ziegler-Nichols method it is not possible to dictate performance specification. Instead, the obtained closed-loop system always will have a decay ratio, $\zeta$, of approximately 0.25. The method assumes that the plant can be described by a delayed first order system of the form seen in equation \ref{eq:NZ_plant_eq}
+The Ziegler-Nichols method uses the step response of the physical system to calculate the controller gains. When using the Ziegler-Nichols method it is not possible to dictate performance specification. Instead, the method aims to achieve a decay ratio, $\zeta$, of approximately 0.25, for the closed loop system. The method assumes that the plant can be described by a delayed first order system of the form seen in equation \ref{eq:NZ_plant_eq},
 
 \begin{equation}
-    \frac{y(s)}{u(s)} = \frac{A}{\tau s + 1} e^{-s t_d}
+    \frac{y(s)}{u(s)} = \frac{A}{\tau s + 1} e^{-s t_d} \qquad ,
     \label{eq:NZ_plant_eq}
 \end{equation}
 
-To calculate the controller gains a set of equations are provided. The equations differ depending on the controller type, the equations used for calculating the gains for a PID-controller can be seen in equations \ref{eq:controllerGains}. The constants R and L are identified from the step response. The constant R is found by drawing the tangent to the steepest part of the transition between zero and the reference. The gradient of the tangent is equal to R. L is equal to the latency of the system, and is defined as the distance between the y-axis and the intersection between the tangent and the x-axis. 
+where $A$ is a steady-state magnitude, $\tau$ is a time constant and $t_{d}$ is time delay.
+To calculate the controller gains a set of equations are provided. The equations differ depending on the controller type, the equations used for calculating the gains for a PID-controller can be seen in equations \ref{eq:controllerGains}. The constants $R$ and $L$ are identified from the step response. $R$ is found by drawing the tangent to the steepest part of the transition between zero and the reference. The gradient of the tangent is equal to $R$. $L$ is equal to the latency of the system, and is defined as the distance between the y-axis and the intersection between the tangent and the x-axis. 
 
 \begin{equation}
 k_p = \frac{1.2}{RL}, \quad k_i = \frac{k_p}{2L}, \quad k_d = \frac{k_p}{0.5L}
 \label{eq:controllerGains}
 \end{equation}
 
-The Ziegler-Nichols tuning method has only been used to tune the velocity controller due to only being possible to obtain a velocity step response. Furthermore it has not been possible to get the velocity from the pan motor due to limitations on the rotation of the frame. Therefore the Ziegler-Nichols has only been used to tune the velocity controller for the tilt motor.
-
 \begin{figure}
     \centering
     \includegraphics[width = 1\textwidth]{Sections/System_Design/Images/Ziegler-Nichols_Stepresponse.png}
-    \caption{Velocity step response for the actual tilt motor, used for tuning using Ziegler-Nichols.}
+    \caption{Velocity step response for the tilt motor, used for tuning using Ziegler-Nichols.}
     \label{fig:stepPlantNZ}
 \end{figure}
 
-In figure \ref{fig:stepPlantNZ} the data point sampled from the step response of the physically  system is plotted. The Curve Fitting tool in MATLAB has then been used to fit a curve that fits the points, it is displayed as the red line. The red line is described as the expression introduced in equation \ref{eq:NZ_plant_eq}.
-From the fitted line the tangent is then found. From the MATLAB console R and L read as seen in equation \ref{eq:R_and_L}.
+In figure \ref{fig:stepPlantNZ} the data point sampled from the step response of the physically  system is plotted. The Curve Fitting tool in MATLAB has then been used to fit a curve that fits the points, it is displayed as the red line. The red line is described as the expression introduced in equation \ref{eq:NZ_plant_eq}. Using MATLAB, $R$ and $L$ are found as seen in equation \ref{eq:R_and_L}.
 
 \begin{equation}
     R = 203.4 \quad L = 11.4 \cdot 10^{-3} 
     \label{eq:R_and_L}
 \end{equation}
 
-Using the found values for R and L from equation \ref{eq:R_and_L} and the equations introduced in equation \ref{eq:controllerGains} the controller gains found as seen in equation \ref{eq:controllerGainsCal}
+Using the found values for R and L from equation \ref{eq:R_and_L} and the equations introduced in equation \ref{eq:controllerGains} the controller gains are found and can be seen in table \ref{tab:pos_controller_gains}.
 
-\begin{equation}
-    k_p = 0.5194, \quad k_i = 22.86, \quad k_d = 3.0 \cdot 10^{-3}
-    \label{eq:controllerGainsCal}
-\end{equation}
+% \begin{equation}
+%     k_p = 0.5194, \quad k_i = 22.86, \quad k_d = 3.0 \cdot 10^{-3}
+%     \label{eq:controllerGainsCal}
+% \end{equation}
 
 
 \begin{figure}
