@@ -57,17 +57,17 @@ The PID-controller tasks on the microcontroller are responsible for calculating 
 
 % Following the controller task functionality described on figure  \ref{fig:PIDControllerFlowchart}, feedback to a controller is supplied whenever the controller sends a request to SPI. The request must contain a slave ID indicating which slave to receive data from. The controller task is then put in a blocked state, while waiting for data. Whenever SPI signals that the requested data is put in the feedback buffer associated with the requesting controller, the controller task is put back into running state. 
 
-The overall structure of the controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. When the feedback data is received, the error between the reference value and feedback value is calculated. As mentioned in section \ref{subsec:SystemImplemtationFPGA}, because of possible variance in velocity feedback due to the imprecise separation of edges in the encoder, a second order lowpass Finite Impulse Response (IIR) filter is applied to the error. 
-
-Since the error ideally would consist of a DC frequency component, the filter was designed using a cutoff frequency at $0.5\,\mathrm{Hz}$. The filter transfer function used is:
+The overall structure of the controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. When the feedback data is received, the error between the reference value and feedback value is calculated. As mentioned in section \ref{subsec:SystemImplemtationFPGA}, because of possible variance in velocity feedback due to error in interfacing in the encoder, a second order lowpass Finite Impulse Response (FIR) filter is applied to the error. It is expected that the signal without any noise would be fairly slow, therefore a low cutoff frequency for the filter is chosen. The sampling frequency for the used filter is \SI{0.5}{\hertz}.
+The transfer function for the filter designed in MATLAB using the filterDesigner is:
 \begin{equation}
-    H(s) = \frac{1}{0.0249s^2 + 0.9502s + 0.0249}
+    H(s) = \frac{1}{0.0249z^2 + 0.9502z + 0.0249}
 \end{equation}
-The proportional term is then calculated.
+
+% The proportional term is then calculated.
 %If noise from the encoder is imagined to be a pure sine wave at a single frequency $\omega_a$, then by differentiating the noise described by equation \ref{eq:Sin_noise} it is seen that the amplitude, is multiplied with the frequency $\omega_a$ demonstrating that high frequency noise can ruin performance of the system. 
-The derivative term amplifies noise, especially high frequent noise. Because of this to further dampen noise, a fifth order lowpass FIR filter is applied to the derivative term, with a cutoff frequency at $0.5\,\mathrm{Hz}$. The filter transfer function used is:
+The derivative term is sensitive to noise. Because of this to further dampen the noise, a fifth order lowpass FIR filter is applied to the derivative term, with a cutoff frequency at $0.5\,\mathrm{Hz}$. The transfer function used MATLAB using the filterDesigner is:
 \begin{equation}
-    H(s) = \frac{1}{0.0555s^5 + 0.1666s^4 + 0.2777s^3 + 0.2777s^2 + 0.166s + 0.055}
+    H(s) = \frac{1}{0.0555z^5 + 0.1666z^4 + 0.2777z^3 + 0.2777z^2 + 0.166z + 0.055}
 \end{equation}
 The use of filters when implementing a controller was initially not assumed to be of high importance, when aiming to achieve good system response. Later this has been discovered to be a wrong assumption and that the choices regarding design of the filters have been poor. In section \ref{sec:Discussion} design of filters will be discussed. \\
 
@@ -81,8 +81,7 @@ The use of filters when implementing a controller was initially not assumed to b
 % \end{equation}
 % where $A$ is the amplitude, $\omega_a$ is the frequency, $\phi_a$ is the phase and $t$ is the time.
 
-To make sure the integral term does not wind up when an error is present for an extended period of time, anti-windup by conditional integration is implemented. As seen on figure \ref{fig:PIDControllerFlowchart} the controller performs a saturation check before updating the output buffer. Is the output in saturation a flag is set and the output is set equal to either the negative or positive saturation value, depending on sign of the error. 
-
+To make sure the integral term does not wind up when an error is present for an extended period of time, anti-windup by conditional integration is implemented. As seen on figure \ref{fig:PIDControllerFlowchart} the controller performs a saturation check before updating the output buffer. Is the output in saturation a flag is set and the output is set equal to either the negative or positive saturation value, depending on sign of the error. On the position controller the saturation limit is equal to the maximum angular velocity of the pan-tilt system, signed depending on direction of rotation. The saturation limit of the velocity controller is equal to the maximum voltage possible to supply the motors which is either $12,\mathrm{V}$ or $-12,\mathrm{V}$.
 
 \begin{figure}[H]
     \centering
@@ -96,8 +95,11 @@ To make sure the integral term does not wind up when an error is present for an 
 
 
 \subsubsection*{SPI Task}
-For the microcontroller to communicate and get data from the FGPA, SPI must be set up.
-The microcontroller have build in hardware that enables the microcontroller to transmit and receive data using SPI. It is set up as a master and with a transmit and receive bit-rate of 13.3 MHz, when communicating with the slaves located on the FPGA. 
+The microcontroller have build in hardware that enables it to transmit and receive data using SPI. The microcontroller is set up as a master, described in section \ref{subsec:SystemImplemtationFPGA}. The microcontroller uses a 4-bit address to select the desired slave, which is setup by using four 
+
+
+The microcontroller uses a transmissionrate of \SI{13.3}{\mega bit} when communicating with the slaves on the FPGA. 
+
 To address the different slaves on the FPGA four pins are used as slave select which are used in parallel with the hardware controlled SS.
 
 As default the SPI task is in the BLOCKED state. Only when a request from one of the controllers enters the SPI-queue, as seen on figure \ref{fig:OverviewTaskDiagramSimple}, the task is given CPU time. Following figure \ref{fig:SPIFlowchart} the request taken from the queue contains a slave ID and data. When the appropriate slave is selected as determined by the slave ID, both data is transmitted and received. If the slave ID has an associated buffer e.g. a velocity feedback buffer, then the received data is put in that buffer.  
