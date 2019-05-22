@@ -15,7 +15,7 @@ Each frame is actuated by a \SI{12}{\volt} DC motor equipped with an incremental
 Figure \ref{fig:Open_Close_loop} shows a simple \textit{controller} setup.
 The plant is the system which is to be controlled. The controller outputs a control signal which is the input to the plant. 
 In this project the plant would be an electric motor for which the control signal could be a voltage and the output could be an angular velocity.
-If a perfect model of the plant exists, and no external disturbances act on the system, a controller can be designed that controls the plant purely based on a reference input. This type of system would be classified as open loop. In reality, such a system cannot be obtained, so to properly control the system, it is beneficial to monitor the output of the plant. The output is subtracted from the reference, yielding an error used as input for the controller. This type of feedback yields a closed loop system and makes the system more robust. 
+If a perfect model of the plant exists, and no external disturbances act on the system, a controller can be designed that controls the plant purely based on a reference input. This type of system would be classified as open-loop. In reality, such a system cannot be obtained, so to properly control the system, it is beneficial to monitor the output of the plant. The output is subtracted from the reference, yielding an error used as input for the controller. This type of feedback yields a closed loop system and makes the system more robust. 
 
 The problem description states that a position controller has to be designed, however such a controller can take on many forms, leading to different design approaches and methods. Generally speaking, controller design can be divided into two categories, classical control, which operates in the frequency domain, and modern control which operates in the time domain. Both approaches will be examined in this section.
 
@@ -45,7 +45,7 @@ The problem description states that a position controller has to be designed, ho
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{Sections/Miscellaneous/Images/Open_closed_Diagram.pdf}
-    \caption{Figure illustrating the concept of controller setup highlighting the open and closed loop concepts. }
+    \caption{Figure illustrating the concept of controller setup highlighting the open- and closed-loop concepts. }
     \label{fig:Open_Close_loop}
 \end{figure}
 
@@ -58,6 +58,8 @@ The problem description states that a position controller has to be designed, ho
 
 A traditional method for designing a controller for a motor is to use a PID-controller. Though many controller configurations using parts of the PID-controllers design exists, only the full PID-controller will be examined. The block diagram of a PID-controller can be seen on figure \ref{fig:anti-windup}. As seen on the block diagram
 a PID-controller utilises a feedback loop. The controller consist of three terms: a proportional term, an integral term and a derivative term. Each term is evaluated separately and then combined to yield the output of the controller. If only the proportional term is used, a steady state error between the output and the reference will always be present. Therefore the integral term is introduced to eliminate the steady state error, as the integral will keep increasing until there is no steady state error. The derivative term adds anticipatory action based on the trend of the error. \cite{}
+
+
 
 
 %I tilfælde med dette system 
@@ -77,20 +79,21 @@ a PID-controller utilises a feedback loop. The controller consist of three terms
 % \end{equation}
 % However feedforward is sensitive to modelling uncertainties, due to it heavily relying on the design of the plant. Instead the integral term can be implemented, integrating the error thus eliminating the steady state error. To increase the settling time of the controller the derivative term can be added, which is an anticipatory term looking at the trend of the error, thus making it possible to change the direction of the signal, if overshoot or oscillating tendencies occurs. However the derivative term is vastly sensitive to noise, making it necessary to filter the signal upon implementation of the controller. 
 
-To achieve a desired response of the system, the different gains of the PID-controller must be found. Finding gains for the PID-controller different methods are available each with different advantages. A method is pole placement, where the location of poles in the closed-loop system is analysed. This introduces the prerequisite, that the system must be known. If no model of the plant is available other means for tuning is present. A method is the Ziegler-Nichols method, where the controller is tuned by examining the input and output of the system. By examining a step response of the actual system and assuming it can be described as a first order delayed system, from where it possible to deduct the lag, the amplitude and the rise time of the system. From these measurements it is possible to make an estimation for the gains of the PID-controller.
+To achieve a desired response of the system, the different gains of the PID-controller must be found. Finding gains for the PID-controller different methods are available each with different advantages. A method is \textit{pole placement}, where the location of poles in the closed-loop system are strategically placed. This introduces the prerequisite, that an accurate model of the system must be known. Furthermore the designer must know, where to place the poles to achieve the desired response.
+The root locus provides a method of analysing movement of the poles as an increasing gain is applied to the system. The method makes it possible to tweak the gain until the desired response is achieved.
+If no model of the plant is available other means for tuning is present. Two heuristic methods known as Ziegler-Nichols methods exist. One is based on creating a marginally stable system, and the other is based on the open-loop step response of the plant. Only the latter will be examined further. This method, assumes that the plant can be described by a first order delayed system. 
 
-From the transfer function the poles and zeros of a system can be derived. The poles is defined as the roots of the denominator polynomial and the zeros as the roots of the numerator polynomial. By analysing the placement of the poles and zeros in the s-plane performance characteristics of the system can be derived. The root locus provides a method of analysing movement of the poles as an increasing gain is applied to the system. The method makes it possible to tweak the gain until the desired response is achieved.
 
 % Having a transfer function of a given plant, $G(s,K)$, with an unknown parameter K, it is possible to describe the movement of the poles in the s-plane using the root locus method. By looking at the rise time, overshoot and settling time it is possible to estimate where in the s-plane the poles can be placed to ensure the desired behavior of the system. %Limitations for the placement of the poles can be found. 
 % With the root locus method, it is possible to tweak the controller in such a manner, that the system satisfies the requirements.
 
-Physical systems have limitation such as maximum velocity etc. When modelling such systems these limitations can be taken into account by introducing saturation to the control signal. The saturation will level the signal at the saturation limit if the signal exceeds the saturation limits. Having a system in saturation the integral term will continue to windup as long as an error is present between the reference and the output. This is not a desired behaviour, since it will take time for the integral term to decrease for the control signal to go below the saturation limit. To circumvent this anti-windup can be implemented. %However this is not a desired behaviour, creating a slower response of the control signal, $v$, goes below saturation. Figure \ref{fig:anti-windup} illustrates the implementation of back calculation for a PID-controller. When the system is in saturation, and therefor not able to increase, the control signal $u$ is constant. The time tracking constant, $\frac{1}{T_t}$ determines how quick the integrator is changed.
-When implementing anti-windup it can be executed using back-calculation or conditional integration. The implementation of back calculation can be seen on figure \ref{fig:anti-windup}. It works by subtracting the saturated signal, $u$, with $v$, thus when the system is saturated the signal $e_s$ is different from zero. This means that a value is subtracted from the integral term in the controller resulting in a lower value of $v$. This decreases $v$ until the point when $v=u$ and $e_s$ is zero. The time tracking constant, $T_t$, dictates how well the saturated control signal follows the unsaturated control signal when it returns from saturation. Conditional integration works by keeping the integration term constant in the controller once saturation is reached for the control signal. 
+Physical systems have limitation such as maximum ratings. When modelling such systems these limitations can be taken into account by introducing saturation to the control signal. The saturation will level the signal at the saturation limit if the signal exceeds the saturation limits. Having a system in saturation the integral term will continue to windup as long as an error is present between the reference and the output. This is not a desired behaviour, since it will take time for the integral term to decrease for the control signal to go below the saturation limit. To circumvent this, anti-windup can be implemented. %However this is not a desired behaviour, creating a slower response of the control signal, $v$, goes below saturation. Figure \ref{fig:anti-windup} illustrates the implementation of back calculation for a PID-controller. When the system is in saturation, and therefor not able to increase, the control signal $u$ is constant. The time tracking constant, $\frac{1}{T_t}$ determines how quick the integrator is changed.
+When implementing anti-windup it can be executed using back-calculation or conditional integration. The implementation of back calculation can be seen on figure \ref{fig:anti-windup}. This approach feeds a fraction of the difference between the commanded output signal and the saturated signal back to the integrator. This way keeping the commanded output signal close to the saturation limits, while in saturation. Conditional integration works by feeding zero into the integrator, thus keeping the integration term constant, when the control signal is saturated. 
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.7\textwidth]{Sections/Miscellaneous/Images/PID-Anti-windup-BackCalc.png}
-    \caption{Diagram of PID-controller included anti-windup implemented using back calculation. $T_t$ is the tracking time constant and $e_s$ is the saturation error.}
+    \includegraphics[width=0.7\textwidth]{Sections/Miscellaneous/Images/PID-Anti-windup-BackCalc.pdf}
+    \caption{Block diagram of a PID-controller including anti-windup implemented using back calculation. $T_t$ is the tracking time constant and $e_s$ is the saturation error.}
     \label{fig:anti-windup}
 \end{figure}
 
@@ -98,18 +101,32 @@ Instead of using a single controller for the plant, sometimes it can be benefici
 
 \subsubsection*{Modern Control Methods}
 %explain states -> state space form
-Modern control methods utilises state feedback represented as a block diagram on figure \ref{fig:Integral_Diagram}. The state space feedback can be described as seen on equation \ref{eq:gen_statespace}, where $A$ is the system matrix, $B$ is the input matrix, $x$ is the state, $u$ is the control signal, $y$ is the output and $C$ is the output matrix. $F$ is the state feedback matrix. 
+A system can be described based on the dynamics of the states found in the system. For the DC motor example, the states could be current, angular velocity and angular position. The dynamics can be presented using the state space form shown in equation \ref{eq:gen_statespace}.
 
 \begin{equation}\label{eq:gen_statespace}
     \begin{split}
         \Dot{x}&=Ax+Bu \\
-        y&=Cx \\
-        u&=Fx
+        y&=Cx \qquad ,%\\
+        %u&=Fx
     \end{split}
 \end{equation}
 
-One approach to designing the feedback matrix is pole assignment, where the feedback matrix is calculated to yield specific closed loop poles in order to achieve a desired response. This requires the designer to decide exactly where the poles should be placed, which for somewhat complex systems can be difficult and counter intuitive.
-A Different approach is using the Linear Quadratic Regulator (LQR) method. This algorithm is based around the minimising of the cost of operating a linear system. This method provides a way to apply a weight to each state and each control signal and thereby influence which will be prioritised higher. As an example, the states can be prioritised highly giving a fast response, at the cost of more aggressive control signals.
+where $A$ is the system matrix, $B$ is the input matrix, $C$ is the output matrix,  $x$ is a vector containing the states and $u$ is a vector containing external control signals.
+Modern control aims to control the states in the system via state feedback, which introduces the control law seen in equation \ref{eq:state_feedback}.
+
+\begin{equation}\label{eq:state_feedback}
+    u = F x \qquad ,
+\end{equation}
+
+where $F$ is the feedback matrix, which can be designed to yield the desired system response.
+
+
+% Modern control methods utilises state feedback represented as a block diagram on figure \ref{fig:Integral_Diagram}. A simple state space feedback can be described as seen in equation \ref{eq:gen_statespace}, where $A$ is the system matrix, $B$ is the input matrix, $x$ is the state, $u$ is the control signal, $y$ is the output, $C$ is the  and $F$ is the state feedback matrix. 
+
+
+
+One approach to design the feedback matrix is pole assignment, where the feedback matrix is calculated to yield specific closed loop poles in order to achieve a desired response. This requires the designer to decide exactly where the poles should be placed, which for somewhat complex systems can be difficult.
+A Different approach is using the linear quadratic regulator method. This algorithm is based around the minimising of a cost function concerning the optimisation of operating a linear system. This method provides a way to apply a weight to each state and each control signal and thereby influence which will be prioritised higher. As an example, the states can be prioritised highly giving a fast response, at the cost of more aggressive control signals.
 
 Since both of the these design methods are based on a linear model of the system, it is a prerequisite that a very accurate model of the plant, which is defined by the $A$ and $B$ matrices, is known. 
 
@@ -120,16 +137,18 @@ Since both of the these design methods are based on a linear model of the system
     \label{fig:Integral_Diagram}
 \end{figure}
 
-A way to reduce some of the issues from uncertainties about the plant, is to include integral action as seen on figure \ref{fig:Integral_Diagram}. The integral feedback provides zero steady state error by integrating the error. Taking basis in the state space form equation \ref{eq:gen_statespace} and adding an additional feedback, the input is given as described in equation \ref{eq:input_integral}.
+A way to reduce some of the issues from uncertainties about the plant, is to include integral action as seen on figure \ref{fig:Integral_Diagram}. The integral feedback provides zero steady state error by integrating the error. Taking basis in the state space form equation \ref{eq:gen_statespace} and adding an additional feedback, the input is given as described in equation \ref{eq:input_integral}.  
+
 \begin{equation}\label{eq:input_integral}
-    u=Fx+F_Ix_I
+        u=Fx+F_Ix_I \qquad , 
 \end{equation}
-where $F$ is the state feedback matrix, $F_I$ is the integral matrix and $x_I$ is given by:
-\begin{equation}
-    \begin{split}
-        x_I(t)=\int_0^t y(\tau)-r(\tau)\,d\tau
-    \end{split}
+
+where $F$ is the state feedback matrix, $F_I$ is the integral matrix and $X_{I}$ is described in equation \ref{eq:integral_xi}.
+
+\begin{equation}\label{eq:integral_xi}
+    x_I(t)=\int_0^t y(\tau)-r(\tau)\,d\tau \qquad ,
 \end{equation}
+
 where $t$ is the time, $y$ is the output, $r$ is the reference and $\tau$ is the integration variable.
 
 \begin{figure}
@@ -139,7 +158,7 @@ where $t$ is the time, $y$ is the output, $r$ is the reference and $\tau$ is the
     \label{fig:Integral_Observer_Diagram}
 \end{figure}
 
-State feedback requires that every state is known, which is not always the case. However means to estimate states of a given system is available. The estimation can be achieved by introducing an observer to the system, which is illustrated on figure \ref{fig:Integral_Observer_Diagram}. The observer aims to mirror the plant and by that making it possible to approximate a given state.
+State feedback requires that every state is measured, which is rarely possible. However means to estimate states of a given system are available. The estimation can be achieved by introducing an observer to the system, which is illustrated on figure \ref{fig:Integral_Observer_Diagram}. The observer aims to mirror the plant and by that making it possible to approximate a given state.
 The observer introduces an observer gain, $L$, which is proportional with the difference between the output from the plant and the estimated observer output. The observer state space model is as seen in equation \ref{eq:Obs_state_space}, where $\hat{x}$ is the estimated state and $\hat{y}$ is the estimated output.
 \begin{equation}\label{eq:Obs_state_space}
     \begin{split}
@@ -148,52 +167,54 @@ The observer introduces an observer gain, $L$, which is proportional with the di
     \end{split}
 \end{equation}
 
-To take into account that there are physical limitation in form of saturation an anti-windup in form of the gain $M$ on figure \ref{fig:Integral_Observer_Diagram} can be added. The anti-windup subtracts $v$ with the control signal, $u$ and multiplies it with the gain, $M$. and if there is a different it prevent the integral term to windup. 
-If saturation occur the dynamic of the observer controller changes to:
-\begin{equation}\label{eq:anti-windup_state_space}
-    \begin{split}
-        \Dot{\hat{x}}&=A\hat{x}+LC\hat{x}+MF\hat{x}\\
-        \hat{y}&=C\hat{x}
-    \end{split}
-\end{equation}
+As with the classical control, saturation might be considered in modern control. This can be handled by introducing a matrix $M$, as seen in figure \ref{fig:Integral_Observer_Diagram}, which can alter the system dynamics when in saturation.
 
-Thus the equivalent state space model of an integral controller with an observer and anti-windup is as seen on equation \ref{eq:state_space_modern_control}.
+% To take into account that there are physical limitation in form of saturation an anti-windup in form of the gain $M$ on figure \ref{fig:Integral_Observer_Diagram} can be added. The anti-windup subtracts $v$ with the control signal, $u$ and multiplies it with the gain, $M$. If there is a different it prevent the integral term to windup. 
+% If saturation occur the dynamic of the observer controller changes to:
+% \begin{equation}\label{eq:anti-windup_state_space}
+%     \begin{split}
+%         \Dot{\hat{x}}&=A\hat{x}+LC\hat{x}+MF\hat{x}\\
+%         \hat{y}&=C\hat{x}
+%     \end{split}
+% \end{equation}
 
-\begin{equation}\label{eq:state_space_modern_control}
-\begin{split}
-\begin{bmatrix}
-        \dot{x} \\
-        \dot{\hat{x}}\\
-        \dot{x}_I
-    \end{bmatrix} &=
-    \begin{bmatrix}
-        A & BF & BF_I \\
-        -LC & A+BF+LC & BF_I \\
-        C & 0 & 0
-    \end{bmatrix}
-    \begin{bmatrix}
-        x \\
-        \hat{x} \\
-        x_I
-    \end{bmatrix}
-    + 
-    \begin{bmatrix}
-    0\\
-    0\\
-    -I
-    \end{bmatrix}
-    r \\
-    y &= \begin{bmatrix}
-        C & 0 & 0
-    \end{bmatrix}     
-    \begin{bmatrix}
-        x \\
-        \hat{x} \\
-        x_I
-    \end{bmatrix}, 
-    \end{split}
-\end{equation}
-where $r$ is the reference and $\Dot{\hat{x}}$ is described by equation \ref{eq:anti-windup_state_space} when saturation occurs.
+% Thus the equivalent state space model of an integral controller with an observer and anti-windup is as seen on equation \ref{eq:state_space_modern_control}.
+
+% \begin{equation}\label{eq:state_space_modern_control}
+% \begin{split}
+% \begin{bmatrix}
+%         \dot{x} \\
+%         \dot{\hat{x}}\\
+%         \dot{x}_I
+%     \end{bmatrix} &=
+%     \begin{bmatrix}
+%         A & BF & BF_I \\
+%         -LC & A+BF+LC & BF_I \\
+%         C & 0 & 0
+%     \end{bmatrix}
+%     \begin{bmatrix}
+%         x \\
+%         \hat{x} \\
+%         x_I
+%     \end{bmatrix}
+%     + 
+%     \begin{bmatrix}
+%     0\\
+%     0\\
+%     -I
+%     \end{bmatrix}
+%     r \\
+%     y &= \begin{bmatrix}
+%         C & 0 & 0
+%     \end{bmatrix}     
+%     \begin{bmatrix}
+%         x \\
+%         \hat{x} \\
+%         x_I
+%     \end{bmatrix}, 
+%     \end{split}
+% \end{equation}
+% where $r$ is the reference and $\Dot{\hat{x}}$ is described by equation \ref{eq:anti-windup_state_space} when saturation occurs.
 
 \subsection*{Implementation}
 %modelling, continuous vs discrete
@@ -205,7 +226,7 @@ Upon designing a controller it is important to keep in mind that an actual imple
     \caption{Illustration of mapping from the continuous s-domain to the discrete z-domain using different approaches.}
     \label{fig:mapping_s_to_z}
 \end{figure}
-Using the forward rectangular rule to map from the s to the z-domain, the entire left-half plane of the s domain is mapped into the z-domain into a rectangular shape. The forward rectangular rule maps the left-half plane of the s-domain into a circle placed in the right-half of the z-domain. The trapezoidial rule fits the left-half plane of the s-domain into the unit-circle of the z-domain. The phenomenons are illustrated on figure \ref{fig:mapping_s_to_z}.  
+Using the forward rectangular rule to map from the s to the z-domain, the entire left-half plane of the s-domain is mapped into the z-domain into a rectangular shape. The forward rectangular rule maps the left-half plane of the s-domain into a circle placed in the right-half of the z-domain. The trapezoidial rule fits the left-half plane of the s-domain into the unit-circle of the z-domain. The phenomenons are illustrated on figure \ref{fig:mapping_s_to_z}.  
 
 Implementing the discrete controller can be done as seen in equation \ref{eq:discrete_control}, utilising the Tustins method. Tustins method is based on the trapezoidial rule, and dictates a certain way of implementing the integral and thereby the differential part.
 \begin{equation}\label{eq:discrete_control}
