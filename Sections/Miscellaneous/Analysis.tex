@@ -143,7 +143,7 @@ A way to reduce some of the issues from uncertainties about the plant, is to inc
         u=Fx+F_Ix_I \qquad , 
 \end{equation}
 
-where $F$ is the state feedback matrix, $F_I$ is the integral matrix and $X_{I}$ is described in equation \ref{eq:integral_xi}.
+where $F$ is the state feedback matrix, $F_I$ is the integral matrix and $X_{I}$ is described in equation \ref{eq:integral_xi},
 
 \begin{equation}\label{eq:integral_xi}
     x_I(t)=\int_0^t y(\tau)-r(\tau)\,d\tau \qquad ,
@@ -237,7 +237,7 @@ Implementing a discrete PID-controller, utilising the Tustin method, can be done
         u(kT+T) &= k_P\cdot e(kT+T)\\&+u_I(kT) + k_I\frac{T}{2} \cdot (e(kT+T)+e(kT))\\ &+k_D \frac{2}{T}\cdot(e(kT+T)-e(kT))-u_D(kT) \quad ,
 \end{split}
 \end{equation}
-where $u(kT+T)$ is the control signal in discrete time. $T$ is the sampling time, $e$ is the error and $k_p$, $k_I$ and $k_D$ are the PID gains. Tustin's method is based on the trapezoidial rule, and dictates a certain way of implementing the integral and thereby also the differential part. As seen from equation \ref{eq:discrete_control} the terms depend on the sampling time, thus it needs to be known. A rule of thump state that the sampling frequency for a discrete controller, should be approximately 20-30 times larger than the closed-loop bandwidth of the system \cite{Design_Of_Digital_Control_Systems_NOTE}. 
+where $u(kT+T)$ is the control signal in discrete time. $T$ is the sampling time, $e$ is the error and $k_p$, $k_I$ and $k_D$ are the PID gains. Tustin's method is based on the trapezoidial rule, and dictates a certain way of implementing the integral and thereby also the differential part. As seen from equation \ref{eq:discrete_control} the terms depend on the sampling time, thus it needs to be known. A rule of thump states that the sampling frequency for a discrete controller, should be approximately 20-30 times larger than the closed-loop bandwidth of the system \cite{Design_Of_Digital_Control_Systems_NOTE}. 
 
 %  In time-domain each term can be described as in equation \ref{eq:time-domain-PID-controller}.
 % \begin{equation}
@@ -284,9 +284,9 @@ where $u(kT+T)$ is the control signal in discrete time. $T$ is the sampling time
 % \end{equation}
 
 \subsection*{Microcontroller}
-Implementing at least two controllers on the same microcontroller and having to accommodate other tasks such as SPI and UART in parallel. It would be advantageous to implement some sort of scheduling algorithm. The easiest way of implementing a scheduling algorithm is by the use of an operating system (OS). Various types of operating systems exist, though in this project only two operating systems has been evaluated, Run To Complete Scheduler (RTCS) and FreeRTOS. The RTCS uses a cooperative scheduling algorithm, where the task voluntarily has to yield processing time on the CPU. This method provides a light weight overhead, though the risk of a task blocking the CPU is greater as no master can reallocate resources while another task i running. 
+Implementing at least two controllers on the same microcontroller and having to accommodate other tasks in parallel, it would be advantageous to implement some sort of scheduling algorithm. The easiest way of implementing a scheduling algorithm is by the use of an operating system. Various types of operating systems exist, though in this project only two operating systems have been evaluated, Run To Complete Scheduler (RTCS) seen in section \ref{sec:digital_appendix} and FreeRTOS. The RTCS uses a cooperative scheduling algorithm, where the task voluntarily has to yield processing time on the CPU. This method provides little overhead, though the risk of a task blocking the CPU, is greater as no master can reallocate resources while another task in running. 
  % The run to complete scheduler (RTCS) constitutes such an algorithm and is based on a cooperative scheduling where a running task wont be interrupted by other tasks, unless the task voluntarily yield control. Thus to achieve a seemingly multitasking system all tasks must cooperate to prevent starvation of tasks. 
-The FreeRTOS as standard uses a preemptive scheduling algorithm where a central master is responsible for the allocation of resources. The central master can preempt a task whenever it is wanted, therefore minimising the probability of starvation occurring. FreeRTOS does however provide a greater overhead compared to the RTCS. If time-critical tasks exists in the system, it is preferred to use a OS providing real-time capabilities. A real-time system ensures that important tasks is guaranteed to complete within a given time frame from when the task is signaled to run. FreeRTOS provides functionalities to operate as a real-time system, such as prioritisation of tasks.   
+As default, FreeRTOS uses a preemptive scheduling algorithm, where a central master is responsible for the allocation of resources. The central master can preempt a task whenever it is necessary, therefore minimising the probability of starvation occurring. FreeRTOS, using preemptive scheduling, does however provide a greater overhead compared to the RTCS, using cooperative scheduling. If time-critical tasks exists in the system, it is preferred to use an operating system providing real-time capabilities. A real-time system ensures that important tasks are guaranteed to complete within a given time frame from when the task is signaled to run. FreeRTOS provides functionalities to operate as a real-time system, such as prioritisation of tasks.   
 
 % could also be implemented, which opposed to the RTCS allow the scheduler to preempt tasks when the allocated CPU time of the task is used. Switching between tasks does however introduce overhead.\\
 

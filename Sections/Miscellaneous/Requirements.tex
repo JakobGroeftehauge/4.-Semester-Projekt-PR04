@@ -1,28 +1,33 @@
 \documentclass[../../main.tex]{subfiles}
 
 \begin{document}
-In accordance with section \ref{sec:ProblemDescription} and section \ref{sec:Delimination}, PID-controllers are to be designed and the following must be examined:
+In accordance with section \ref{sec:ProblemDescription} and section \ref{sec:Delimination}, different PID-controllers are to be designed and the following must be examined:
 \begin{itemize}
     \item The effect of different tuning methods for the controller, namely the Ziegler-Nichols and pole placement method.
-    \item The effect of using a single controller design versus a cascaded controller design.
+    \item The effect of using a single controller design versus a cascaded controller design with a velocity controller in the inner loop and a position controller in the outer loop.
 \end{itemize}
 
-The following specifications have to be considered when designing the PID-controllers:
+The following specifications shall be used as guidelines
+when designing the PID-controllers:
 \begin{itemize}
     %\item The designed PID-controllers are to be stable.
-    \item The controllers are to have a maximum rise time of $\SI{0.5}{\second}$, a maximum overshoot of 5\% and a maximum settling time of $\SI{1.5}{\second}$.
+    \item The controllers are to have a maximum rise time of $\SI{0.5}{\second}$, a maximum overshoot of \SI{5}{\percent} and a maximum \SI{1}{\percent} settling time of $\SI{1.5}{\second}$.
 \end{itemize}
 
-To meet the aforementioned goals, a program which allows for processing PID control algorithms must be implemented on the microcontroller. To ensure reliable performance, the following requirements must be met:
+To meet the aforementioned goals, a program which allows for processing PID-controllers must be implemented on the microcontroller. To ensure reliable performance, the following requirements must be met:
 
 \begin{itemize}
-    \item The control algorithms must be implemented on the microcontroller.
+    \item The PID-controllers must be implemented on the microcontroller.
+    \begin{itemize}
+        \item The PID-controllers must not utilize more than \SI{60}{\percent} of the CPU time on the microcontroller.
+    \end{itemize}
     \item The microcontroller must run the FreeRTOS operating system.
     %\item The program running on the microcontroller must consist of loosely coupled tasks scheduled by the FreeRTOS operating system.
     \begin{itemize}
         \item It must be verified that the overhead does not compromise the timing of the system.
     \end{itemize}
-    \item The microcontroller is not to utilise more than 80\% of the total CPU time.
+   % \item The PID-controllers must not utilize more than \SI{60}{\percent} of the CPU time on the microcontroller. 
+    %\item The microcontroller is not to utilise more than \SI{80}{\percent} of the total CPU time.
     \item All PID-controllers must be processed within a specified time frame to guarantee a minimum frequency. The minimum frequency and time period is to be determined.
     
     \item A UART protocol is to be implemented to allow for user input.
@@ -30,7 +35,7 @@ To meet the aforementioned goals, a program which allows for processing PID cont
 Using an FPGA the motor encoders must be interfaced to provide feedback for the PID-controllers executing on the microcontroller. The interface must meet the following requirements:
 \begin{itemize}
     \item Data transmission between the FPGA and the microcontroller must be possible through SPI.
-    \item Using SPI with a transmission frequency of \SI{2}{\kilo\hertz}, the FPGA is to receive 10000/10000 messages correct with no errors.
+    \item Using SPI with a transmission frequency of \SI{1}{\kilo\hertz}, the FPGA is to receive 10000/10000 messages correct with no errors.
     \item The FPGA is to be able to keep track of the position and velocity of the motors via the encoders.
     \item Provided with a duty cycle from the microcontroller, the FPGA must be able to generate a PWM signal with a frequency between \SI{30}{\kilo\hertz} and \SI{100}{\kilo\hertz}.
     \item A reset function for the pan-tilt system is to be implemented to allow for a reference position.
