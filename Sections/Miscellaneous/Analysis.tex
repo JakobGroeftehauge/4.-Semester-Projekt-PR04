@@ -97,7 +97,7 @@ When implementing anti-windup it can be executed using back-calculation or condi
     \label{fig:anti-windup}
 \end{figure}
 
-Instead of using a single controller for the plant, sometimes it can be beneficial to implement multiple controllers in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is perceived as multiple simpler plants that feed into each other. The outermost control loop will then supply the reference signal for the next and so on. If designed correctly, this design will provide better noise rejection and lower sensitivity to parameter variations. This is because disturbances acting on the inner loop will be isolated from, and ideally invisible to the outer control loops. On the pan-tilt system a cascade constituting three controllers would be a inner current controller, a velocity controller and then an outer position controller.
+Instead of using a \textit{single} controller for the plant, sometimes it can be beneficial to implement multiple controllers in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is perceived as multiple simpler plants that feed into each other. The outermost control loop will then supply the reference signal for the next and so on. If designed correctly, this design will provide better noise rejection and lower sensitivity to parameter variations. This is because disturbances acting on the inner loop will be isolated from, and ideally invisible to the outer control loops. On the pan-tilt system a cascade constituting three controllers would be a inner current controller, a velocity controller and then an outer position controller.
 
 \subsubsection*{Modern Control Methods}
 %explain states -> state space form

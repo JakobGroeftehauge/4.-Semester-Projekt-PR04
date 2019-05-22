@@ -5,22 +5,20 @@
 
 % introduction, quickly describe which tunings methods are to be explored. List the specifications which are attempted to be met.
 %If it is not already mentioned earlier, mention that the design is done by assuming the controller to be continuous rather than discretising the plant
-As mentioned in section \ref{sec:Requirements} the controller design method explored in this project will focus on different configurations of a PID-controller. Both single and cascaded controllers will be examined, meaning that both position and velocity controllers are to be designed. The performance specifications listed in table \ref{tab:performanceSpec} is used as a guideline of the design. However, the main focus will be on comparing different controller configurations rather than meeting the performance specifications.   
+As mentioned in section \ref{sec:Requirements} the controller design method explored in this project will focus on different configurations of a PID-controller. Both single and cascaded controllers will be examined, meaning that both position and velocity controllers are to be designed. The performance specifications mentioned in section \ref{sec:Requirements} is used as a guideline of the design. However, the main focus will be on comparing different controller configurations rather than meeting the performance specifications. As mentioned in section \ref{sec:Delimination}, the controllers designed in this section will be designed in the continuous time domain, afterwards additional steps will be taken to approximate the effect of the discrete controllers and verify performance.
 
-As mentioned in section \ref{sec:Delimination}, the controllers designed in this section will be designed in the continuous time domain, afterwards additional steps will be taken to approximate the effect of the discrete controllers, and verify performance.
+% \begin{table}[]
+%     \centering
+%     \begin{tabular}{lc}
+%         Rise time &  \SI{0.5}{\second}\\
+%         Settling time & \SI{1.5}{\second}\\ 
+%         Overshoot & \SI{5}{\percent}
+%     \end{tabular}
+%     \caption{Performance specifications}
+%     \label{tab:performanceSpec}
+% \end{table}
 
-\begin{table}[]
-    \centering
-    \begin{tabular}{lc}
-        Rise time &  \SI{0.5}{\second}\\
-        Settling time & \SI{1.5}{\second}\\ 
-        Overshoot & \SI{5}{\percent}
-    \end{tabular}
-    \caption{Performance specifications}
-    \label{tab:performanceSpec}
-\end{table}
-
-\subsection{Position Control System Design Based on Mathematical Model}
+\subsection{Design of Position Control Based on Mathematical Model}
 \label{subsec:position_control_model}
 % Position 
 % Present the bode plot of closed-loop and argue that the chosen sampling rate is sufficient.
@@ -28,7 +26,7 @@ As mentioned in section \ref{sec:Delimination}, the controllers designed in this
 % Argue why the specific reference is used for the step response
 % block diagram representing the controller with, and without saturation. Showing step responses with and without saturation, argue that for future responses, a model with saturation is used, in order be able to compare to tests. Maybe also present an argument for anti wind-up, if not presented previously.
 %looking at the step response, discuss how well it matches the specifications
-A \textit{single} unique position PID-controller must be designed for each motor. To design the control systems, the \textit{root locus plot} will be utilised to calculate the correct gains for the proportional, integral and derivative terms. Considering a closed-loop system of the form shown in equation \ref{eq:closedLoopSystem},
+A single position PID-controller must be designed for each motor. To design the control systems, the \textit{root locus plot} will be utilised to calculate the appropriate gains for the proportional, integral and derivative terms. Considering a closed-loop system of the form shown in equation \ref{eq:closedLoopSystem},
 
 \begin{equation}\label{eq:closedLoopSystem}
     H_{cl}(s)=\frac{K\cdot G(s)}{1+K\cdot G(s)} \qquad ,
@@ -42,9 +40,7 @@ As seen from the transfer function of a PID-controller in equation \ref{eq:PID_t
     K(s) = \frac{k_d s^2 + k_p s + k_i}{s} \qquad ,
 \end{equation}
 
-where $k_p$,$k_d$ and $k_i$ are the respective gains, this type of controller adds two open-loop zeros and one open-loop pole to an existing system. The open-loop pole, originating from the integral term, will always be placed at the origin, but the zero positions can be controlled.
-
-The design procedure which will be followed in this section will thus involve first placing these two zeros and afterwards choosing an appropriate gain based on the root locus plot. To place the zeros, equation \ref{eq:PID_zero_placement} is used, 
+where $k_p$,$k_d$ and $k_i$ are the respective gains, this type of controller adds two open-loop zeros and one open-loop pole to an existing system. The open-loop pole, originating from the integral term, will always be placed at the origin, but the positions of the zeros can be controlled. The design procedure which will be followed in this section will thus involve first placing these two zeros and afterwards choosing an appropriate gain based on the root locus plot. To place the zeros, equation \ref{eq:PID_zero_placement} is used, 
 
 \begin{equation}\label{eq:PID_zero_placement}
     K(s) = \frac{(s-z_1)\cdot(s-z_2)}{s} \qquad ,
@@ -59,19 +55,19 @@ To figure out where to place the zeros, it must first be considered where the po
 \end{equation}
 
 where $\omega_{n}$ is the undamped natural frequency of the system and $\zeta$ is the damping ratio. 
-The closed-loop system for position control has four poles, although only three dominant ones, and two zeros, so the frequency domains rules will have to be used only as guidelines. To obtain a rise time shorter than $t_r$ the minimum magnitude, $w_n$, of the poles can be approximated as $w_n\geq\frac{1.8}{t_r}$. To obtain a 1\% settling time faster than $t_s$, the magnitude of the real part of the poles, $\sigma = \omega_n \zeta$ can be found as $\sigma \geq \frac{-\ln{0.01}}{t_s} $. Lastly, to keep an overshoot below 5\%, it must be true that $\zeta \geq \sqrt{\frac{(\frac{\ln{0.05}}{-\pi})^2}{1+(\frac{\ln{0.05}}{-\pi})^2}}$, which defines a cone shaped region in the complex plane, in which the poles should be placed \cite{}. The region based on the specifications can be seen on figure \ref{fig:system_requirements}.
+The closed-loop system for position control has four poles, although only three dominant ones, and two zeros, so the frequency domains rules will have to be used only as guidelines. To obtain a rise time shorter than $t_r$ the minimum magnitude, $w_n$, of the poles can be approximated as $w_n\geq\frac{1.8}{t_r}$. To obtain a \SI{1}{\percent} settling time faster than $t_s$, the magnitude of the real part of the poles, $\sigma = \omega_n \zeta$ can be found as $\sigma \geq \frac{-\ln{0.01}}{t_s} $. Lastly, to keep an overshoot below \SI{5}{\percent}, it must be true that $\zeta \geq \sqrt{\frac{(\frac{\ln{0.05}}{-\pi})^2}{1+(\frac{\ln{0.05}}{-\pi})^2}}$, which defines a cone shaped region in the complex plane, in which the poles should be placed \cite{}. The region based on the specifications can be seen on figure \ref{fig:system_requirements}.
 % remember that the poles have to be in the left half plane, introduce how the specifications map to the root locus plot.
 
 
 \begin{figure}
     \centering
     \includegraphics[width=0.7\textwidth]{Sections/System_Design/Images/system_requirements_new.png}
-    \caption{All poles should be placed to the left of all the lines, in the yellow region, for the system to meet the required performance specifications}
+    \caption{All poles should be placed to the left of all the lines, in the yellow region, for the system to meet the required performance specifications.}
     \label{fig:system_requirements}
 \end{figure}
 
-It can be seen on figure \ref{fig:PosRootLocus} that in order to follow the frequency domain guidelines found above, the two open-loop poles at the origin should be moved to the left, while at the same time keeping their imaginary parts close enough to zero to stay within the cone shaped region dictated by the requirement of 5\% overshoot.
-Through experimentation it has been found that placing zeros at $9.5$ and $1$ for the tilt motor and at $3.3$ and $0.8$ for the pan motor, produced satisfactory root loci, which are shown in figure \ref{fig:PosRootLocus}. Based on the plots, an appropriate gain is chosen. For the tilt motor a value of $0.9$ was chosen while $1.2$ was chosen for the pan motor. This results in the control gains shown in table \ref{tab:pos_controller_gains}. The closed-loop pole locations at these gains are also visible from figure \ref{fig:PosRootLocus}.
+It can be seen on figure \ref{fig:PosRootLocus} that in order to follow the frequency domain guidelines found above, the two open-loop poles at the origin should be moved to the left. This should be done while keeping their imaginary parts close enough to zero to stay within the cone shaped region dictated by the requirement of \SI{5}{\percent} overshoot.
+Through experimentation it has been found that placing zeros at $s=-9.5$ and $s=-1$ for the tilt motor and at $s=-3.3$ and $s=-0.8$ for the pan motor, produced satisfactory root loci, which are shown in figure \ref{fig:PosRootLocus}. Based on the plots, an appropriate gain is chosen. For the tilt motor a value of $s=-0.9$ was chosen while $s=-1.2$ was chosen for the pan motor. The resulting control gains are summarised in table \ref{tab:pos_controller_gains}. The closed-loop pole locations at these gains are also visible from figure \ref{fig:PosRootLocus}.
 
 \begin{table}[]
     \centering

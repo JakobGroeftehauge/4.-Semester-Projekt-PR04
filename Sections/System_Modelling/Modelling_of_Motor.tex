@@ -39,8 +39,8 @@ Using equation \ref{eq:sysEq1} and \ref{eq:sysEq2} the system is represented on 
 \end{bmatrix} &=
 \begin{bmatrix}
 0 & 1 & 0 \\
-0 & \frac{-b}{J} & \frac{K}{J}\\
-0 & \frac{-K}{L} & \frac{-R}{L}
+0 & \frac{-b}{J} & \frac{K_m}{J}\\
+0 & \frac{-K_m}{L} & \frac{-R_m}{L_m}
 \end{bmatrix}
 \begin{bmatrix}
 \theta\\
@@ -66,7 +66,15 @@ i
     \end{split}
 \end{equation}
 
-The system dynamics can also be described by the transfer functions for  position
+The system dynamics can also be described by the transfer functions for velocity and position, seen in equation \ref{eq:tf_pos_vel} and \ref{eq:tf_pos}.
+\begin{equation}\label{eq:tf_pos}
+    \frac{\dot{\theta}(s)}{V(s)} = \frac{K_m}{(J\cdot s + b)(L\cdot s + R) + K_m^2}
+\end{equation}
+
+\begin{equation}
+    \frac{\theta(s)}{V(s)} = \frac{K_m}{s\cdot((J\cdot s + b)(L\cdot s + R) + K_m^2)} \qquad 
+\end{equation}
+
 
 \begin{figure}[H]
     \centering
