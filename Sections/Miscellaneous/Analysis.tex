@@ -14,10 +14,10 @@ Each frame is actuated by a \SI{12}{\volt} DC motor equipped with an incremental
 
 Figure \ref{fig:Open_Close_loop} shows a simple \textit{controller} setup.
 The plant is the system which is to be controlled. The controller outputs a control signal which is the input to the plant. 
-An example of a plant is an electric motor for which the control signal could be a voltage and the output could be an angular velocity.
-If a perfect model of the plant exists, and no external disturbances act on the system, a controller can be designed that controls the plant purely based on a reference input. In reality, such a system cannot be obtained, so to properly control the system, it is beneficial to monitor the output of the plant. The output is subtracted from the reference, thereby providing a feedback for the system, making the system more robust. In this case it is a closed loop system. When there is no feedback the system is an open loop system.  
+In this project the plant would be an electric motor for which the control signal could be a voltage and the output could be an angular velocity.
+If a perfect model of the plant exists, and no external disturbances act on the system, a controller can be designed that controls the plant purely based on a reference input. This type of system would be classified as open loop. In reality, such a system cannot be obtained, so to properly control the system, it is beneficial to monitor the output of the plant. The output is subtracted from the reference, yielding an error used as input for the controller. This type of feedback yields a closed loop system and makes the system more robust. 
 
-The problem description states that a position controller has to be designed, however such a controller can take on many forms, leading to different design approaches and methods. Generally speaking, controller design can be divided into two categories, classical control which operates in the frequency domain and modern control which operates in the time domain. Both approaches will be examined in this section.
+The problem description states that a position controller has to be designed, however such a controller can take on many forms, leading to different design approaches and methods. Generally speaking, controller design can be divided into two categories, classical control, which operates in the frequency domain, and modern control which operates in the time domain. Both approaches will be examined in this section.
 
 
 
@@ -45,7 +45,7 @@ The problem description states that a position controller has to be designed, ho
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{Sections/Miscellaneous/Images/Open_closed_Diagram.pdf}
-    \caption{Figure illustrating the concept of open and closed loop. }
+    \caption{Figure illustrating the concept of controller setup highlighting the open and closed loop concepts. }
     \label{fig:Open_Close_loop}
 \end{figure}
 
@@ -56,10 +56,9 @@ The problem description states that a position controller has to be designed, ho
 \subsection*{Classical Control Methods}\label{subsec:classic_control}
 
 
-A traditional method for designing a controller for a motor is to use a PID-controller. Though many controller configurations using parts of the PID-controllers design exists, only the full PID-controller will be examined. The block diagram of a PID-controller can be seen on figure \ref{fig:PID_controller}. As seen on the block diagram
-a PID-controller utilises a feedback loop. The feedback is subtracted from the reference signal resulting in an error, which then is send to the controller. The controller consist of three terms: a proportional term, an integral term and a derivative term. Each evaluated separately and then combined to yield the output of the controller. If only the proportional term is used, a steady state error between the output and the reference will always be present. Therefore the integral term is introduced to eliminate the steady state error, as the integral will keep increasing until there is no steady state error. The derivative term is used to control the overshoot of the step response.
+A traditional method for designing a controller for a motor is to use a PID-controller. Though many controller configurations using parts of the PID-controllers design exists, only the full PID-controller will be examined. The block diagram of a PID-controller can be seen on figure \ref{fig:anti-windup}. As seen on the block diagram
+a PID-controller utilises a feedback loop. The controller consist of three terms: a proportional term, an integral term and a derivative term. Each term is evaluated separately and then combined to yield the output of the controller. If only the proportional term is used, a steady state error between the output and the reference will always be present. Therefore the integral term is introduced to eliminate the steady state error, as the integral will keep increasing until there is no steady state error. The derivative term adds anticipatory action based on the trend of the error. \cite{}
 
-Instead of using a single controller for the plant, sometimes it can be beneficial to implement multiple controllers in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is perceived as multiple simpler plants that feed into each other. The outermost control loop will then supply the reference signal for the next and so on. If designed correctly, this design will provide better noise rejection and lower sensitivity to parameter variations. This is because disturbances acting on the inner loop will be isolated from, and ideally invisible to the outer control loops. On the pan-tilt system a cascade constituting three controllers would be a inner current controller, a velocity controller and then an outer position controller.
 
 %I tilfælde med dette system 
 % \begin{equation}\label{eq:feedforward}
@@ -91,9 +90,11 @@ When implementing anti-windup it can be executed using back-calculation or condi
 \begin{figure}
     \centering
     \includegraphics[width=0.7\textwidth]{Sections/Miscellaneous/Images/PID-Anti-windup-BackCalc.png}
-    \caption{Diagram of anti-windup using back calculation. $T_t$ is the tracking time constant and $e_s$ is the saturation error.}
+    \caption{Diagram of PID-controller included anti-windup implemented using back calculation. $T_t$ is the tracking time constant and $e_s$ is the saturation error.}
     \label{fig:anti-windup}
 \end{figure}
+
+Instead of using a single controller for the plant, sometimes it can be beneficial to implement multiple controllers in a cascaded design as shown on figure \ref{fig:cascaded_design_analysis}. Here, the plant is perceived as multiple simpler plants that feed into each other. The outermost control loop will then supply the reference signal for the next and so on. If designed correctly, this design will provide better noise rejection and lower sensitivity to parameter variations. This is because disturbances acting on the inner loop will be isolated from, and ideally invisible to the outer control loops. On the pan-tilt system a cascade constituting three controllers would be a inner current controller, a velocity controller and then an outer position controller.
 
 \subsubsection*{Modern Control Methods}
 %explain states -> state space form
