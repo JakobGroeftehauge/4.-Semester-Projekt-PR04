@@ -24,7 +24,7 @@ As mentioned in section \ref{sec:Requirements} the controller design method expl
 % Present the bode plot of closed-loop and argue that the chosen sampling rate is sufficient.
 % Inserting a delay to emulate the discrete controller, present the stability margins
 % Argue why the specific reference is used for the step response
-% block diagram representing the controller with, and without saturation. Showing step responses with and without saturation, argue that for future responses, a model with saturation is used, in order be able to compare to tests. Maybe also present an argument for anti wind-up, if not presented previously.
+% block diagram representing the controller with, and without saturation. Showing step responses with and without saturation, argue that for future responses, a model with saturation is used, in order be able to compare to tests. Maybe also present an argument for anti-windup, if not presented previously.
 %looking at the step response, discuss how well it matches the specifications
 A single position PID-controller must be designed for each motor. To design the control systems, the \textit{root locus plot} will be utilised to calculate the appropriate gains for the proportional, integral and derivative terms. Considering a closed-loop system of the form shown in equation \ref{eq:closedLoopSystem},
 
@@ -62,12 +62,12 @@ The closed-loop system for position control has four poles, although only three 
 \begin{figure}
     \centering
     \includegraphics[width=0.7\textwidth]{Sections/System_Design/Images/system_requirements_new.png}
-    \caption{All poles should be placed to the left of all the lines, in the yellow region, for the system to meet the required performance specifications.}
+    \caption{All poles should be placed in the yellow area for the system to meet the required performance specifications.}
     \label{fig:system_requirements}
 \end{figure}
 
 It can be seen on figure \ref{fig:PosRootLocus} that in order to follow the frequency domain guidelines found above, the two open-loop poles at the origin should be moved to the left. This should be done while keeping their imaginary parts close enough to zero to stay within the cone shaped region dictated by the requirement of \SI{5}{\percent} overshoot.
-Through experimentation it has been found that placing zeros at $s=-9.5$ and $s=-1$ for the tilt motor and at $s=-3.3$ and $s=-0.8$ for the pan motor, produced satisfactory root loci, which are shown in figure \ref{fig:PosRootLocus}. Based on the plots, an appropriate gain is chosen. For the tilt motor a value of $s=-0.9$ was chosen while $s=-1.2$ was chosen for the pan motor. The resulting control gains are summarised in table \ref{tab:pos_controller_gains}. The closed-loop pole locations at these gains are also visible from figure \ref{fig:PosRootLocus}.
+Through experimentation it has been found that placing zeros at $s=-9.5$ and $s=-1$ for the tilt motor and at $s=-3.3$ and $s=-0.8$ for the pan motor, produced satisfactory root loci, which are shown in figure \ref{fig:PosRootLocus}. Based on the plots, an appropriate gain is chosen. For the tilt motor a gain of $s=-0.9$ was chosen while $s=-1.2$ was chosen for the pan motor. The resulting control gains are summarised in table \ref{tab:pos_controller_gains}. The closed-loop pole locations at these gains are also visible from figure \ref{fig:PosRootLocus}.
 
 \begin{table}[]
     \centering
@@ -90,12 +90,12 @@ Through experimentation it has been found that placing zeros at $s=-9.5$ and $s=
 \begin{figure}[h]
 \begin{subfigure}{0.48\textwidth}
     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/RL_PanMotorPos2.png}
-    \caption{Root locus pan motor}
+    \caption{Root locus pan motor.}
     \label{fig:PosRootLocusPan}
 \end{subfigure}\quad
 \begin{subfigure}{0.48\textwidth}
     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/RL_TiltMotorPos.png}
-    \caption{Root locus tilt motor}
+    \caption{Root locus tilt motor.}
     \label{fig:PosRootLocusTilt}
 \end{subfigure}
 \caption{Root locus plots of the pan and tilt system with the chosen zero locations.}
@@ -109,8 +109,10 @@ Through experimentation it has been found that placing zeros at $s=-9.5$ and $s=
     \label{fig:pos_bode_plot}
 \end{figure}
 
-A rule of thumb states that when implementing a continuously designed controller in a discrete system, such as a microcontroller, the sampling frequency shall be 25-30 times the bandwidth of the closed-loop system. A bode plot of the closed-loop system for the tilt motor, shown in figure \ref{fig:pos_bode_plot} reveals a cutoff frequency of \SI{18}{\radian \per \second}. The tilt motor bode plot is highlighted since it has the highest bandwidth. A similar plot for the pan motor can be found in the digital appendix, outlined in section \ref{sec:digital_appendix}. Future bode plots referenced in this section can also be found in the digital appendix. It has been decided to implement the position controllers using a sampling frequency of \SI{1000}{\hertz}. This honours the rule of thumb, which demands a minimum sampling rate of $t_{sampling} = \frac{18}{2\pi}\cdot 30 = \SI{85.94}{\hertz}$.
-To emulate the discrete controller, when evaluating performance, a delay of half of the sampling time is added to the controller. This is done by appending the transfer function shown in equation \ref{eq:delay_transfer_function},
+As stated in section \ref{sec:Analysis}, the sampling frequency shall be 20-30 times the bandwidth of the closed-loop system. A bode plot of the closed-loop system for the tilt motor, shown in figure \ref{fig:pos_bode_plot} reveals a cutoff frequency of \SI{18}{\radian \per \second}. The tilt motor bode plot is highlighted since it has the highest bandwidth. A similar plot for the pan motor can be found in the digital appendix, outlined in section \ref{sec:digital_appendix}. With a sampling frequency of \SI{1000}{\hertz}, the position controller honours the minimum sampling rate of $t_{sampling} = \frac{18}{2\pi}\cdot 30 = \SI{85.94}{\hertz}$. To emulate the discrete controller, when evaluating performance, a delay of half of the sampling time is added to the controller. This is done by appending the transfer function shown in equation \ref{eq:delay_transfer_function},
+
+%A rule of thumb states that when implementing a continuously designed controller in a discrete system, such as a microcontroller, the sampling frequency shall be 25-30 times the bandwidth of the closed-loop system. A bode plot of the closed-loop system for the tilt motor, shown in figure \ref{fig:pos_bode_plot} reveals a cutoff frequency of \SI{18}{\radian \per \second}. The tilt motor bode plot is highlighted since it has the highest bandwidth. A similar plot for the pan motor can be found in the digital appendix, outlined in section \ref{sec:digital_appendix}. It has been decided to implement the position controllers using a sampling frequency of \SI{1000}{\hertz}. This honours the rule of thumb, which demands a minimum sampling rate of $t_{sampling} = \frac{18}{2\pi}\cdot 30 = \SI{85.94}{\hertz}$.
+%To emulate the discrete controller, when evaluating performance, a delay of half of the sampling time is added to the controller. This is done by appending the transfer function shown in equation \ref{eq:delay_transfer_function},
 
 \begin{equation}\label{eq:delay_transfer_function}
     G_{delay}(s) = \frac{1}{\frac{t_{sampling}}{2}\cdot s+1} \qquad ,
@@ -118,7 +120,7 @@ To emulate the discrete controller, when evaluating performance, a delay of half
 
 where $t_{sampling} = \SI{0.001}{\second}$, to the transfer function of the PID-controller. 
 
-With this delay added, the phase and gain margins are evaluated by drawing the bode plot of the open-loop transfer function and evaluating the phase at the frequency which gives  \SI{0}{\deci \bel} gain, and evaluating the gain at the frequency which gives \SI{-180}{\degree} phase. As seen in figure \ref{fig:pos_stability_plot}, the gain margins for the tilt and pan motors are \SI{100}{\deci \bel} and \SI{105}{\deci \bel} respectively, while the phase margins are \SI{85.6}{\degree} and \SI{77.9}{\degree}. These margins are quite large, which is good, since that allows room for more uncertainties in the plant model.
+With this delay added, the phase and gain margins are evaluated by drawing the bode plot of the open-loop transfer function and evaluating the phase at the frequency. This yields \SI{0}{\deci \bel} gain, and evaluating the gain at the frequency which gives \SI{-180}{\degree} phase. As seen in figure \ref{fig:pos_stability_plot}, the gain margins for the tilt and pan motors are \SI{100}{\deci \bel} and \SI{105}{\deci \bel} respectively, while the phase margins are \SI{85.6}{\degree} and \SI{77.9}{\degree}. These margins are quite large, which is good, since that allows room for more uncertainties in the plant model. Future bode plots and margin plots referenced in this section can be found in the digital appendix.
 
 \begin{figure}[h]
 \begin{subfigure}{0.48\textwidth}
@@ -135,7 +137,7 @@ With this delay added, the phase and gain margins are evaluated by drawing the b
 \label{fig:pos_stability_plot}
 \end{figure}
 
-To verify the performance of the controllers, the tilt and pan motor systems, with added PID-controllers, are simulated using a step reference of magnitude 1. To properly emulate the physical system, saturation and associated anti wind-up must be added as described in section \ref{subsec:classic_control}, since the physical system can only respond to a limited control signal. Figure \ref{fig:PosStepSat} and \ref{fig:PosStepNoSat} show the difference that the saturation makes. The figure shows that ideally, the controller for the tilt motor honours the specifications, however the specifications for settling time and overshoot are not quite met when saturation is introduced. Even without the saturation, the step response of the pan motor controller does not quite live up to the  requirements, but through experimenting with different zero placement and gains, it was found to be the best compromise between a relatively fast rise and settling time, while still keeping the overshoot reasonable.
+The tilt and pan motor systems with added PID-controllers, are simulated using a step reference of magnitude 1. This is done to verify the performance of the controllers. To properly emulate the physical system, saturation and associated anti-windup must be added as described in section \ref{subsec:classic_control}, since the physical system can only respond to a limited control signal. Figure \ref{fig:PosStepSat} and \ref{fig:PosStepNoSat} show the difference that the saturation makes. The figure shows that ideally, the controller for the tilt motor honours the specifications, however the specifications for settling time and overshoot are not quite met when saturation is introduced. Even without the saturation, the step response of the pan motor controller does not quite live up to the  requirements, but through experimenting with different zero placement and gains, it was found to be the best compromise between a relatively fast rise time and settling time, while still keeping the overshoot reasonable.
 
 \begin{figure}[h]
 \begin{subfigure}{0.48\textwidth}
@@ -156,45 +158,37 @@ To verify the performance of the controllers, the tilt and pan motor systems, wi
 
 
 \subsection{Velocity Controller Design} \label{subsec:vel_controller_design}
-As mentioned in section \ref{sec:Delimination}, it is wanted to explore the performance of a cascaded controller design. To achieve this, a velocity controller must be designed. The range of motion for the pan motor is physically fairly limited. Therefore it has been prioritised to focus on designing a velocity controller for the tilt motor, as the unlimited range makes testing the velocity controller possible, without jeopardising the pan-tilt system. Two different methods of designing velocity controllers will be explored. One will use the pole placement approach used in section \ref{subsec:position_control_model}, the other will utilise the Ziegler-Nichols approach, which can be used without a mathematical model of the system to be controlled.
-When working with a cascaded control design, it is desired that any inner controllers are faster than the outer loop, as well as critically or over damped. It is therefore worked towards designing a controller yielding no overshoot while still achieving a fast rise time.
+As mentioned in section \ref{sec:Delimination}, it is wanted to explore the performance of a cascaded controller design. To achieve this, a velocity controller must be designed. As mentioned in section \ref{sec:Analysis} the range of motion for the pan motor is physically limited. Therefore it has been prioritised to focus on designing a velocity controller for the tilt motor, as the unlimited range makes testing the velocity controller possible, without jeopardising the pan-tilt system. Two different methods of designing velocity controllers will be explored. One will use the pole placement approach used in section \ref{subsec:position_control_model}, the other will utilise the Ziegler-Nichols approach, which can be used without a mathematical model of the system to be controlled.
+When working with a cascaded control design, it is desired that any inner controllers are faster than the outer loop, as well as critically or over damped \cite{}. It is therefore worked towards designing a controller yielding no overshoot while still achieving a fast rise time.
 
 \subsubsection*{Ziegler-Nichols Tuning}
 %The Ziegler-Nichols tuning method provides a method for tuning a PID-controller without knowing specific information about the dynamics of the plant. 
 The Ziegler-Nichols method uses the step response of the physical system to calculate the controller gains. When using the Ziegler-Nichols method it is not possible to dictate performance specification. Instead, the method aims to achieve a decay ratio, $\zeta$, of approximately 0.25, for the closed loop system. The method assumes that the plant can be described by a delayed first order system of the form seen in equation \ref{eq:NZ_plant_eq},
 
 \begin{equation}
-    \frac{y(s)}{u(s)} = \frac{A}{\tau s + 1} e^{-s t_d} \qquad ,
+    \frac{y(s)}{u(s)} = \frac{A_{ss}}{\tau s + 1} e^{-s t_d} \qquad ,
     \label{eq:NZ_plant_eq}
 \end{equation}
 
-where $A$ is a steady-state magnitude, $\tau$ is a time constant and $t_{d}$ is time delay.
-To calculate the controller gains a set of equations are provided. The equations differ depending on the controller type, the equations used for calculating the gains for a PID-controller can be seen in equations \ref{eq:controllerGains},
+where $A_{ss}$ is a steady-state magnitude, $\tau$ is a time constant and $t_{d}$ is time delay. To calculate the controller gains a set of equations are provided. The equations differ depending on the controller type. The equations used for calculating the gains for a PID-controller can be seen in equations \ref{eq:controllerGains},
 
 \begin{equation}
 k_p = \frac{1.2}{RL}\;, \quad k_i = \frac{k_p}{2L}\;, \quad k_d = \frac{k_p}{0.5L} \qquad ,
 \label{eq:controllerGains}
 \end{equation}
 
-where the constants $R$ and $L$ are identified from the step response. $R$ is found by drawing the tangent to the steepest part of the transition between zero and the reference. The gradient of the tangent is equal to $R$. $L$ is equal to the latency of the system, and is defined as the distance between the y-axis and the intersection between the tangent and the x-axis. 
+where the constants $R$ and $L$ are identified from the step response. $R$ is found by drawing the tangent to the steepest part of the transition between zero and the reference. The gradient of the tangent is equal to $R$. $L$ is equal to the latency of the system, and is defined as the distance between the y-axis and the intersection between the tangent and the x-axis \cite{}. 
 
 
 
 \begin{figure}
     \centering
     \includegraphics[width = 1\textwidth]{Sections/System_Design/Images/Ziegler-Nichols_Stepresponse.png}
-    \caption{Velocity step response for the tilt motor, used for tuning using Ziegler-Nichols.}
+    \caption{Open loop velocity step response for the tilt motor, used for tuning using Ziegler-Nichols.}
     \label{fig:stepPlantNZ}
 \end{figure}
 
-In figure \ref{fig:stepPlantNZ} the data point sampled from the step response of the physically  system is plotted. The Curve Fitting tool in MATLAB has then been used to fit a curve that fits the points, it is displayed as the red line. The red line is described as the expression introduced in equation \ref{eq:NZ_plant_eq}. Using MATLAB, $R$ and $L$ are found as seen in equation \ref{eq:R_and_L},
-
-\begin{equation}
-    R = 203.4 \;, \quad L = 11.4 \cdot 10^{-3} \qquad .
-    \label{eq:R_and_L}
-\end{equation}
-
-Using the found values for R and L from equation \ref{eq:R_and_L} and the equations introduced in equation \ref{eq:controllerGains} the controller gains are found and can be seen in table \ref{tab:pos_controller_gains}.
+In figure \ref{fig:stepPlantNZ} the data points sampled from the velocity step response of the physical system are plotted. The initial spike seen in the figure might be caused by friction but will not be discussed further. The disturbances which can be seen on the figure will be explained further in the discussion. Due to the seemingly noisy data in the plot, the Curve Fitting tool in MATLAB has been used to fit a curve that, it is displayed as the red line. The red line is described as the expression introduced in equation \ref{eq:NZ_plant_eq}. Using MATLAB $R = 203.4 $ and $L = 11.4 \cdot 10^{-3}$ are found. Using the found values for R and L from equation \ref{eq:R_and_L} and the equations introduced in equation \ref{eq:controllerGains} the controller gains are found and can be seen in table \ref{tab:pos_controller_gains}.
 
 % \begin{equation}
 %     k_p = 0.5194, \quad k_i = 22.86, \quad k_d = 3.0 \cdot 10^{-3}
@@ -213,8 +207,8 @@ Using the found values for R and L from equation \ref{eq:R_and_L} and the equati
 %In figure \ref{fig:NZ_implemented} the measured step response using the calculated gains seen in equation \ref{eq:controllerGainsCal} is plotted. 
 
 
-\subsubsection*{Model Based Velocity Controller Design}
-The procedure for designing the velocity controller based on the model is very similar to the approach used for designing the position controllers mentioned in section \ref{subsec:position_control_model}. The main difference is that the open-loop system now has one less pole at the origin, as the only pole at the origin originates from the integral term of the PID-controller. As seen on figure \ref{fig:vel_root_locus}, it has been found that placing the zeros stemming from the PID-controller at $s = -10$ and $s = -12$, yields adequate root loci. This placement allows the close-loop poles to be moved far into the left half plane, while still remaining directly on the real axis. A gain value of $0.065$ is chosen. The closed-loop pole locations are also visible from the figure \ref{fig:vel_root_locus}. The closed-loop pole and zero locations can be compared to the pole and zero locations given by the Ziegler-Nichols tuning shown in figure \ref{fig:ZN_pole_zero}.
+\subsubsection*{Pole Placement Based Velocity Controller Design}
+The procedure for designing the velocity controller based on the model is very similar to the approach used for designing the position controllers mentioned in section \ref{subsec:position_control_model}. The main difference is that the open-loop system now has one less pole at the origin, as the only pole at the origin originates from the integral term of the PID-controller. As seen on figure \ref{fig:vel_root_locus}, it has been found that placing the zeros stemming from the PID-controller at $s = -10$ and $s = -12$, yields adequate root loci. This placement allows the close-loop poles to be moved far into the left half plane, while still remaining directly on the real axis. A gain value of $0.065$ is chosen. The closed-loop pole locations are visible from the figure \ref{fig:vel_root_locus}. The closed-loop pole and zero locations can be compared to the pole and zero locations given by the Ziegler-Nichols tuning shown in figure \ref{fig:ZN_pole_zero}.
 
 \begin{figure}[h]
 \begin{subfigure}{0.48\textwidth}
@@ -224,7 +218,7 @@ The procedure for designing the velocity controller based on the model is very s
 \end{subfigure}\quad
 \begin{subfigure}{0.48\textwidth}
     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/PoleZero_TiltMotorVel_NZ.png}
-    \caption{Closed-loop poles and zero locations obtained via using the Ziegler-Nichols tuning method.}
+    \caption{Closed-loop poles and zero locations obtained using the Ziegler-Nichols tuning method.}
     \label{fig:ZN_pole_zero}
 \end{subfigure}
 \caption{Bode plots of the closed-loop motor control systems for the pan and tilt motors.}
@@ -233,7 +227,7 @@ The procedure for designing the velocity controller based on the model is very s
 
 \subsubsection*{Performance Evaluation of Velocity Controllers}
 
-As with the position controller, the bandwidth of the closed-loop velocity controller systems are evaluated. The cutoff frequencies are found to be at approximately \SI{11}{\radian \per \second} for the model based design, and approximately \SI{28}{\radian \per \second} for the Ziegler-Nichols based design. Therefore it can be concluded that the chosen sampling frequency of \SI{1000}{\hertz} is again more than sufficient. 
+As with the position controller, the bandwidth of the closed-loop velocity controller systems are evaluated. The cutoff frequencies are found to be at approximately \SI{11}{\radian \per \second} for the model based design, and approximately \SI{28}{\radian \per \second} for the Ziegler-Nichols based design. Therefore it can be concluded that the chosen sampling frequency of \SI{1000}{\hertz} is sufficient. 
 %It is worth mentioning however, that a higher bandwidth would have been preferable, especially for the model based controller. 
 The phase and gain margins are also examined for the velocity controller with the delay introduced to emulate the discrete controller. The phase and gain margins have been plotted and can be found in the digital appendix, outlined in section \ref{sec:digital_appendix}. From these figures, it can be seen that both design approaches gives an infinite gain margin, as the phase never crosses \SI{-180}{\degree}. It is worth noting however, that the Ziegler-Nichols based design has significantly less phase margin. The \SI{50}{\degree} phase margin is still deemed sufficient though.
 % As seen in figure \ref{fig:vel_stability_plot}, large stability margins are obtained. The gain margin is infinite as the phase never crosses \SI{-180}{\degree} and the phase margin is found to be \SI{145}{\degree}. It is worth mentioning though, that the magnitude plot does show a flat band just around a gain of \SI{0}{\deci \bel}. This means that the phase margin could be quite different given just a slight change in gain. Looking at the figure however, it can be seen that the phase margin would still remain about the same, or even increase.
