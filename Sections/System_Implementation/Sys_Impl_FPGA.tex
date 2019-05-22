@@ -26,13 +26,13 @@ The logic implemented in the FPGA is divided into modules. Table \ref{tab:FPGAMo
     \begin{tabular}{l|p{0.8\textwidth}} %{p{0.12\linewidth}p{0.4\textwidth}p{0.38\textwidth}}
         Module & Description \\
         \hline
-        Encoder Module & Interfaces with and takes inputs from the pan-tilt system. Channel A and B of the encoders are read continuously and from this information a signed position relative to the original reference is calculated, which is the output of the module. \\
+        Encoder Module & Interfaces with the pan-tilt system. Channel A and B of the encoders are read continuously and from this information a signed position relative to the original reference is calculated. \\
         \hline
         Speed Module & Calculates a speed related to the time period between two encoder pulses. Also provides a flag for determining when a frame is not moving.\\
         \hline
         Reset Module & Interfaces with the index signal of a frame and uses this signal to reset the frame. \\
         \hline
-        Protocol Module & Used to determining which duty cycle is passed on to the PWM-module and enabling the reset routine. \\
+        Protocol Module & Used to determine which duty cycle is passed on to the PWM-module and enabling the reset routine. \\
         \hline
         SPI Module & Interfaces with the microcontroller. Contains an SPI slave for each type of information going to or from the microcontroller. \\
         \hline
