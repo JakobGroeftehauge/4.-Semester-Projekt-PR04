@@ -15,7 +15,7 @@ In order to analyse and the pan-tilt system and design appropriate controllers, 
 
 \begin{table}[]
     \centering
-    \begin{tabular}{L{4 cm} L{0.5 cm}  L{1.5 cm} | C{3 cm} C{3 cm}}
+    \begin{tabular}{L{6 cm} L{0.5 cm}  C{1.5 cm} | C{3 cm} C{3 cm}}
         \textbf{Parameter} &  & \textbf{Unit} &  \textbf{Pan} &  \textbf{Tilt} \\ \hline
         Moment of inertia & $J$ & [\si{\kilogram\square\meter}] & 0.02 & \num{5.6e-3}\\
         Inductance & $L_m$ & [\si{\henry}] & \num{2.75e-6} & \num{2.75e-6}\\
@@ -65,6 +65,8 @@ i
     \end{bmatrix}
     \end{split}
 \end{equation}
+
+The system dynamics can also be described by the transfer functions for  position
 
 \begin{figure}[H]
     \centering
@@ -147,24 +149,25 @@ where $K$ is a coefficient related to the torque of the motor, $\tau_{c}$ is the
 \subsection{Analysis of the Modelled Plant}
 Through discussion with the project supervisor, it has been decided that determining the inductance $L_m$ is not of interest. Instead the value found in the control tutorial \cite{universityofmichigan2019}, provided by the supervisor, is used.
 
-The state space model in equation \ref{eq:stateSpaceSys1} combined with the model parameters from table \ref{tab:modellingParam} is used to calculate the step response and pole locations for the plant seen in figure \ref{fig:polesPlant} and \ref{fig:StepVelPlant}.
+The state space model in equation \ref{eq:stateSpaceSys1} combined with the model parameters from table \ref{tab:modellingParam} is used to calculate the step response and pole locations for the plant seen in figures \ref{fig:polesPlant} and \ref{fig:StepVelPlant}.
 
-Analysing the location of the poles, it is apparent that the plant consist of one fast pole and two slower poles. This also complies well with the fact that the plant is comprised of an electrical part and a mechanical part. The electrical part is by nature significantly faster than the mechanical part, therefore yielding the fastest pole. Looking at the zoomed in plot in figure \ref{fig:polesPlant} it can also be seen that the difference in inertia between the two plants manipulates the second fastest pole. Since the tilt has a lower moment of inertia, it can be seen that the system becomes faster as the moment of inertia decreases. This also complies with general laws of physics. 
+Analysing the location of the poles, it is apparent that each plant consist of one fast pole and two slower poles. This also complies well with the fact that the plant is comprised of an electrical part and a mechanical part. The electrical part is by nature significantly faster than the mechanical part, therefore yielding the fastest pole. For the dynamics of the system these fast poles are negligible, as the slower poles are dominant. Looking at the zoomed in plot in figure \ref{fig:polesPlant} it can also be seen that the difference in inertia between the two plants manipulates the second fastest pole. Since the tilt frame has a lower moment of inertia, it can be seen that the system becomes faster as the moment of inertia decreases.
 
 \begin{figure}
     \centering
     \includegraphics[width = 0.9\textwidth]{Sections/System_Modelling/Images/polesPlant.png}
-    \caption{Placement of poles for the unrestrained plant.}
+    \caption{Placement of poles for the plant.}
     \label{fig:polesPlant}
 \end{figure}
 
-Analysing the step response for both the plants it resembles that both plants are of first order. Though on figure \ref{fig:polesPlant} it is seen that both plants has three poles and is therefore of second order. This behavior is due to the pole introduced by the electrical system being placed so far from the other poles, that this pole becomes insignificant. Looking at figure \ref{fig:StepVelPlant}, it is seen that the pan plant is slower than the tilt due to the increased moment of inertia.  
+The observations based on the pole locations can be verified by looking at the step response for the velocity of the systems. From figure \ref{fig:StepVelPlant} it is seen that the velocity responses resemble that of a first order system, although the transfer function for the velocity would be of second order. Thus it is verified that the fast pole for each plant is negligible. It can also be seen that the response of the tilt motor is significantly faster.
+%Analysing the step response for both the plants it resembles that both plants are of first order. Though on figure \ref{fig:polesPlant} it is seen that both plants has three poles and is therefore of second order. This behavior is due to the pole introduced by the electrical system being placed so far from the other poles, that this pole becomes insignificant. Looking at figure \ref{fig:StepVelPlant}, it is seen that the pan plant is slower than the tilt due to the increased moment of inertia.  
  
 
 \begin{figure}
     \centering
     \includegraphics[width = 0.9 \textwidth]{Sections/System_Modelling/Images/stepResponseVelPlant.png}
-    \caption{Velocity step response for the unrestrained plant.}
+    \caption{Velocity step response for the plant.}
     \label{fig:StepVelPlant}
 \end{figure}
 
@@ -172,7 +175,7 @@ Analysing the step response for both the plants it resembles that both plants ar
 
 \subsection{Conclusion}
 
-A mathematical model of the dynamics of the DC-motors in the pan-tilt system has been derived. The moment of inertia has been estimated from equations, which describe the moment of inertia for shapes similar to the ones found in the pan-tilt system. The coefficients describing the behaviour of the DC-motor has been determined experimentally by evaluating cognate measurements of current, voltage and angular velocity. From the mathematical model the system is put on state space form in order to calculate step response and analyse the location of the poles.
+A mathematical model of the dynamics of the DC-motors in the pan-tilt system has been derived. The moment of inertia has been estimated from equations, which describe the moment of inertia for shapes similar to the ones found in the pan-tilt system. The coefficients describing the behaviour of the DC-motor has been determined experimentally by evaluating related measurements of current, voltage and angular velocity. From the mathematical model the system is put on state space form in order to calculate step responses and analyse the location of the poles.
 
 
 
