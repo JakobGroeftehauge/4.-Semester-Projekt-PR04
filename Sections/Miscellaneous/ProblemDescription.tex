@@ -4,18 +4,18 @@
 The theme of the project is regulation and control of robot systems. The project revolves around control of a \textit{pan-tilt system} sketched in figure \ref{fig:Pan_Tilt_Drawing}. 
 The pan-tilt system is actuated by two DC motors which are interfaced using H-bridges. The system is equipped with \textit{incremental encoders} on the motors, as well as hall effect sensors to provide \textit{index signals}.
 
-To honour requirements stated in the given project description \cite{christoffersloth}, it has been chosen to set out to design and test several different controller designs and tuning methods to allow control of the motor positions. This includes developing a mathematical model of the system. Reference inputs for controlling the positions must be supplied through a user interface. To accommodate this an embedded program must be designed with appropriate tasks.
+To honour requirements stated in the given project description \cite{christoffersloth}, it has been chosen to set out to design and test several different controller designs and tuning methods to allow control of the angular position of the two motors. This includes developing a mathematical \textit{model} of the system. Reference inputs for controlling the positions must be supplied through a user interface. To accommodate this an embedded program must be designed with appropriate tasks.
 
 Additionally the given project description has the following requirements to the project:
 
 \begin{itemize}
     \item The control algorithms must be implemented on a microcontroller.
-    \item Data between the microcontroller and the \textit{FPGA} must be transmitted using the \textit{SPI}-protocol. 
+    \item Data exchanged between the microcontroller and the \textit{FPGA} must be transmitted using the \textit{SPI}-protocol. 
     \item The FPGA must control the \textit{PWM}-signal to the motors through the H-bridges.
-    \item The FPGA must be used for determining the position of the motors using the encoders on the motors
+    \item The FPGA must be used for determining the position of the motors using the encoders on the motors.
 \end{itemize}
 
-Based on the requirements stated, figure \ref{fig:SystemOverviewIntroduction} shows and overview of the system and how the different elements are connected. Furthermore it has been dictated that the pan-tilt system is not to be disassembled.  
+Based on the requirements stated, figure \ref{fig:SystemOverviewIntroduction} shows an overview of the system and how the different elements are connected. Furthermore it has been dictated that the pan-tilt system is not to be disassembled.  
 
 % Additionally, the project description requires that an analysis of the different elements in the system are made to contribute to a model of the system. Analysis and design of control algorithms to control the motors must be made. It requires documentation of the FPGA design and implementation as well as  
 
@@ -28,7 +28,7 @@ Based on the requirements stated, figure \ref{fig:SystemOverviewIntroduction} sh
 \begin{figure}
     \centering
     \includegraphics[width=0.5\textwidth]{Sections/Miscellaneous/Images/PhysicalMotorModel.png}
-    \caption{Drawing of the pan-tilt system. All dimensions are in \SI{}{\milli \meter}.}
+    \caption{Technical drawing of the pan-tilt system. All dimensions are in \SI{}{\milli \meter}.}
     \label{fig:Pan_Tilt_Drawing}
 \end{figure}
 
