@@ -101,7 +101,7 @@ Instead of using a single controller for the plant, sometimes it can be benefici
 
 \subsubsection*{Modern Control Methods}
 %explain states -> state space form
-A system can be described based on the dynamics of the states found in the system. For the DC motor example, the states could be current, angular velocity and angular position. The dynamics can be presented using the state space form shown in equation \ref{eq:gen_statespace}.
+A system can be described based on the dynamics of the states found in the system. For the DC motor example, the states could be current, angular velocity and angular position. The dynamics can be presented using the state space form shown in equation \ref{eq:gen_statespace},
 
 \begin{equation}\label{eq:gen_statespace}
     \begin{split}
@@ -112,7 +112,7 @@ A system can be described based on the dynamics of the states found in the syste
 \end{equation}
 
 where $A$ is the system matrix, $B$ is the input matrix, $C$ is the output matrix,  $x$ is a vector containing the states and $u$ is a vector containing external control signals.
-Modern control aims to control the states in the system via state feedback, which introduces the control law seen in equation \ref{eq:state_feedback}.
+Modern control aims to control the states in the system via state feedback, which introduces the control law seen in equation \ref{eq:state_feedback},
 
 \begin{equation}\label{eq:state_feedback}
     u = F x \qquad ,
@@ -137,7 +137,7 @@ Since both of the these design methods are based on a linear model of the system
     \label{fig:Integral_Diagram}
 \end{figure}
 
-A way to reduce some of the issues from uncertainties about the plant, is to include integral action as seen on figure \ref{fig:Integral_Diagram}. The integral feedback provides zero steady state error by integrating the error. Taking basis in the state space form equation \ref{eq:gen_statespace} and adding an additional feedback, the input is given as described in equation \ref{eq:input_integral}.  
+A way to reduce some of the issues from uncertainties about the plant, is to include integral action as seen on figure \ref{fig:Integral_Diagram}. The integral feedback provides zero steady state error by integrating the error. Taking basis in the state space form equation \ref{eq:gen_statespace} and adding an additional feedback, the input is given as described in equation \ref{eq:input_integral},  
 
 \begin{equation}\label{eq:input_integral}
         u=Fx+F_Ix_I \qquad , 
@@ -159,13 +159,16 @@ where $t$ is the time, $y$ is the output, $r$ is the reference and $\tau$ is the
 \end{figure}
 
 State feedback requires that every state is measured, which is rarely possible. However means to estimate states of a given system are available. The estimation can be achieved by introducing an observer to the system, which is illustrated on figure \ref{fig:Integral_Observer_Diagram}. The observer aims to mirror the plant and by that making it possible to approximate a given state.
-The observer introduces an observer gain, $L$, which is proportional with the difference between the output from the plant and the estimated observer output. The observer state space model is as seen in equation \ref{eq:Obs_state_space}, where $\hat{x}$ is the estimated state and $\hat{y}$ is the estimated output.
+The observer introduces an observer gain, $L$, which is proportional with the difference between the output from the plant and the estimated observer output. The observer state space model is as seen in equation \ref{eq:Obs_state_space}, 
+
 \begin{equation}\label{eq:Obs_state_space}
     \begin{split}
         \Dot{\hat{x}}&=A\hat{x}+Bu+L(C\hat{x}-y)\\
-        \hat{y}&=C\hat{x}
+        \hat{y}&=C\hat{x} \qquad ,
     \end{split}
 \end{equation}
+
+where $\hat{x}$ is the estimated state and $\hat{y}$ is the estimated output.
 
 As with the classical control, saturation might be considered in modern control. This can be handled by introducing a matrix $M$, as seen in figure \ref{fig:Integral_Observer_Diagram}, which can alter the system dynamics when in saturation. This can act as a form of anti-windup.
 
@@ -220,28 +223,21 @@ As with the classical control, saturation might be considered in modern control.
 %modelling, continuous vs discrete
 %more implementing methods
 Upon designing a controller it is important to keep in mind that an actual implementation in software is discrete rather than continuous. 
+The plant, for which the controller is designed, is continuous. Since the plant and the controller exists in different domains, mathematical analysis of the combined system is not possible. One way to get around this, is to design the controller in continuous time while effects of the discretisation are kept in mind. The controller can also be designed directly in the discrete domain. However, that requires the plant model to be converted into a discrete time representation. 
+%The controller can be designed continuous and then discretisised to render the possibility of implementation. Another approach is discretising the plant and then designing the controller discrete. However this requires a method of mapping between the domains.
+Different methods can be chosen when discretising a continuous system. These are based on different approaches to numerical integration. Three common approaches exist, the forward rectangular rule, the backward rectangular rule and the trapezoidal rule. Each has advantages and disadvantages, although only the trapezoidal method will be examined further, as it gives the best approximation of the integral.
+%Different means of mapping from the continuous domain (s-domain) to the discrete domain (z-domain) is available such as the trapezoidal rule, forward rectangular rule and the backward rectangular rule. 
 
-The plant, for which the controller is designed, is continuous making it difficult to match the requirements of the discrete controller.
 
-The controller can be designed continuous and then discretisised to render the possibility of implementation. Another approach is discretisising the plant and then designing the controller discrete. However this requires a method of mapping from the domains. Different means of mapping from the continuous domain (s-domain) to the discrete domain (z-domain) is available such as the trapezoidal rule, forward rectangular rule and the backward rectangular rule. 
-\begin{figure}
-    \centering
-    \includegraphics[width = 0.7\textwidth]{Sections/Miscellaneous/Images/Trapezoid_rule.jpeg}
-    \caption{Illustration of mapping from the continuous s-domain to the discrete z-domain using different approaches.}
-    \label{fig:mapping_s_to_z}
-\end{figure}
-Using the forward rectangular rule to map from the s to the z-domain, the entire left-half plane of the s-domain is mapped into the z-domain into a rectangular shape. The forward rectangular rule maps the left-half plane of the s-domain into a circle placed in the right-half of the z-domain. The trapezoidial rule fits the left-half plane of the s-domain into the unit-circle of the z-domain. The phenomena are illustrated on figure \ref{fig:mapping_s_to_z}.  
+%Using the forward rectangular rule to map from the s- to the z-domain, the entire left-half plane of the s-domain is mapped into the z-domain into a rectangular shape. The forward rectangular rule maps the left-half plane of the s-domain into a circle placed in the right-half of the z-domain. The trapezoidal rule fits the left-half plane of the s-domain into the unit-circle of the z-domain. The phenomena are illustrated on figure \ref{fig:mapping_s_to_z}.  
 
-Implementing the discrete controller can be done as seen in equation \ref{eq:discrete_control}, utilising the Tustins method. Tustins method is based on the trapezoidial rule, and dictates a certain way of implementing the integral and thereby the differential part.
+Implementing a discrete PID-controller, utilising the Tustin method, can be done as seen in equation \ref{eq:discrete_control}, 
 \begin{equation}\label{eq:discrete_control}
 \begin{split}
-        u(kT+T)=&k_P\cdot e(kT+T)\\&+u_I(kT) + k_I\frac{T}{2} \cdot (e(kT+T)+e(kT))\\ &+k_D \frac{2}{T}\cdot(e(kT+T)-e(kT))-u_D(kT) \quad ,
+        u(kT+T) &= k_P\cdot e(kT+T)\\&+u_I(kT) + k_I\frac{T}{2} \cdot (e(kT+T)+e(kT))\\ &+k_D \frac{2}{T}\cdot(e(kT+T)-e(kT))-u_D(kT) \quad ,
 \end{split}
 \end{equation}
-
-where $u(s)$ is the control signal in continuous time and $u(kT+T)$ is the control signal in discrete time. $T$ is the sampling time, $e$ is the error and $k_p$, $k_I$ and $k_D$ are the PID gains.
-
-As seen from equation \ref{eq:discrete_control} the terms depend on the sampling time, thus it needs to be known. A rule of thump state that the sampling frequency for a discrete controller, should be approximately 20 times larger than the closed-loop bandwidth of the system \cite{Design_Of_Digital_Control_Systems_NOTE}. 
+where $u(kT+T)$ is the control signal in discrete time. $T$ is the sampling time, $e$ is the error and $k_p$, $k_I$ and $k_D$ are the PID gains. Tustin's method is based on the trapezoidial rule, and dictates a certain way of implementing the integral and thereby also the differential part. As seen from equation \ref{eq:discrete_control} the terms depend on the sampling time, thus it needs to be known. A rule of thump state that the sampling frequency for a discrete controller, should be approximately 20-30 times larger than the closed-loop bandwidth of the system \cite{Design_Of_Digital_Control_Systems_NOTE}. 
 
 %  In time-domain each term can be described as in equation \ref{eq:time-domain-PID-controller}.
 % \begin{equation}
