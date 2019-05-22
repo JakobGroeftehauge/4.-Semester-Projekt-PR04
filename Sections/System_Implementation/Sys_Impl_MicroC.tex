@@ -5,6 +5,7 @@
 
 \subsubsection*{System overview}
 \label{subsec:SystemImplementationOperatingSystem}
+It is imperative that the microcontroller is in control of the overall timing of the system. Therefore, the microcontroller is responsible for pulling data from specific slaves on the FPGA.
 
 As described in the section \ref{subsec:SystemImplemtationFPGA} the microcontroller is responsible for getting data from specific slaves on the FPGA. Because of this it is imperative that the microcontroller is in control of the overall timing of the system. As described in the requirements section \ref{sec:Requirements}, it is decided to accommodate a cascaded controller design consisting of two PID-controllers on each motor. This yields a total of 4 tasks needed to be scheduled regarding the motor control. Furthermore the microcontroller also needs to handle the user interface. The program will be structured as seen on figure \ref{fig:OverviewTaskDiagramSimple}. The task diagram is simplified displaying only one of the cascaded controllers for controlling only one motor, as the second cascade controller is identical in structure. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}. In FreeRTOS tasks have assigned a priority, meaning that high priority tasks are ensured to be scheduled and completed before tasks of lower priority can be scheduled. To achieve a real-time system prioritisation of tasks is vital.
 
@@ -22,7 +23,7 @@ As described in the section \ref{subsec:SystemImplemtationFPGA} the microcontrol
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/OverviewTaskDiagramSimple.pdf}
-    \caption{Simplified task diagram showing the different tasks running on the microcontroller}
+    \caption{Simplified task diagram showing the different tasks running on the microcontroller.}
     \label{fig:OverviewTaskDiagramSimple}
 \end{figure}
 

@@ -101,7 +101,7 @@ Trying to understand how noise affects the response of the system, figure  \ref{
          \caption{Simulation of the system with added noise.}
          \label{fig:StepResponsAddedNoise}
      \end{subfigure}
-        \caption{Simulation results when applying a 5th order FIR to the velocity feedback}
+        \caption{Simulation results when applying a 5th order FIR to the velocity feedback.}
         \label{fig:FilterDiskussionImplementedFilter}
 \end{figure}
 From figure \ref{fig:StepResponsAddedNoise} it is clear that the noise decreases the rise time and then lowers the value that the response converges towards. On figure \ref{fig:StepResponsAddedNoiseAndFilter} a filter is implemented on the derivative term with transfer function $\frac{5}{1+5/s}$ having a cutoff frequency at $5\,\mathrm{Hz}$. With the noise components at higher frequencies being dampened, it is clear that the derivative term performs much better allowing for faster response and the system almost converging towards the reference at $20\,\frac{\mathrm{rad}}{\mathrm{s}}$. Tilføj noget om hvad filteret betyder ift til vores data, uddyb.\\
@@ -121,7 +121,7 @@ From figure \ref{fig:StepResponsAddedNoise} it is clear that the noise decreases
          \caption{Simulation of the system with added noise and filter on the derivative term.}
          \label{fig:StepResponsAddedNoiseAndFilter}
      \end{subfigure}
-        \caption{Simulation results when app}
+        \caption{Simulation results when app.}
         \label{fig:FilterDiskussionImplementedFilter20}
 \end{figure}
 To achieve a response more like in simulation, it would have been favorable to put more time into deliberately designing a filter. On figure \ref{fig:fig:FilteredStepRespons20Order} a $20^{th}$ order filter is applied to the raw velocity feedback data. Even though the amplitude of the data is even smaller than with a $5^{th}$ order filter it is still oscillating. To know if the response would meet the chosen requirements, a test would be necessary. A Infinite Impulse Response (IIR) filter, also displayed on figure \ref{fig:StepResponsAddedNoiseAndFilter}, is another opportunity... Tilføj

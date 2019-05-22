@@ -108,7 +108,7 @@ For the system to know if the angular velocity of the pan-tilt frames are zero, 
 
 \subsubsection*{Reset Module}
 The Encoder module needs a reference point to initialise position measurement.
-The Reset module is responsible for resetting the pan or tilt frame to its index position. When a reset routine is enabled from the Protocol module, the motors drives the pan-tilt frames with constant low duty cycle, until a pulse from the respective index hall sensors are received. If the pan frame is stopped during a reset, due to physical limitations in the setup, the frame reverts the direction of rotation. The physical limitations is detected when the zero-flag is signaled from the Speed module. When it receives the pulse from the hall sensor, the Reset module brakes the motors while pulsing the Encoder module to reset its encoder value to 0. 
+The Reset module is responsible for resetting the pan or tilt frame to its index position. When a reset routine is enabled from the Protocol module, the motors drives the pan-tilt frames with constant low duty cycle, until a pulse from the respective index hall sensors are received. If the pan frame is stopped during a reset, due to physical limitations in the setup, the frame reverts the direction of rotation. The physical limitations are detected when the zero-flag is signaled from the Speed module. When it receives the pulse from the hall sensor, the Reset module brakes the motors while pulsing the Encoder module to reset its encoder value to 0. 
 
 
 %  Figure \ref{fig:FPGAFlowchartsResetLatchAndIndex} shows the flow in the process that receives the pulse from the index hall sensor. When it receives the pulse the module immediately brakes the motors while pulsing the Encoder module to reset its encoder value to 0. 
@@ -117,6 +117,10 @@ The Reset module is responsible for resetting the pan or tilt frame to its index
 
 
 \subsubsection*{Protocol Module}
+%Forklar formål med modulet til at starte med:
+% - Bruges til at udvide funktionaliteten på FPGA'en. 
+% - Micro controlleren kan også hente tilstanden for FpGa'en ud. 
+% kun ideer ikke krav ^^^^
 The Protocol decoder logic block act as an interface between the SPI connection to the microcontroller, and the logic on the FPGA. This enables the microcontroller to control the voltage supplied to the motors as well as direction of rotation. The module also offers the possibility of controlling the reset routine. It not possible for the microcontroller to change voltage supplied to the motors or direction of rotation when the reset routine is running.  
 
 % The protocol decoder module is designed as seen in figure \ref{fig:ProtocolDecoderLogic}. It determines which modules has access to the PWM module and thus controlling the robot. The two modules that need access are the Reset module and the SPI module. As default the SPI module controls the PWM and direction of the robot. As seen on figure \ref{fig:SPILogicSimple}, a separate SPI slave is connected to the protocol module which allows for the microcontroller to transmit a signal telling the reset module, when to control the PWM and the direction of the motors. When the signal is received the SPI cannot change anything regarding the PWM or direction until the reset is completed. 
@@ -135,7 +139,7 @@ The Protocol decoder logic block act as an interface between the SPI connection 
 
 \subsubsection*{SPI Module}
 
-On figure \ref{fig:SPILogicSimple} an overview of the SPI module is shown. The module contains seven internal slaves. Four slaves hold the information used for the controllers in the microcontroller. Two holds the PWM provided by the microcontroller, needed to control the voltage supplied to the motors. The last slave is used for the Protocol module. The microcontroller is the master device controlling the slaves and can access a specific slave by using a 4-bit address. The address is decoded in the FPGA by the slave select decoder, seen on figure \ref{fig:SPILogicSimple}. SSEN is used to enable the decoder, where as SS1-SS4 is for the address. Master-out-slave-in (MOSI) transfers data from the microcontroller to the slaves. Master-in-slave-out (MISO) transfers data from the FPGA to the microcontroller. A data transfer is controlled by the serial clock (SCK) by shifting data from the slave to the master and vice versa at the same time. The SCK is controlled by microcontroller, why the FPGA only has to keep the slave registers updated with newest value. This only holds for the slave registers containing velocity and position data. 
+On figure \ref{fig:SPILogicSimple} an overview of the SPI module is shown. The module contains seven internal slaves. Four slaves are responsible for transmitting the information used for the controllers in the microcontroller. Two are responsible for the PWM provided by the microcontroller, needed to control the voltage supplied to the motors. The last slave is used for the Protocol module. The microcontroller is the master device controlling the slaves and can access a specific slave by using a 4-bit address. The address is decoded in the FPGA by the slave select decoder, seen on figure \ref{fig:SPILogicSimple}. SSEN is used to enable the decoder, where as SS1-SS4 is for the address. Master-out-slave-in (MOSI) transfers data from the microcontroller to the slaves. Master-in-slave-out (MISO) transfers data from the FPGA to the microcontroller. A data transfer is controlled by the serial clock (SCK) by shifting data from the slave to the master and vice versa at the same time. The SCK-signal is controlled by the microcontroller, thus the FPGA only has to keep the slave registers updated with the newest value. This only holds for the slave registers containing velocity and position data. 
 
 
 
