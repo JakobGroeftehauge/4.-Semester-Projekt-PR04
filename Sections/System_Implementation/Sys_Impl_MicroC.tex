@@ -57,23 +57,27 @@ The PID-controller tasks on the microcontroller are responsible for calculating 
 % Following the controller task functionality described on figure  \ref{fig:PIDControllerFlowchart}, feedback to a controller is supplied whenever the controller sends a request to SPI. The request must contain a slave ID indicating which slave to receive data from. The controller task is then put in a blocked state, while waiting for data. Whenever SPI signals that the requested data is put in the feedback buffer associated with the requesting controller, the controller task is put back into running state. 
 %As mentioned in section \ref{subsec:SystemImplemtationFPGA}, because of possible variance in velocity feedback due to error in interfacing in the encoder, a second order lowpass Finite Impulse Response (FIR) filter is applied to the error. 
 
-The overall flow of the PID-controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. When the feedback data is received, the error between the reference value and feedback value is calculated. Because the derivative term of the PID-controller amplifies noise, it is beneficial to include a low pass filter in the implementation. The filter can be used specifically on the derivative term, or be applied to the error signal passed to all three terms. Initially the latter approach was implemented, but through tests, it was found that an extra filter specifically on the derivative term was needed as well. Little focus has 
-
-It is expected that the signal without any noise would be fairly slow, therefore a low cutoff frequency for the filter is chosen. The sampling frequency for the used filter is \SI{0.5}{\hertz}.
-The transfer function for the filter designed in MATLAB using the filterDesigner:
-\begin{equation}
-    H(z) = \frac{1}{0.0249z^2 + 0.9502z + 0.0249}
+The overall flow of the PID-controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. When the feedback data is received, the error between the reference value and feedback value is calculated. Because the derivative term of the PID-controller amplifies noise, it is beneficial to include a low pass filter in the implementation. The filter can be used specifically on the derivative term, or be applied to the error signal passed to all three terms. Initially the latter approach was implemented, but through tests, it was found that an extra filter specifically on the derivative term was needed as well. Designing these filters has not been highly prioritised and thus not much thought has gone into the filter design. This has been discovered to possibly be a poor prioritisation, and will be discussed in section \ref{sec:Discussion}. The filters are designed using the MATLAB Filter Designer. The filter design seen equation \ref{eq:general_filter},
+\begin{equation}\label{eq:general_filter}
+    H(z) = \frac{1}{0.0249z^2 + 0.9502z + 0.0249} \qquad ,
 \end{equation}
+is used for the general error and the design shown in equation \ref{eq:derivative_filter},
+\begin{equation}\label{eq:derivative_filter}
+    H(z) = \frac{1}{0.0555z^5 + 0.1666z^4 + 0.2777z^3 + 0.2777z^2 + 0.1666z + 0.0555} \qquad ,
+\end{equation}
+is used for filtering the derivative term.
+
+
+%It is expected that the signal without any noise would be fairly slow, therefore a low cutoff frequency for the filter is chosen. The sampling frequency for the used filter is \SI{0.5}{\hertz}.
+%The transfer function for the filter designed in MATLAB using the filterDesigner:
 
 % The proportional term is then calculated.
 %If noise from the encoder is imagined to be a pure sine wave at a single frequency $\omega_a$, then by differentiating the noise described by equation \ref{eq:Sin_noise} it is seen that the amplitude, is multiplied with the frequency $\omega_a$ demonstrating that high frequency noise can ruin performance of the system. 
 
 
-Because of this to further dampen the noise, a fifth order lowpass FIR filter is applied to the derivative term, with a cutoff frequency at \SI{0.5}{\hertz}. The transfer function used MATLAB using the filterDesigner is:
-\begin{equation}
-    H(z) = \frac{1}{0.0555z^5 + 0.1666z^4 + 0.2777z^3 + 0.2777z^2 + 0.1666z + 0.0555}
-\end{equation}
-The use of filters when implementing a controller was initially not assumed to be of high importance, when aiming to achieve good system response. Later this has been discovered to be a wrong assumption and that the choices regarding design of the filters have been poor. In section \ref{sec:Discussion} design of filters will be discussed.
+%Because of this to further dampen the noise, a fifth order lowpass FIR filter is applied to the derivative term, with a cutoff frequency at \SI{0.5}{\hertz}. The transfer function used MATLAB using the filterDesigner is:
+
+%The use of filters when implementing a controller was initially not assumed to be of high importance, when aiming to achieve good system response. Later this has been discovered to be a wrong assumption and that the choices regarding design of the filters have been poor. In section \ref{sec:Discussion} design of filters will be discussed.
 
 
 
@@ -85,7 +89,7 @@ The use of filters when implementing a controller was initially not assumed to b
 % \end{equation}
 % where $A$ is the amplitude, $\omega_a$ is the frequency, $\phi_a$ is the phase and $t$ is the time.
 
-To make sure the integral term does not wind up when an error is present for an extended period of time, anti-windup by conditional integration is implemented. As seen on figure \ref{fig:PIDControllerFlowchart} the controller performs a saturation check before updating the output buffer. If the calculated output is in saturation, a flag is set and the output is set equal to either the negative or positive saturation value, depending on sign of the error. On the position controller the saturation limit is equal to the maximum angular velocity of the pan-tilt system, signed depending on direction of rotation. The saturation limit of the velocity controller is equal to the maximum voltage possible to supply the motors which is either \SI{12}{\volt} or \SI{-12}{\volt}.
+To make sure the integral term does not wind up when an error is present for an extended period of time, anti-windup by conditional integration is implemented. As seen on figure \ref{fig:PIDControllerFlowchart} the controller performs a saturation check before updating the output buffer. If the calculated output is in saturation, a flag is raised and the output is set to either the negative or positive saturation value, depending on the sign of the error. On the position controller the saturation limit is equal to the maximum angular velocity, found by test to be approximately \SI{20}{\radian\per\second}, of the pan-tilt system. The saturation limit of the velocity controller is equal to the maximum voltage possible to supply the motors which is either \SI{12}{\volt} or \SI{-12}{\volt}.
 
 \begin{figure}[H]
     \centering
@@ -94,14 +98,14 @@ To make sure the integral term does not wind up when an error is present for an 
     \label{fig:PIDControllerFlowchart}
 \end{figure}
 
-
-
-
-
 \subsubsection*{SPI Task}
-The microcontroller have build in hardware that enables it to transmit and receive data using SPI. The microcontroller is set up as a master, described in section \ref{subsec:SystemImplemtationFPGA}. To select a desired slave, the microcontroller uses a 4-bit address. Four general purpose input output pins on the Tiva-C launchpad are used for selecting a slave, while a hardware controlled pin connected to SPI, is used to enable the slaves. The microcontroller uses a transmissionrate of \SI{13.3}{\mega bit} when communicating with the slaves on the FPGA. 
+%Responsibility and purpose of task 
 
-As default the SPI task is in the BLOCKED state. Only when a request from one of the controllers enters the SPI-queue, as seen on figure \ref{fig:OverviewTaskDiagramSimple}, the task is given CPU time. Following figure \ref{fig:SPIFlowchart} the request taken from the queue contains a slave ID and data. When the appropriate slave is selected as determined by the slave ID, both data is transmitted and received. If the slave ID has an associated buffer, then the received data is put in that buffer signaling a PID-controller.  
+The microcontroller have build in hardware that enables it to transmit and receive data using SPI. The microcontroller is set up as a master, as described in section \ref{subsec:SystemImplemtationFPGA}. To select a desired slave, the a 4-bit address is used. Four general purpose input output pins on the microcontroller are used for selecting a slave, while a hardware controlled pin connected to SPI, is used to enable the slaves. The microcontroller uses a bit rate of \SI{13.3}{\mega bit} when communicating with the slaves on the FPGA. 
+
+% Describe associated buffer/ Hver slave repræsenterer en type info og har derfor en buffer tilknyttet. Beskriv prioritet
+
+As default the SPI task is in the blocked state. Only when a request from one of the controllers enters the SPI-queue, as seen on figure \ref{fig:OverviewTaskDiagramSimple}, the task is given CPU time. Following figure \ref{fig:SPIFlowchart} the request taken from the queue contains a slave ID and data. When the appropriate slave is selected, determined by the slave ID, both data is transmitted and received. If the slave ID has an associated buffer, then the received data is put in that buffer signalling a PID-controller.  
 
 \begin{figure}[H]
     \centering
@@ -110,7 +114,7 @@ As default the SPI task is in the BLOCKED state. Only when a request from one of
     \label{fig:SPIFlowchart}
 \end{figure}
 
-The SPI task is responsible for providing the PID-controllers with values with units same as the reference value. A conversion has to happen so the units match \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \]. The motor encoder on the motor has 360 encoder counts per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
+The SPI task is responsible for providing the PID-controllers with values with units same as the reference value. A conversion has to happen so the units match \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second }\qquad . \] The motor encoder on the motor has 360 encoder counts per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
 \begin{equation}\label{eq:velocity_motor}
     \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
 \end{equation}
@@ -132,7 +136,7 @@ However a conversion is made in the microcontroller to convert the result to hav
 
 
 \subsubsection*{UI Task}
-The UI task is responsible for handling user inputs including set-points for the position controllers. Communication is initiated when the user transmits a command through UART to the microcontroller via the computer. The UI task is given lowest priority, meaning it is only given CPU time whenever no other tasks are scheduled. To facilitate user inputs a protocol has been defined for which the different commands are described in table \ref{tab:UART_UI_PROTOCOL}. With these commands the user is able to reset both motors, home a motor or command a motor to go to a given set-point. The UI-task consists of two states: "Waiting for command" and "Waiting for queue". The state machine is illustrated in figure
+The UI task is responsible for handling user inputs including references for the position controllers. Communication is initiated when the user transmits a command through UART to the microcontroller via the computer. The UI task is given lowest priority, meaning it is only given CPU time whenever no other tasks are scheduled. To facilitate user inputs a protocol has been defined for which the different commands are described in table \ref{tab:UART_UI_PROTOCOL}. With these commands the user is able to reset both motors, home a motor or command a motor to go to a given  reference point. The UI-task consists of two states: "Waiting for command" and "Waiting for queue". The state machine is illustrated in figure
 \ref{fig:UITaskStateDiagram}. 
 
 \begin{table}[H]
@@ -171,6 +175,7 @@ The UI task is responsible for handling user inputs including set-points for the
 
 
 \subsection{Conclusion}
+%Which tasks have been implemented, mention slave setup in more detail.
 
 Logic has been implemented on the FPGA to evaluate the position and speed of the motors, to provide a PWM-signal to control the motors and to communicate over SPI with the microcontroller. On the microcontroller FreeRTOS, a real-time operating system, has been implemented for easy separation of algorithms into tasks, that can be scheduled by a scheduling algorithm. Overall the embedded system includes a task to handle the SPI-communication with the FPGA, a task to handle UART-commands sent by the user and tasks to implement the four PID-controllers.   
 
