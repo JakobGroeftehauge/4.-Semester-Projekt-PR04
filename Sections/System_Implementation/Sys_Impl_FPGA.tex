@@ -76,6 +76,9 @@ Each motor is equipped with an Encoder module. The encoder provides information 
 % Add to the module explanation of the choices made with regards to how to measure the speed
 
 The Speed module is provided with a clock of \SI{100}{\kilo \hertz}. As seen on figure \ref{fig:FPGAProcessSpeedFlowcharts}, the velocity is found by counting how many clock ticks there are between two encoder counts, yielding the result in the unit $\left[\dot{\theta_{FPGA}}\right] = \frac{\SI{10}{\micro \second}}{\mathrm{tick_{enc}}}$. The angular velocity is calculated based on the assumption that change in position of the output shaft per encoder count is equal. Later this assumption was discovered to be wrong, the consequences will be discussed in section \ref{sec:Discussion}.
+
+
+There are two ways to determine the speed from encoder readings. One way is to count the encoder ticks within a constant time period, providing more precise readings when the speed is high, because the amount of encoder ticks is higher. The other way is to count time ticks between encoder ticks, providing more precise readings when the speed is low, as the amount of time ticks between encoder ticks is higher. In this project the latter method is chosen.   
 % the units for the FPGA output speed is described by $\left[\dot{\theta}_{FPGA}\right] = \frac{\SI{10}{\micro \second}}{\mathrm{tick_{enc}}}$, where $\mathrm{tick_{enc}}$ is the encoder counts.
 
 %However a conversion is made in the microcontroller to convert the result to have the units \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \] with respect to the motor. The motor encoder on the motor has 360 encoder ticks per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
@@ -83,7 +86,6 @@ The Speed module is provided with a clock of \SI{100}{\kilo \hertz}. As seen on 
 %     \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
 % \end{equation}
 For the system to know if the angular velocity of the pan-tilt frames are zero, a zero-flag is implemented. As seen on figure \ref{fig:FPGAProcessSpeedFlowcharts}, if no change in encoder position has happened in a given time period, the zero-flag is set otherwise it is cleared.
-
 
 %The Speed module is also responsible for setting and clearing a flag, which indicates whether the speed is zero or not. A change in encoder position must happen within a set time period for the flag to be cleared. In figure \ref{fig:FPGAProcessSpeedFlowcharts} a flowchart of the logic in the module is provided.
     

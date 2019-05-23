@@ -56,19 +56,13 @@ The difference as seen from equation \ref{eq:PercantageIncreaseEncoderProblem} i
     \label{tab:EncoderDifferenceBetweenEdges}
 \end{table}
 
-There are two ways to determine the speed from encoder readings. One way is to count the encoder ticks within a constant time period, providing more precise readings when the speed is high, because the amount of encoder ticks is higher. The other way is to count time ticks between encoder ticks, providing more precise readings when the speed is low, as the amount of time ticks between encoder ticks is higher. In this project the latter method is chosen.    
+As mentioned in section \ref{subsec:SystemImplemtationFPGA} there are two ways to determine the speed from the encoder readings. The issue with the inconsistent distance between encoder counts is relevant for both methods. 
 
-As mentioned in section \ref{subsec:SystemImplemtationFPGA} there are two ways to determine the speed from the encoder readings. The issue with the inconsistent distance between encoder ticks is relevant for both methods. 
+One way to compensate for the inconsistency is to group four edges of the encoder signals into one count, resulting in less variance. Also it is possible that the variance can be attributed to the inaccuracies of the oscilloscope used to measure. With this modification the resolution of the encoder module would be 90 counts per revolution, four times lower than the original resolution, which is not desired. This would introduce other problems for the PID-controllers implemented, as the rate at which new data is available would decrease. 
 
-One way to compensate for the inconsistency is to group four edges of the encoder signals into one count. Also it is possible that the variance can be attributed to the inaccuracies of the oscilloscope used to measure. With this modification the resolution of the encoder module would be 90 edges per revolution, four times lower than the original resolution. This would introduce other problems for the PID-controllers implemented, as they require that the position and speed be updated frequently. 
+Currently at the slowest speed at which the tilt frame is able to continuously rotate, the tilt frame takes approximately 5 seconds for a full revolution. This yields 1.66 seconds per revolution of the the motor. With an encoder resolution of 360 ticks per revolution the amount of encoder counts per second would be $360 / 1.66 \approx \SI{ 217 }{ \mathrm{ counts_{enc} } \per \second  } $.
 
-Currently at the slowest speed at which the tilt frame is able to overcome the friction in the bearings in all positions, the tilt frame takes about 5 seconds for a full revolution. This yields 1.66 seconds per revolution of the the motor. With an encoder resolution of 360 ticks per revolution the amount of encoder ticks per second would be: 
-
-\begin{equation}
-    \frac{360}{1.66} \approx \SI{ 217 }{ \frac{ \mathrm{ ticks_{enc} } }{ \second } }
-\end{equation}
-
-With a constant time period of $\SI{ 10 }{ \milli \second } $ this yields 2-3 tick per time period. A resolution far to low to be utilised for feedback. Maintaining this motor speed the speed measured would most of the time read the value 2 and occasionally 3. A jump from 2 to 3 corresponds to a \SI{50}{\percent} increase while the other way would result in a \SI{33}{\percent} decrease, changes in readings that when used as feedback would be to much for the PID-controllers to handle.
+With a constant time period of $\SI{ 10 }{ \milli \second } $ this yields 2-3 counts per time period. A resolution far to low to be utilised for feedback. Maintaining this motor speed the speed measured would most of the time read the value 2 and occasionally 3. A jump from 2 to 3 corresponds to a \SI{50}{\percent} increase while the other way would result in a \SI{33}{\percent} decrease, changes in readings that when used as feedback would be to much for the PID-controllers to handle.
 
 An option to mitigate the sudden changes in encoder readings would be be to constantly compute a moving average of the encoder readings, which would smoothen out the differences between the readings. However this would come at the cost of latency. A change in speed would not immediately be read by the result of the moving average, instead being delayed. This delay would introduce problems on its own for the PID-controllers. 
 

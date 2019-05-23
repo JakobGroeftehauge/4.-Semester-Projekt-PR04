@@ -161,23 +161,40 @@ The state space model in equation \ref{eq:stateSpaceSys1} combined with the mode
 
 Analysing the location of the poles, it is apparent that each plant consist of one fast pole and two slower poles. This also complies well with the fact that the plant is comprised of an electrical part and a mechanical part. The electrical part is by nature significantly faster than the mechanical part, therefore yielding the fastest pole. For the dynamics of the system these fast poles are negligible, as the slower poles are dominant. Looking at the zoomed in plot in figure \ref{fig:polesPlant} it can also be seen that the difference in inertia between the two plants manipulates the second fastest pole. Since the tilt frame has a lower moment of inertia, it can be seen that the system becomes faster as the moment of inertia decreases.
 
+% \begin{figure}
+%     \centering
+%     \includegraphics[width = 0.9\textwidth]{Sections/System_Modelling/Images/polesPlant.png}
+%     \caption{Placement of poles for the plant.}
+%     \label{fig:polesPlant}
+% \end{figure}
+
 \begin{figure}
-    \centering
-    \includegraphics[width = 0.9\textwidth]{Sections/System_Modelling/Images/polesPlant.png}
-    \caption{Placement of poles for the plant.}
-    \label{fig:polesPlant}
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width = 0.99\textwidth]{Sections/System_Modelling/Images/polesPlant.png}
+  \captionof{figure}{Placement of poles for the plant.}
+      \label{fig:polesPlant}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width = 0.99 \textwidth]{Sections/System_Modelling/Images/stepResponseVelPlant.png}
+  \captionof{figure}{Velocity step response for the plant.}
+  \label{fig:StepVelPlant}
+\end{minipage}
 \end{figure}
+
 
 The observations based on the pole locations can be verified by looking at the step response for the velocity of the systems. From figure \ref{fig:StepVelPlant} it is seen that the velocity responses resemble that of a first order system, although the transfer function for the velocity would be of second order. Thus it is verified that the fast pole for each plant is negligible. It can also be seen that the response of the tilt motor is significantly faster.
 %Analysing the step response for both the plants it resembles that both plants are of first order. Though on figure \ref{fig:polesPlant} it is seen that both plants has three poles and is therefore of second order. This behavior is due to the pole introduced by the electrical system being placed so far from the other poles, that this pole becomes insignificant. Looking at figure \ref{fig:StepVelPlant}, it is seen that the pan plant is slower than the tilt due to the increased moment of inertia.  
  
 
-\begin{figure}
-    \centering
-    \includegraphics[width = 0.9 \textwidth]{Sections/System_Modelling/Images/stepResponseVelPlant.png}
-    \caption{Velocity step response for the plant.}
-    \label{fig:StepVelPlant}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width = 0.9 \textwidth]{Sections/System_Modelling/Images/stepResponseVelPlant.png}
+%     \caption{Velocity step response for the plant.}
+%     \label{fig:StepVelPlant}
+% \end{figure}
 
 
 
