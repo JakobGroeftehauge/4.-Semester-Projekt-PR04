@@ -100,15 +100,11 @@ To make sure the integral term does not wind up when an error is present for an 
 
 \subsubsection*{SPI Task}
 %Responsibility and purpose of task 
-For the PID-controllers to be able to get their respective feedback data, a SPI task is necessary. The task is responsible for processing requests coming from each controller, receive data from the FPGA and then put it in the correct state buffer. To do this each controller and the belonging feedback state buffer is associated with a slave ID. The ID is then connected to a slave on the FPGA, containing data only relevant to the requesting controller. The tilt PWM slave, pan PWM slave and protocol slave does not have associated buffers, since they require no feedback. Every request holds both a slave ID and data, .
+For the PID-controllers to be able to get their respective feedback data, a SPI task is necessary. The task is responsible for processing requests coming from each controller, receive data from the seven different slaves and then put it in the correct state buffer. To do this each controller and the belonging feedback state buffer is associated with a slave ID. The ID is then connected to a slave on the FPGA, containing data only relevant to the requesting controller. The tilt PWM slave, pan PWM slave and protocol slave does not have associated state buffers, since they require no feedback. 
 
-Additionally the SPI task has to send input from the UI and PWM values from each velocity controller to the FPGA. 
+The microcontroller have build in hardware that enables transmitting and receiving data using SPI. To enable the slaves, a hardware controlled slave-select pin connected to SPI is used. Then to select a specific slave, four general purpose input output pins on the microcontroller are used. By setting the pins high or low, each slave can be selected by their 4-bit address as mentioned in section \ref{subsec:SystemImplemtationFPGA}. Data is transferred at a bit rate of \SI{13.3}{\mega bit}.
 
-The microcontroller have build in hardware that enables transmitting and receiving data using SPI. To enable the slaves, a hardware controlled slave-select pin connected to SPI is used. Then to select a specific slave, four general purpose input output pins on the microcontroller are used. By setting the pins high or low, each slave can be selected by their 4-bit address as mentioned in section \ref{subsec:SystemImplemtationFPGA} is used. Data is transferred at a bit rate of \SI{13.3}{\mega bit}.
-
-As default the SPI task is in the blocked state. Only when a request enters the SPI-queue the SPI task is given CPU time. Then as seen on figure \ref{fig:OverviewTaskDiagramSimple}, the task deciphers the request, enables and selects the correct slave after which both data is transmitted and received. If the slave ID has an associated buffer, then the received data is put in that buffer signalling a PID-controller.    ,
-
-When a request is received from either of the controllers via the SPI-queue the task is given CPU time. Following figure \ref{fig:SPIFlowchart} the request taken from the queue contains a slave ID and data. When the appropriate slave is selected, determined by the slave ID, both data is transmitted and received. If the slave ID has an associated buffer, then the received data is put in that buffer signalling a PID-controller.  
+As default the SPI task is in the blocked state. Only when a request enters the SPI-queue the SPI task is given CPU time. Then as seen on figure \ref{fig:OverviewTaskDiagramSimple}, the task deciphers the request, enables and selects the correct slave after which both data is transmitted and received. If the slave ID has an associated state buffer, then the received data is put in that state buffer signalling the PID-controller sending the request.    
 
 \begin{figure}[H]
     \centering
@@ -117,18 +113,18 @@ When a request is received from either of the controllers via the SPI-queue the 
     \label{fig:SPIFlowchart}
 \end{figure}
 
-The SPI task is responsible for providing the PID-controllers with values with the same units as the reference value. To be able to achieve this, the relation between the angle of the motor measured in radians and the encoder ticks has to be taken into account. The encoder on the motor has 360 encoder counts per revolution, which means the relation is, $\pi / 180$. As a result the conversion is given by table \ref{tab:conversionposvel},
+To make sure the feedback and reference values provided to each controllers have the same units, the feedback value coming from the FPGA has to be converted. The relation between the angle of the motor measured in radians, and the corresponding number of encoder counts is $\pi / 180$. As a result the conversion is given by table \ref{tab:conversionposvel}.
 
 \begin{table}[H]
 \centering
 \begin{tabular}{c|c}
-Conversion to an angle \left[\SI{}{\radian}\right]  & Conversion to an angular velocity \left [ \SI{}{\radian \per \second }\right ] \\ \hline
+Conversion to an angle $\left[\SI{}{\radian}\right]$ & Conversion to an angular velocity $\left [ \SI{}{\radian \per \second }\right ]$ \\ \hline
  $\theta_{m} = \frac{\pi}{180} \cdot \mathrm{FPGA_{pos}}$ & $\dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}$ 
 \end{tabular}
-\caption{}
+\caption{Unit conversion table, for data received from position and velocity slaves.}
 \label{tab:conversionposvel}
 \end{table}
-where the angle of the motor, $\theta_m$, is calculated using the the encoder value, $FPGA_{pos}$, provided by the FPGA. The angular velocity, $\dot{\theta}_m$, uses the calculated angular velocity, $\dot{\theta}_{\mathrm{FPGA}}$, made by the speed module in the FPGA.
+The angle of the motor, $\theta_m$, is calculated using the the encoder count value, $FPGA_{pos}$. The angular velocity, $\dot{\theta}_m$, uses $\dot{\theta}_{\mathrm{FPGA}}$, made by the speed module on the FPGA.
 
 
 %The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. 
@@ -157,41 +153,65 @@ where the angle of the motor, $\theta_m$, is calculated using the the encoder va
 
 
 
-\subsubsection*{UI Task}
-The UI task is responsible for handling user inputs including references for the position controllers. Communication is initiated when the user transmits a command through UART to the microcontroller via the computer. The UI task is given lowest priority, meaning it is only given CPU time whenever no other tasks are scheduled. To facilitate user inputs a protocol has been defined for which the different commands are described in table \ref{tab:UART_UI_PROTOCOL}. With these commands the user is able to reset both motors, home a motor or command a motor to go to a given  reference point. The UI-task consists of two states: "Waiting for command" and "Waiting for queue". The state machine is illustrated in figure
-\ref{fig:UITaskStateDiagram}. 
+\subsubsection*{UI Task and UART Task}
+%Responsibility and purpose of task and the conversion of degrees to radians
+%To enable a user to control the pan and tilt frames to desired positions, a UI task is necessary. For this to be possible, the task needs access to the position reference buffers shown
 
-\begin{table}[H]
-    \centering
-    
-    \begin{tabular}{l|c|l|p{0.1\textwidth}|c} %{p{0.12\linewidth}p{0.4\textwidth}p{0.38\textwidth}}
-              & Byte & Description & ASCII chars & Value  \\
-        \hline
-        RESET & 0 & BEGIN RESET COMMAND & 1 & "0" \\
-        \hline
-        HOME MOTOR  & 0 & HOME MOTOR COMMAND & 1 & "1" \\
-                    & 1 & Motor number & 1 & 0-1 \\
-        \hline
-        GO TO POSITION & 0 & GO TO POSITION COMMAND & 1 & "3" \\
-            & 1 & Motor number & 1 & 0-1 \\
-            & 2,3,4,5 & Encoder position to go to & 4 & 0-1080 \\
-        \hline
-        ABORT & 0 & ABORT COMMAND & 1 & "4" \\
-        \hline
-        MAX PWM TILT & 0 & MAX PWM TILT COMMAND & 1 & "5" \\
-       & 1 & Direction of rotation of tilt arm & 1 & 0-1
-    \end{tabular}    
-    
-    \caption{UART Protocol showing the different commands available for the user of the system. "Motor number" chooses either the tilt motor ("0") or the pan motor ("1"). Direction of rotation has similar mechanics where "0" chooses CCW rotation and "1" chooses CW rotation of the tilt arm.}
-    \label{tab:UART_UI_PROTOCOL}
+To enable a user from a terminal to control the pan and tilt frames to desired positions, a user interface (UI) and UART task is necessary. The UART task has to receive data from a PC terminal through UART and put it in a queue for the UI task to use. From here a protocol is setup to interpret the received data and control the robot accordingly. A protocol state buffer was initially thought of to hold information about the different states of the FPGA. From here the UI task could pass information on to the user, for him to act on. No time was further spent on this however.
+
+The UART task is assigned the idle priority, meaning it is given CPU time when no other tasks are scheduled. When it is running, it checks if user input has been received. If so it puts data into the UART receive-queue, signaling 
+
+
+
+The UI task is responsible for handling user inputs including references for the position controllers. Communication is initiated when the user transmits a command through UART to the microcontroller via the computer. The UI task is given lowest priority, meaning it is only given CPU time whenever no other tasks are scheduled. To facilitate user inputs a protocol has been defined for which the different commands are described in table \ref{tab:UART_UI_PROTOCOL}. With these commands the user is able to reset both motors, home a motor or command a motor to go to a given  reference point. 
+To make it more intuitive for the user, when changing the position of one of the frames, the desired position is entered in degrees instead of radians. The conversion from degrees to radians is immediately handle by the UI task, so the correct reference point can be given to the controllers.  
+%The UI-task consists of two states: "Waiting for command" and "Waiting for queue". The state machine is illustrated in figure
+%\ref{fig:UITaskStateDiagram}. 
+
+\begin{table}[]
+\centering
+\begin{tabular}{c|c|c}
+ Command & Number of bytes & Description \\ \hline
+Reset & 1 & Begin the reset command. \\ \hline
+Home motor & 2 & \begin{tabular}[c]{@{}c@{}}The tilt and pan frame\\ returns to index position.\end{tabular} \\ \hline
+Go to position & 6 & \begin{tabular}[c]{@{}c@{}}Makes the tilt or pan frame \\ go to a specific position.\end{tabular} \\ \hline
+Abort & 1 & Shuts down controllers.  
+\end{tabular}
+\caption{UART Protocol showing the different commands available for the user of the system.}
+\label{tab:UART_UI_PROTOCOL}
 \end{table}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/UITaskStateDiagram.pdf}
-    \caption{State diagram for the UI task on the microcontroller.}
-    \label{fig:UITaskStateDiagram}
-\end{figure}
+% \begin{table}[H]
+%     \centering
+    
+%     \begin{tabular}{l|c|l|p{0.1\textwidth}|c} %{p{0.12\linewidth}p{0.4\textwidth}p{0.38\textwidth}}
+%               & Byte & Description & ASCII chars & Value  \\
+%         \hline
+%         RESET & 0 & BEGIN RESET COMMAND & 1 & "0" \\
+%         \hline
+%         HOME MOTOR  & 0 & HOME MOTOR COMMAND & 1 & "1" \\
+%                     & 1 & Motor number & 1 & 0-1 \\
+%         \hline
+%         GO TO POSITION & 0 & GO TO POSITION COMMAND & 1 & "3" \\
+%             & 1 & Motor number & 1 & 0-1 \\
+%             & 2,3,4,5 & Encoder position to go to & 4 & 0-1080 \\
+%         \hline
+%         ABORT & 0 & ABORT COMMAND & 1 & "4" \\
+%         \hline
+%         MAX PWM TILT & 0 & MAX PWM TILT COMMAND & 1 & "5" \\
+%       & 1 & Direction of rotation of tilt arm & 1 & 0-1
+%     \end{tabular}    
+    
+%     \caption{UART Protocol showing the different commands available for the user of the system. "Motor number" chooses either the tilt motor ("0") or the pan motor ("1"). Direction of rotation has similar mechanics where "0" chooses CCW rotation and "1" chooses CW rotation of the tilt arm.}
+%     \label{tab:UART_UI_PROTOCOL}
+% \end{table}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/UITaskStateDiagram.pdf}
+%     \caption{State diagram for the UI task on the microcontroller.}
+%     \label{fig:UITaskStateDiagram}
+% \end{figure}
 
 
 

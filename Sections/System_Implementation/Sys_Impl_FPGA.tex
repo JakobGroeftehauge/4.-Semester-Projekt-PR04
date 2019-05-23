@@ -17,9 +17,9 @@ This section will concern the design and implementation of the functionality on 
 
 % The system is implemented on a Basys-3 development kit shown in figure \ref{fig:Basys-3-kit}. The figure highlights the connectors used for interfacing with the robot and for interfacing with the micro-controller. For interfacing with the robot two PMOD-connectors are used, one dedicated to giving input to the robot and the other dedicated to receiving outputs from the robot. As described in section \ref{sec:ProblemDescription} the robot has two motors, each one requiring a H-bridge for control and each H-bridge requiring three inputs, yielding six inputs in total for the robot. 
 
-\subsubsection*{Logic Implemented in the FPGA}
+%\subsubsection*{Logic Implemented in the FPGA}
 
-The logic implemented in the FPGA is divided into modules. Speed, Encoder, PWM and Reset modules are implemented twice, one for each motor. Figure \ref{fig:FPGALogicBothMotors} illustrates the modules implemented on the FPGA and the relation between the different modules.      
+The logic implemented in the FPGA is divided into modules, which will be described in this section. Speed, Encoder, PWM and Reset modules are implemented twice, one for each motor. Figure \ref{fig:FPGALogicBothMotors} illustrates the modules implemented on the FPGA and the relation between the different modules. Flowcharts describing the logic in the different modules are provided in the digital appendix, outlined in section \ref{sec:digital_appendix}.      
 % \begin{table}[]
 %     \centering
     
@@ -75,7 +75,7 @@ The Speed module takes the position provided by the Encoder module as input. The
 
 There are two ways to determine the angular velocity from encoder readings. It can either be determined by evaluating encoder counts within a constant time period, providing more precise readings when the angular velocity is high. Another approach is to count time periods between encoder counts, providing more precise readings when the angular velocity is low. In this project the latter method is chosen. This is implemented by providing the Speed module with a clock of \SI{100}{\kilo \hertz}. The angular velocity is then found by determining how many time periods there are between two encoder counts.
 
-For the system to know if the angular velocity of the pan-tilt frames are zero, a zero-flag is implemented. If no change in encoder position is detected  within a given time period, the zero-flag is set.
+For the system to know if the angular velocity of a frame is zero, a zero-flag is implemented. If no change in encoder position is detected within a given time period, the zero-flag is set.
 
 The angular velocity is calculated based on the assumption that change in position of the output shaft per encoder count is equal. Later this assumption was discovered to be wrong, the consequences will be discussed in section \ref{sec:Discussion}.
 
@@ -116,7 +116,7 @@ The Reset module takes an index signal and the zero-flag provided by the speed m
 
 % The Encoder module needs a reference point to initialise position measurement.
 
-When a reset routine is enabled from the Protocol module, the motors drives the pan-tilt frames with constant low duty cycle, until a pulse from the respective index hall sensors are received. If the pan frame is stopped during a reset, due to physical limitations in the setup, the frame reverts the direction of rotation. The physical limitations are detected when the zero-flag is signaled from the Speed module. When it receives the pulse from the hall sensor, the Reset module brakes the motors while pulsing the Encoder module to reset its encoder value to 0. 
+When a reset routine is enabled from the Protocol module, the motors drives the pan-tilt frames with constant low duty cycle, until a pulse from the respective index hall sensors are received. If the pan frame is stopped during a reset, due to physical limitations in the setup, the module reverts the direction of rotation. The physical limitations are detected when the zero-flag is signaled from the Speed module. When it receives the pulse from the index hall sensor, the Reset module brakes the motors while pulsing the Encoder module to reset its encoder value to 0. 
 
 %An index is provided, so a fixed reference is given for initialising the position measurement.
 
@@ -135,7 +135,7 @@ The PWM module takes a 10-bit duty cycle reference and a direction signal as inp
 The Protocol module act as an interface between the SPI connection to the microcontroller, and the logic on the FPGA. The Protocol module takes a duty cycle reference from either the reset module or SPI module as input. The Protocol module provides the PWM module with the duty cycle reference.
 %Initially, the module was designed to be able to provide the microcontroller with states, thus functionality to inform the microcontroller of the states of the pan-tilt system is provided. In addition to that the protocol module enables the possibility of expanding the functionality of the FPGA for future use.
 
-The Protocol module enables the microcontroller to control the voltage supplied to the motors as well as direction of rotation. The module also offers the possibility of controlling the reset routine. However it is not possible for the microcontroller to change voltage supplied to the motors or direction of rotation when the reset routine is running.  
+% The Protocol module enables the microcontroller to control the voltage supplied to the motors as well as direction of rotation. The module also offers the possibility of controlling the reset routine. However it is not possible for the microcontroller to change voltage supplied to the motors or direction of rotation when the reset routine is running.  
 
 % The protocol decoder module is designed as seen in figure \ref{fig:ProtocolDecoderLogic}. It determines which modules has access to the PWM module and thus controlling the robot. The two modules that need access are the Reset module and the SPI module. As default the SPI module controls the PWM and direction of the robot. As seen on figure \ref{fig:SPILogicSimple}, a separate SPI slave is connected to the protocol module which allows for the microcontroller to transmit a signal telling the reset module, when to control the PWM and the direction of the motors. When the signal is received the SPI cannot change anything regarding the PWM or direction until the reset is completed. 
 
@@ -153,7 +153,9 @@ The Protocol module enables the microcontroller to control the voltage supplied 
 
 \subsubsection*{SPI Module}
 
-On figure \ref{fig:SPILogicSimple} an overview of the SPI module is shown. The SPI module on the FPGA is responsible of handling the communication to and from the microcontroller. The module contains seven internal slaves. Four slaves are responsible for transmitting the information used for the controllers in the microcontroller. Two are responsible for the PWM provided by the microcontroller, needed to control the voltage supplied to the motors. The last slave is used for the Protocol module. The microcontroller is the master device controlling the slaves and can access a specific slave by using a 4-bit address. The address is decoded in the FPGA by the slave select decoder, seen on figure \ref{fig:SPILogicSimple}. SSEN is used to enable the decoder, where as SS1-SS4 is for the address. Master-out-slave-in (MOSI) transfers data from the microcontroller to the slaves. Master-in-slave-out (MISO) transfers data from the FPGA to the microcontroller. A data transfer is controlled by the serial clock (SCK) by shifting data from the slave to the master and vice versa at the same time. The SCK-signal is controlled by the microcontroller, thus the FPGA only has to keep the slave registers updated with the newest value. This only holds for the slave registers containing velocity and position data. 
+The SPI module on the FPGA is responsible of interfacing with the microcontroller. On figure \ref{fig:SPILogicSimple} an overview of the SPI module is provided. The module contains seven internal SPI slaves. Four slaves are responsible for transmitting the information used for the PID-controllers in the microcontroller. Two slaves are used for receiving the duty cycle references sent from the microcontroller. The last slave is used for the Protocol module.
+
+The microcontroller is the master device controlling the slaves and can access a specific slave by using a 4-bit address. The address is decoded in the FPGA by the slave select decoder, seen on figure \ref{fig:SPILogicSimple}. SSEN is used to enable the decoder, while the signals SS1-SS4 are used to choose the address. Master-out-slave-in (MOSI) transfers data from the microcontroller to the slaves. Master-in-slave-out (MISO) transfers data from the FPGA to the microcontroller. A data transfer is controlled by the serial clock (SCK) by shifting data from the slave to the master and vice versa at the same time. The SCK-signal is controlled by the microcontroller, thus the FPGA only has to keep position and velocity slaves updated with the newest position and velocity feedback data. 
 
 \begin{figure}[]
     \centering

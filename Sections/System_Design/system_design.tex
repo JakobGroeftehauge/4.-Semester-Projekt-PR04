@@ -71,7 +71,7 @@ Through experimentation it has been found that placing zeros at $s=-9.5$ and $s=
 
 \begin{table}[]
     \centering
-    \begin{tabular}{l c c c}
+    \begin{tabular}{l | c c c}
         Design methods                      & $k_{p}$ & $k_{i}$ & $k_{d}$ \\
         \hline
         Position tilt model based   & 9.45 & 8.55 & 0.9     \\
@@ -80,7 +80,6 @@ Through experimentation it has been found that placing zeros at $s=-9.5$ and $s=
         Velocity tilt Ziegler-Nichols & 0.52 & 22.86 & 0.003 \\
         Cascade model based         & 7.53 & 7.59 & 1.03    \\
         Cascade Ziegler-Nichols     & 8.78 & 7.64 & 1.22    \\
-        \hline
     \end{tabular}
     \caption{Controller gains found from the different design methods. }
     \label{tab:pos_controller_gains}
@@ -177,7 +176,7 @@ k_p = \frac{1.2}{RL}\;, \quad k_i = \frac{k_p}{2L}\;, \quad k_d = \frac{k_p}{0.5
 \label{eq:controllerGains}
 \end{equation}
 
-where the constants $R$ and $L$ are identified from the step response. $R$ is found by drawing the tangent to the steepest part of the transition between zero and the reference. The gradient of the tangent is equal to $R$. $L$ is equal to the latency of the system, and is defined as the distance between the y-axis and the intersection between the tangent and the x-axis \cite{}. 
+where the constants $R$ and $L$ are identified from the step response. $R$ is found by drawing magnitude the tangent to the steepest part of the transition between zero and the steady state. The gradient of the tangent is equal to $R$, found by $R = \frac{A_{ss}}{\tau}$. $L$ is equal to the latency of the system, and is defined as the distance between the y-axis and the intersection between the tangent and the x-axis \cite{}. 
 
 
 
@@ -189,7 +188,7 @@ where the constants $R$ and $L$ are identified from the step response. $R$ is fo
     \label{fig:stepPlantNZ}
 \end{figure}
 
-In figure \ref{fig:stepPlantNZ} the data points sampled from the velocity step response of the physical system are plotted. The initial spike seen in the figure might be caused by friction but will not be discussed further. The disturbances which can be seen on the figure will be explained further in the discussion. Due to the seemingly noisy data in the plot, the Curve Fitting tool in MATLAB has been used to fit a curve that, it is displayed as the red line. The red line is described as the expression introduced in equation \ref{eq:NZ_plant_eq}. Using MATLAB $R = 203.4 $ and $L = 11.4 \cdot 10^{-3}$ are found. Using the found values for R and L and the equations introduced in equation \ref{eq:controllerGains} the controller gains are found and can be seen in table \ref{tab:pos_controller_gains}.
+In figure \ref{fig:stepPlantNZ} the data points sampled from the velocity step response of the physical system are plotted. The initial spike seen in the figure might be caused by friction but will not be discussed further. The disturbances, marked with the yellow ellipse, on the figure will be explained further in the discussion. Due to the seemingly noisy data in the plot, the Curve Fitting tool in MATLAB has been used to fit a curve that, it is displayed as the red line. The red line is described as the expression introduced in equation \ref{eq:NZ_plant_eq}. Using MATLAB $R = 203.4 $ and $L = 11.4 \cdot 10^{-3}$ are found. Using the found values for R and L and the equations introduced in equation \ref{eq:controllerGains} the controller gains are found and can be seen in table \ref{tab:pos_controller_gains}.
 
 % \begin{equation}
 %     k_p = 0.5194, \quad k_i = 22.86, \quad k_d = 3.0 \cdot 10^{-3}
@@ -211,18 +210,20 @@ In figure \ref{fig:stepPlantNZ} the data points sampled from the velocity step r
 \subsubsection*{Pole Placement Based Velocity Controller Design}
 The procedure for designing the velocity controller based on the model is very similar to the approach used for designing the position controllers mentioned in section \ref{subsec:position_control_model}. The main difference is that the open-loop system now has one less pole at the origin, as the only pole at the origin originates from the integral term of the PID-controller. As seen on figure \ref{fig:vel_root_locus}, it has been found that placing the zeros stemming from the PID-controller at $s = -10$ and $s = -12$, yields adequate root loci. This placement allows the close-loop poles to be moved far into the left half plane, while still remaining directly on the real axis. A gain value of $0.065$ is chosen. The closed-loop pole locations are visible from the figure \ref{fig:vel_root_locus}. The closed-loop pole and zero locations can be compared to the pole and zero locations given by the Ziegler-Nichols tuning shown in figure \ref{fig:ZN_pole_zero}.
 
+
+
 \begin{figure}[h]
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/RL_TiltMotorVelPolePlace.png}
-    \caption{Tilt motor.}
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/RL_TiltMotorVelPolePlace.png}
+    \caption{Root locus plot for the tilt position controller with the chosen pole placement}
     \label{fig:vel_root_locus}
 \end{subfigure}\quad
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/PoleZero_TiltMotorVel_NZ.png}
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/PoleZero_TiltMotorVel_NZ.png}
     \caption{Closed-loop poles and zero locations obtained using the Ziegler-Nichols tuning method.}
     \label{fig:ZN_pole_zero}
 \end{subfigure}
-\caption{Bode plots of the closed-loop motor control systems for the pan and tilt motors.}
+\caption{?????}
 \label{fig:vel_poles_zeros}
 \end{figure}
 
