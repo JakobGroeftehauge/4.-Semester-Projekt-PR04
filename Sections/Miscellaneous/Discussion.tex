@@ -100,7 +100,7 @@ Trying to understand how noise affects the response of the system, a step respon
         \caption{Simulation results when applying a fifth order FIR to the velocity feedback.}
         \label{fig:FilterDiskussionImplementedFilter}
 \end{figure}
-From figure \ref{fig:StepResponsAddedNoise} it is clear that the noise decreases the rise time and then lowers the value that the response converges towards. On figure \ref{fig:StepResponsAddedNoiseAndFilter} a filter is implemented on the derivative term with transfer function $\frac{5}{1+5/s}$ having a cutoff frequency at \SI{5}{\hertz}. With the noise components at higher frequencies being dampened, it is clear that the derivative term performs much better allowing for faster response and the system almost converging towards the reference at \SI{20}{\radian \per \second}. Tilføj noget om hvad filteret betyder ift til vores data, uddyb.\\
+From figure \ref{fig:StepResponsAddedNoise} it is clear that the noise increases the rise time and lowers the value that the response converges towards. On figure \ref{fig:StepResponsAddedNoiseAndFilter} a filter is implemented on the derivative term with transfer function $H(s) = \frac{5}{1+5/s}$. With the noise components at higher frequencies being dampened, the derivative term performs much better allowing for faster response and the system almost converging towards the reference at \SI{20}{\radian \per \second}. Tilføj noget om hvad filteret betyder ift til vores data, uddyb.\\
 
 \begin{figure}[H]
      \centering
@@ -120,30 +120,21 @@ From figure \ref{fig:StepResponsAddedNoise} it is clear that the noise decreases
         \caption{Simulation results when applying FIR and IIR filters to the raw velocity feedback data.}
         \label{fig:FilterDiskussionImplementedFilter20}
 \end{figure}
-To achieve a response with less error, it would have been favourable to put more time into deliberately designing a filter. On figure \ref{fig:FilteredStepRespons20Order} a $20^{th}$ order filter is applied to the raw velocity feedback data. Even though the amplitude of the data is even smaller than with a fifth order filter it is still noisy. To know if the response would meet the chosen requirements, a test would be necessary. The figure also shows taht 
-
-
-A Infinite Impulse Response (IIR) filter, also displayed on figure \ref{fig:StepResponsAddedNoiseAndFilter}, is another opportunity... Tilføj
-
-
-
-
-
+To achieve a response with less error, it would have been favourable to put more time into deliberately designing a filter. On figure \ref{fig:FilteredStepRespons20Order} a $20^{th}$ order filter is applied to the raw velocity feedback data. Even though the amplitude of the data is even smaller than with a fifth order filter it is still noisy. To know if the response would meet the chosen requirements, a test would be necessary. The figure also shows that using an infinite impulse response filter, substantially better noise reduction can be achieved using only a first order filter. Implementing an IIR filter may have been beneficial to achieve better performance.
 
 \subsection*{Using built-in hardware in the Tiva launchpad}
-The project description states that the FPGA must be used for interfacing with the pan-tilt system, while the microcontroller must handle the user input and that these two development kits must communicate to each other through SPI. However the processing power available on the microcontroller alone or the amount of logic blocks available on the FPGA alone far exceeds the requirements by the scope of the project. Therefore it is possible to implement the project on just one of the devices. It is clear that the project is constructed in this way to encompass all disciplines taught on the semester. However, it is also wanted to clarify that had this project been ordered by an employer, it would have been implemented on just one of the devices. A typical choice could be to implement the system on the microcontroller. The microcontroller features peripherals implemented in physical hardware, for handling PWM and getting position and velocity readings from a quadrature encoder. As these are implemented in hardware in the microcontroller and since new data can be flagged by interrupts, eliminating the need for the microcontroller to poll the data, the microcontroller still has plenty of processing power left while handling all the tasks that the FPGA handles right now. The use of the microcontroller as interface to the encoder would also eliminate the need for additional SPI functionality.
+The project description states that the FPGA must be used for interfacing with the pan-tilt system, while the microcontroller must handle the user input and that these two development kits must communicate to each other through SPI. However the processing power available on the microcontroller alone or the amount of logic blocks available on the FPGA alone far exceeds the requirements by the scope of the project. Therefore it is possible to implement the project on just one of the devices. It is clear that the project is constructed in this way to encompass all disciplines taught on the semester. However, it is also wanted to clarify that had this project been ordered by an employer, it would have been implemented on just one of the devices. A typical choice could be to implement the system on the microcontroller. The microcontroller features peripherals implemented in physical hardware, for handling PWM and getting position and velocity readings from an encoder. As these are implemented in hardware in the microcontroller and since new data can be flagged by interrupts, eliminating the need for the microcontroller to poll the data, the microcontroller still has plenty of processing power left while handling all the tasks that the FPGA handles. The use of the microcontroller as interface to the encoder would also eliminate the need for additional SPI functionality.
 %\subsection*{Reset from both directions}
 
-\subsection*{Comparison between Simulation and Implementation}
-It is noted that it would have beneficial to plot the control signal along with the step responses of all tests. This would have made it easier to comprehend and conclude on the behavior of the responses. 
-As concluded in the tests section \ref{sec:Test}, there is a difference between the simulated and the implemented response of the controllers. A comparison between the physical step response and the model can be seen on figure \ref{fig:Mes_vs_siml}. The two responses resembles each other fairly well, though if examined further it is seen that there is a difference in the steady state of around 2-3 \si{rad/s}. Also worth noticing is the undulation in the actual response, making it apparent that some parameters are not taken into account or flaws in the estimation of parameters. 
-
-\begin{figure}
-    \centering
-    \includegraphics[width = 0.9 \textwidth]{Sections/Miscellaneous/Images/velocityPlantMes_vs_Sim.png}
-    \caption{Measured and simulated system response.}
-    \label{fig:Mes_vs_siml}
-\end{figure}
+% \subsection*{Test Methods}
+% It is noted that it would have beneficial to plot the control signal along with the step responses of all tests. This would have made it easier to comprehend and conclude on the behaviour of the responses. 
+% As concluded in the tests section \ref{sec:Test}, there is a difference between the simulated and the implemented response of the controllers. A comparison between the physical step response and the model can be seen on figure \ref{fig:Mes_vs_siml}. The two responses resembles each other fairly well, though if examined further it is seen that there is a difference in the steady state of around 2-3 \si{rad/s}. Also worth noticing is the undulation in the actual response, making it apparent that some parameters are not taken into account or flaws in the estimation of parameters. 
+% \begin{figure}
+%     \centering
+%     \includegraphics[width = 0.9 \textwidth]{Sections/Miscellaneous/Images/velocityPlantMes_vs_Sim.png}
+%     \caption{Measured and simulated system response.}
+%     \label{fig:Mes_vs_siml}
+% \end{figure}
 
 
 
