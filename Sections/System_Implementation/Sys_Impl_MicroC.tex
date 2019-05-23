@@ -100,16 +100,15 @@ To make sure the integral term does not wind up when an error is present for an 
 
 \subsubsection*{SPI Task}
 %Responsibility and purpose of task 
-%- PID skal kunne modtage data bestemt efter slave ID. For at det kunne det skal buffers være associeret tilknyttet de buffer.
+For the PID-controllers to be able to get their respective feedback data, a SPI task is necessary. The task is responsible for processing requests coming from each controller, receive data from the FPGA and then put it in the correct state buffer. To do this each controller and the belonging feedback state buffer is associated with a slave ID. The ID is then connected to a slave on the FPGA, containing data only relevant to the requesting controller. The tilt PWM slave, pan PWM slave and protocol slave does not have associated buffers, since they require no feedback. Every request holds both a slave ID and data, .
 
-For the PID-controllers to be able to get their respective feedback data, a SPI task is necessary. To 
-he task must handle request from the controllers for getting data from a specific slave.
+Additionally the SPI task has to send input from the UI and PWM values from each velocity controller to the FPGA. 
 
-The microcontroller have build in hardware that enables it to transmit and receive data using SPI. The microcontroller is set up as a master, as described in section \ref{subsec:SystemImplemtationFPGA}. To select a desired slave, the 4-bit address is used. Four general purpose input output pins on the microcontroller are used for selecting a slave, while a hardware controlled pin connected to SPI, is used to enable the slaves. The microcontroller uses a bit rate of \SI{13.3}{\mega bit} when communicating with the slaves on the FPGA. 
+The microcontroller have build in hardware that enables transmitting and receiving data using SPI. To enable the slaves, a hardware controlled slave-select pin connected to SPI is used. Then to select a specific slave, four general purpose input output pins on the microcontroller are used. By setting the pins high or low, each slave can be selected by their 4-bit address as mentioned in section \ref{subsec:SystemImplemtationFPGA} is used. Data is transferred at a bit rate of \SI{13.3}{\mega bit}.
 
-% Describe associated buffer/ Hver slave repræsenterer en type info og har derfor en buffer tilknyttet. Beskriv prioritet
+As default the SPI task is in the blocked state. Only when a request enters the SPI-queue the SPI task is given CPU time. Then as seen on figure \ref{fig:OverviewTaskDiagramSimple}, the task deciphers the request, enables and selects the correct slave after which both data is transmitted and received. If the slave ID has an associated buffer, then the received data is put in that buffer signalling a PID-controller.    ,
 
-As default the SPI task is in the blocked state. Only when a request from one of the controllers enters the SPI-queue, as seen on figure \ref{fig:OverviewTaskDiagramSimple}, the task is given CPU time. Following figure \ref{fig:SPIFlowchart} the request taken from the queue contains a slave ID and data. When the appropriate slave is selected, determined by the slave ID, both data is transmitted and received. If the slave ID has an associated buffer, then the received data is put in that buffer signalling a PID-controller.  
+When a request is received from either of the controllers via the SPI-queue the task is given CPU time. Following figure \ref{fig:SPIFlowchart} the request taken from the queue contains a slave ID and data. When the appropriate slave is selected, determined by the slave ID, both data is transmitted and received. If the slave ID has an associated buffer, then the received data is put in that buffer signalling a PID-controller.  
 
 \begin{figure}[H]
     \centering
@@ -118,16 +117,35 @@ As default the SPI task is in the blocked state. Only when a request from one of
     \label{fig:SPIFlowchart}
 \end{figure}
 
-The SPI task is responsible for providing the PID-controllers with values with units same as the reference value. A conversion has to happen so the units match \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second }\qquad . \] The motor encoder on the motor has 360 encoder counts per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made on the microcontroller is given by equation \ref{eq:velocity_motor}.
-\begin{equation}\label{eq:velocity_motor}
-    \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
-\end{equation}
+The SPI task is responsible for providing the PID-controllers with values with the same units as the reference value. To be able to achieve this, the relation between the angle of the motor measured in radians and the encoder ticks has to be taken into account. The encoder on the motor has 360 encoder counts per revolution, which means the relation is, $\pi / 180$. As a result the conversion is given by table \ref{tab:conversionposvel},
+
+\begin{table}[H]
+\centering
+\begin{tabular}{c|c}
+Conversion to an angle \left[\SI{}{\radian}\right]  & Conversion to an angular velocity \left [ \SI{}{\radian \per \second }\right ] \\ \hline
+ $\theta_{m} = \frac{\pi}{180} \cdot \mathrm{FPGA_{pos}}$ & $\dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}$ 
+\end{tabular}
+\caption{}
+\label{tab:conversionposvel}
+\end{table}
+where the angle of the motor, $\theta_m$, is calculated using the the encoder value, $FPGA_{pos}$, provided by the FPGA. The angular velocity, $\dot{\theta}_m$, uses the calculated angular velocity, $\dot{\theta}_{\mathrm{FPGA}}$, made by the speed module in the FPGA.
 
 
-The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. The angle of the motor, $ \theta_{m} $, is described by equation \ref{eq:angle_of_motor}, where $FPGA_{pos}$ is the encoder value provided by the FPGA.
-\begin{equation}\label{eq:angle_of_motor}
-     \theta_{m} = \frac{\pi}{180} \cdot \mathrm{FPGA_{pos}}
-\end{equation}
+%The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. 
+
+
+
+
+% \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second }\qquad . \] The motor encoder on the motor has 360 encoder counts per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made on the microcontroller is given by equation \ref{eq:velocity_motor}.
+% \begin{equation}\label{eq:velocity_motor}
+%     \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
+% \end{equation}
+
+
+% The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. The angle of the motor, $ \theta_{m} $, is described by equation \ref{eq:angle_of_motor}, where $FPGA_{pos}$ is the encoder value provided by the FPGA.
+% \begin{equation}\label{eq:angle_of_motor}
+%      \theta_{m} = \frac{\pi}{180} \cdot \mathrm{FPGA_{pos}}
+% \end{equation}
 
 
 % However a conversion is made in the microcontroller to convert the result to have the units \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \] with respect to the motor. The motor encoder on the motor has 360 encoder ticks per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.

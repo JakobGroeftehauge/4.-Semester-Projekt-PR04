@@ -91,17 +91,19 @@ The system dynamics can also be described by the transfer functions for velocity
 
 \subsection{Determining System Parameters}\label{subsec:motorParameters}
 \subsubsection*{Moment of Inertia}
-Moment of inertia, sometimes referred to as mass moment of inertia, is the angular motion analogue to mass in a translational system. It determines proportionality between the applied torque and the angular acceleration. An estimation for the value of the moment of inertia will be calculated based on measurements and information from data sheets. 
+An estimation for the value of the moment of inertia will be calculated based on measurements and information from data sheets. This section will summarise the results of the calculations, the full derivations can be found in the digital appendix outlined in section \ref{sec:digital_appendix}.
 
-To estimate the inertia, a simplified representation of the pan and tilt system, in figure \ref{}, is considered. This representation ignores bolts, brackets, gears, etc. Furthermore, the extrusions are considered as solid boxes, thus ignoring the profile shape.
+The inertia estimates are based on a simplified representation of the pan and tilt system shown in figure \ref{}. This representation ignores bolts, brackets, gears, etc. Furthermore, the extrusions are considered as solid boxes, thus ignoring the profile shape.
 
-Based on the simplified representation, the inertia accruing to the tilt frame around the axis $a_{tilt}$ can be found. Using a formula to calculate the inertia of a box with dimensions $w_t\times l_t\times h_t$ and subtracting the inertia of the inner box of dimensions $w_{ct}\times l_{ct}\times h_t$, equation \ref{eq:J_tilt} is found, where $\rho_t$ is the density of the tilt frame.
+%Based on the simplified representation, the inertia accruing to the tilt frame around the axis $a_{tilt}$ can be found. Using a formula to calculate the inertia of a box with dimensions $w_t\times l_t\times h_t$ and subtracting the inertia of the inner box of dimensions $w_{ct}\times l_{ct}\times h_t$, equation \ref{eq:J_tilt} is found, where $\rho_t$ is the density of the tilt frame.
 
+Based on the simplified representation, the inertia of the tilt frame can be found by subtracting the inertia of the inner box of dimensions $w_{ct}\times l_{ct}\times h_t$ from the inertia of the outer box with dimensions $w_t\times l_t\times h_t$. This yields equation \ref{eq:J_tilt},
 \begin{equation} \label{eq:J_tilt}
-    J_{a_{tilt}} =  w_{t} \,h_{t}\, l_{t}\,\rho_{t}\frac{1}{12}(l_{t}^2+h_{t}^2)-w_{ct}\, h_{t} \, l_{ct} \, \rho_{t}\frac{1}{12}(h_{t}^2+l_{ct}^2)
+    J_{a_{tilt}} =  w_{t} \,h_{t}\, l_{t}\,\rho_{t}\frac{1}{12}(l_{t}^2+h_{t}^2)-w_{ct}\, h_{t} \, l_{ct} \, \rho_{t}\frac{1}{12}(h_{t}^2+l_{ct}^2) \qquad ,
 \end{equation}
+where $\rho_t$ is the average density of the tilt frame.
 
-The inertia of the pan frame can be found in a similar manner, however to properly estimate the inertia accruing to the pan motor, the tilt frame must be considered as well. The inertia of the tilt frame about the axis $a_{pan}$ also depends on the angle, $\theta$, at which the tilt motor is positioned.
+The inertia of the pan frame can be found in a similar manner, however to properly estimate the inertia relevant to the pan motor, the tilt frame, must be considered as well. The inertia of the tilt frame about the axis $a_{pan}$ also depends on the angle, $\theta$, at which the tilt motor is positioned. Finding the inertia of the inclined tilt frame is non-trivial, and is carried out the document
 
 The same approach of subtracting the inertia of an inner box from an outer box can be used, but since no formula is readily available for calculating the inertia of an inclined box, integration must instead be used. The inertia of a point mass is defined as $J=m\cdot r^2$ \cite{PrincipalsOfPhysics}, where $m$ is the mass of the point and $r$ is the distance from the point to the axis of rotation. Thus the inertia of a volume, $V$, can be found as $\iiint_V \rho r^2 dV$, where $\rho$ is the density of the volume and $r$ is a function that describes the distance to the axis of rotation at each point in the volume. In the case of the box positioned as in figure \ref{}, $r$ can be described as in equation \ref{eq:r_function}.
 \begin{equation}\label{eq:r_function}
