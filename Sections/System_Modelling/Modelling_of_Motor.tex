@@ -86,12 +86,11 @@ The system dynamics can also be described by the transfer functions for velocity
 
 
 
-
-
-
 \subsection{Determining System Parameters}\label{subsec:motorParameters}
 \subsubsection*{Moment of Inertia}
-An estimation for the value of the moment of inertia will be calculated based on measurements and information from data sheets. This section will summarise the results of the calculations, the full derivations can be found in the digital appendix outlined in section \ref{sec:digital_appendix}.
+An estimation for the value of the moment of inertia will be calculated based on measurements and information from data sheets. This section will summarise the results of the calculations, the full derivations can be found in the document "Derivations and Estimations for Inertia" found in the digital appendix outlined in section \ref{sec:digital_appendix}.
+
+
 
 The inertia estimates are based on a simplified representation of the pan and tilt system shown in figure \ref{fig:DrawingFrames}. This representation ignores bolts, brackets, gears, etc. Furthermore, the extrusions are considered as solid boxes, thus ignoring the profile shape.
 
@@ -118,7 +117,9 @@ Based on the simplified representation, the inertia of the tilt frame can be fou
 \end{equation}
 where $\rho_t$ is the average density of the tilt frame.
 
-The inertia of the pan frame can be found in a similar manner, however to properly estimate the inertia relevant to the pan motor, the tilt frame, must be considered as well. The inertia of the tilt frame about the axis $a_{pan}$ also depends on the angle, $\theta$, at which the tilt motor is positioned. Finding the inertia of the inclined tilt frame is non-trivial and requires triple integration. The derivation is carried out the document "Derivations and Estimations for Inertia" found in the digital appendix outlined in section \ref{sec:digital_appendix}. The resulting formula is non-linear as it will give the largest value at $\theta_{t}=\frac{\pi}{2}$ and the lowest at $\theta_t=0$. It has been chosen to calculate the inertia at $\theta_t = \frac{\pi}{4}$, to get a value which is right between the two extremes. 
+The inertia of the pan frame can be found in a similar manner, however to properly estimate the inertia relevant to the pan motor, the tilt frame, must be considered as well. The inertia of the tilt frame, about the axis $a_{pan}$, depends on the angle, $\theta$, at which the tilt motor is positioned. Finding the inertia of the inclined tilt frame is non-trivial and requires triple integration. 
+%The derivation is carried out in the document "Derivations and Estimations for Inertia" found in the digital appendix outlined in section \ref{sec:digital_appendix}. 
+The resulting formula is non-linear as it will give the largest value at $\theta=\frac{\pi}{2}$ and the lowest at $\theta=0$. It has been chosen to calculate the inertia at $\theta = \frac{\pi}{4}$, to get a value which is right between the two extremes. 
 % The resulting expression is presented in equation \ref{eq:inertiaTiltOnPan}.
 % \begin{equation}\label{eq:inertiaTiltOnPan}
 %     J_{t,\,a_{pan}} &= \frac{1}{24}h_t\,l_t\,w_t\, \rho_t (h_t^2+l_t^2+2w_t^2)-\frac{1}{24}h_t\,l_{ct}\,w_{ct}\, \rho_t (h_t^2+l_{ct}^2+2w_{ct}^2)

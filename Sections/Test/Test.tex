@@ -19,7 +19,7 @@ The single controller test is performed with the velocity controller described i
 
 \subsubsection*{Results}
 Table \ref{tab:CPU_utilisation_test} shows the timing of running the controllers including the UART, SPI and UI task. 
-$t_1$ is the duration of two velocity PID-controller tasks and $t_2$ is the duration of two position PID-controllers tasks. $T_ce$ is the duration between the first task starts to the same task starts again, as seen on figure \ref{fig:Schedueling_controllers}. This makes it possible to estimate the average CPU utilisation of the PID-controller tasks as seen in equation \ref{eq:CPU_util},
+$t_1$ is the duration of two velocity PID-controller tasks and $t_2$ is the duration of two position PID-controllers tasks. $T_c$ is the duration between the first task starts to the same task starts again, as seen on figure \ref{fig:Schedueling_controllers}. The UART task is not directly included in the calculations, however, as seen on table \ref{tab:Task_Timing}, it is so short, that it is deemed negligible. The SPI task is called directly from the PID-controller tasks, thus indirectly included in the calculations. This makes it possible to estimate the average CPU utilisation of the PID-controller tasks as seen in equation \ref{eq:CPU_util},
 \begin{equation}\label{eq:CPU_util}
     U_{CPU} =\left(\frac{t_{1,avg} + t_{2,avg}}{T_{c,avg}}\right)\cdot 100=\left(\frac{\SI{457,6}{\mu\second}}{\SI{992}{\mu\second}}\right)\cdot 100\approx \SI{46,13}{\percent}
 \end{equation}
@@ -30,11 +30,11 @@ where $ U_{CPU,avg} $ is the average CPU utilisation, $t_{1,avg}$ and $ t_{2,avg
 \begin{tabular}{lrrrrr}
 \multicolumn{1}{c}{\textbf{}}            & \multicolumn{5}{c}{\textbf{Test number}}                                                                                              \\
 \multicolumn{1}{r|}{}                    & \multicolumn{1}{r|}{1}    & \multicolumn{1}{r|}{2}    & \multicolumn{1}{r|}{3}    & \multicolumn{1}{r|}{4}    & \multicolumn{1}{r}{5} \\ \hline
-\multicolumn{1}{l|}{$t_1 + t_2$ (\SI{}{\micro\second})} & \multicolumn{1}{r|}{458}  & \multicolumn{1}{r|}{456}  & \multicolumn{1}{r|}{456}  & \multicolumn{1}{r|}{460}  & 458                   \\
-\multicolumn{1}{l|}{$T_c$ (\SI{}{\micro\second})}                 & \multicolumn{1}{r|}{990}  & \multicolumn{1}{r|}{988}  & \multicolumn{1}{r|}{994}  & \multicolumn{1}{r|}{994}  & 994                   \\
-\multicolumn{1}{l|}{$U_{CPU}$ (\SI{}{\percent})}          & \multicolumn{1}{r|}{46,3} & \multicolumn{1}{r|}{46,1} & \multicolumn{1}{r|}{45,9} & \multicolumn{1}{r|}{46,3} & 46,1                 
+\multicolumn{1}{l|}{$t_1 + t_2$ [\SI{}{\micro\second}]} & \multicolumn{1}{r|}{458}  & \multicolumn{1}{r|}{456}  & \multicolumn{1}{r|}{456}  & \multicolumn{1}{r|}{460}  & 458                   \\
+\multicolumn{1}{l|}{$T_c$ [\SI{}{\micro\second}]}                 & \multicolumn{1}{r|}{990}  & \multicolumn{1}{r|}{988}  & \multicolumn{1}{r|}{994}  & \multicolumn{1}{r|}{994}  & 994                   \\
+\multicolumn{1}{l|}{$U_{CPU}$ [\SI{}{\percent}]}          & \multicolumn{1}{r|}{46,3} & \multicolumn{1}{r|}{46,1} & \multicolumn{1}{r|}{45,9} & \multicolumn{1}{r|}{46,3} & 46,1                 
 \end{tabular}
-\caption{Data regarding the duty cycle of the controller process scheduled with two position and two velocity controllers, the UART and SPI task. The position controllers, $t_2$ are scheduled at a rate of \SI{200}{\hertz} and the velocity controllers, $t_1$ at \SI{1000}{\hertz}. Figure \ref{fig:Schedueling_controllers} illustrates the test.}
+\caption{Data regarding CPU utilisation of the four PID-controller tasks and the SPI task.}
 \label{tab:CPU_utilisation_test}
 \end{table}
 
@@ -47,31 +47,28 @@ where $ U_{CPU,avg} $ is the average CPU utilisation, $t_{1,avg}$ and $ t_{2,avg
 \begin{tabular}{lrrrrr}
 \multicolumn{1}{c}{\textbf{}}            & \multicolumn{5}{c}{\textbf{Test number}}                                                                                                 \\
 \multicolumn{1}{l|}{}                    & \multicolumn{1}{r|}{1}     & \multicolumn{1}{r|}{2}     & \multicolumn{1}{r|}{3}    & \multicolumn{1}{r|}{4}     & \multicolumn{1}{r}{5} \\ \hline
-\multicolumn{1}{l|}{SPI\_transmit (\SI{}{\micro\second})}       & \multicolumn{1}{r|}{9,9}   & \multicolumn{1}{r|}{9,75}  & \multicolumn{1}{r|}{9,75} & \multicolumn{1}{r|}{9,74}  & 9,75                  \\
-\multicolumn{1}{l|}{SPI\_receive (\SI{}{\micro\second})}        & \multicolumn{1}{r|}{5,44}  & \multicolumn{1}{r|}{5,44}  & \multicolumn{1}{r|}{5,44} & \multicolumn{1}{r|}{5,46}  & 5,45                  \\
-\multicolumn{1}{l|}{UART (\SI{}{\nano\second})}                & \multicolumn{1}{r|}{458}   & \multicolumn{1}{r|}{500}   & \multicolumn{1}{r|}{500}  & \multicolumn{1}{r|}{500}   & 501                   \\
-\multicolumn{1}{l|}{Velocity Controller (\SI{}{\micro\second})} & \multicolumn{1}{r|}{107,8} & \multicolumn{1}{r|}{107,8} & \multicolumn{1}{r|}{108}  & \multicolumn{1}{r|}{107,8} & 107,8                
+\multicolumn{1}{l|}{UART [\SI{}{\nano\second}]}                & \multicolumn{1}{r|}{458}   & \multicolumn{1}{r|}{500}   & \multicolumn{1}{r|}{500}  & \multicolumn{1}{r|}{500}   & 501                   \\
+\multicolumn{1}{l|}{Velocity Controller [\SI{}{\micro\second}]} & \multicolumn{1}{r|}{107,8} & \multicolumn{1}{r|}{107,8} & \multicolumn{1}{r|}{108}  & \multicolumn{1}{r|}{107,8} & 107,8                
 \end{tabular}
-\caption{Timing of SPI upon transmission and receiving, the UART task and velocity PID-controller.}
+\caption{Duration of the  UART task and velocity PID-controller task.}
 \label{tab:Task_Timing}
 \end{table}
 
-Table \ref{tab:Task_Timing} shows the timing of the UART, SPI and the velocity PID-controller task respectively. As seen in the table, the PID-controller has an average processing time of $\SI{107,8}{\micro \second}$ with an fifth order derivative filter. In accordance with the requirement specification this is sufficient for a single controller.
+Table \ref{tab:Task_Timing} shows the timing of the UART and the velocity PID-controller task respectively. As seen in the table, the PID-controller has an average processing time of $\SI{107,8}{\micro \second}$ with an fifth order derivative filter. In accordance with the requirement specification this is sufficient for a single controller.
 \begin{figure}
     \centering
     \includegraphics[width=0.7\textwidth]{Sections/Test/Images/TestMicrocontrollerTiming.png}
-    \caption{Illustration of the scheduling of the four controllers running with two position and two velocity controllers, the UART, SPI and UI task.
-    
-    $t_2$ are the position controllers run at a rate of \SI{200}{\hertz}.$t_1$ are the velocity controllers run at a rate of \SI{1000}{\hertz}.}
+    \caption{Illustration of the scheduling of the four PID-controller tasks, the UART and SPI tasks. $t_2$ is the duration of both position PID-controllers run at a rate of \SI{200}{\hertz}. $t_1$ is the duration of both velocity PID-controllers run at a rate of \SI{1000}{\hertz}.  $T_c$ is the duration between the first task starts to the same task starts again. } 
     \label{fig:Schedueling_controllers}
 \end{figure}
 
-However it is also possible to get an estimation of the overhead of the system by comparing the values of table \ref{tab:Task_Timing} and \ref{tab:CPU_utilisation_test}. This is done by comparing the total time of executing four PID-controllers and the time of processing a single PID-controller as seen in equation \ref{eq:overhead},
+It is possible to get an estimation of the overhead of the system by comparing the values of table \ref{tab:Task_Timing} and \ref{tab:CPU_utilisation_test}. This is done by comparing the total time of executing four PID-controllers with the time of processing a single PID-controller.
+This yields an overhead in terms of CPU-time of \SI{5.7}{\percent}.
 
-\begin{equation}\label{eq:overhead}
-    \mathrm{overhead}=\frac{T_{c}-(T_{controller}\cdot 4)}{T_{c1}}\cdot 100 \approx \SI{5,7}{\percent} \qquad ,
-\end{equation}
-where $T_{controller}$ is the processing time of a single velocity controller.
+% \begin{equation}\label{eq:overhead}
+%     \mathrm{overhead}=\frac{T_{c}-(T_{controller}\cdot 4)}{T_{c1}}\cdot 100 \approx \SI{5,7}{\percent} \qquad ,
+% \end{equation}
+% where $T_{controller}$ is the processing time of a single velocity controller.
 
 %%%%%-----
 
@@ -99,27 +96,17 @@ Using SPI as the only communication between the FPGA and the microcontroller, it
 \end{itemize}
 The test was preformed by sending 10000 messages from the microcontroller to the FPGA. Each message contains the value of a counter, starting at 0 and incrementing to 9999. Subsequent is each message transmitted to a computer with the help of the microblaze, and processed to check if all values are present and in the correct sequence.  
 
-\begin{table}[]
-    \centering
-    \begin{tabular}{L{1.4 cm} | c{5 cm} c{3 cm} c{3 cm} 
-         \textbf{Test number} & \textbf{Transmission Rate [\si{\kilo\hertz}]} & \textbf{Messages sent} & \textbf{Messages Received}  \\
-         \hline
-         1 & 1 & 1 & 1 \\
-         1 & 1 & 1 & 1 \\
-         1 & 1 & 1 & 1 \\
-         1 & 1 & 1 & 1 \\
-         1 & 1 & 1 & 1 
-    \end{tabular}
-    \caption{Caption}
-    \label{tab:my_label}
-\end{table}
 
 
 \begin{table}[H]
 \centering
-\begin{tabular}{c|c|c|c}
-Test no. & Transmission Rate {[}kHz{]} & Msg. sent & Msg. received \\ \hline
-1-5 & 2 & 10000 & 10000
+\begin{tabular}{c|c c c}
+\textbf{Test no.} & \textbf{Transmission Rate {[}Hz{]}} & \textbf{Messages sent} & \textbf{Messages received} \\ \hline
+1 & \num{2e3} & 10000 & 10000 \\
+2 & \num{2e3} & 10000 & 10000 \\
+3 & \num{2e3} & 10000 & 10000 \\
+4 & \num{2e3} & 10000 & 10000 \\
+5 & \num{2e3} & 10000 & 10000
 \end{tabular}
 \caption{Data regarding the five test performed with SPI.}
 \label{tab:SPI-stresstest}
@@ -242,11 +229,11 @@ Table \ref{tab:controller_data} shows the data regarding the performance of the 
 \end{table}
 
 \subsection{Conclusion}
-It has been possible to achieve an average CPU utilisation time of approximately \SI{46,13}{\percent}, thus satisfying the project stated requirement of the PID-controllers utilising a maximum of \SI{60}{\percent} of the CPU time. A maximum allowed processing time for a single PID-controller is determined to be of $\SI{150}{\mu\second}$. Furthermore the processing time of a single PID-controller is tested with different parameters. A maximum processing time of $\SI{107,8}{\mu\second}$ is found, thus satisfying the requirement. Furthermore an average overhead is estimated to approximately $\SI{5,7}{\percent}$, hence not deemed to compromise the timing of the system.
+It has been possible to achieve an average CPU utilisation time of approximately \SI{46,13}{\percent}, thus satisfying the project stated requirement of the PID-controllers utilising a maximum of \SI{60}{\percent} of the CPU time. A maximum allowed processing time for a single PID-controller is determined to be $\SI{150}{\micro \second}$. Furthermore the processing time of a single PID-controller yielding a processing time $\SI{107,8}{\micro \second}$, thus satisfying the requirement. An average overhead is estimated to approximately $\SI{5,7}{\percent}$, hence not deemed to compromise the timing of the system.
 
-The SPI communication has been tested to satisfy the requirement of transmitting at a bit rate of \SI{13,3}{\mega bit} with a success rate of \SI{99,9}{\percent}.
+The SPI communication has been tested to satisfy the requirement of transmitting at a bit rate of \SI{13,3}{\mega bit} with a success rate of 10000/10000 messages successfully received, thus complying with the requirement of a success rate of \SI{99,9}{\percent}.
 
-The Ziegler-Nichols and pole placement design methods has been tested. The methods are tested on single PID-controllers as well as PID-controllers in cascade. 
+The Ziegler-Nichols and pole placement design methods have been tested. The methods are tested on single PID-controllers as well as PID-controllers in cascade. 
 
 
 \end{document}

@@ -25,6 +25,8 @@ It was also found that the cascaded controller which relied purely on the mathem
 
 \subsection{Encoder Accuracy}
 %Explain how this effects the step responses and other things
+As the angular velocity is deduced from the encoder output, the performance of the PID-controllers and the accuracy of the encoders is closely linked. As seen in figure \ref{fig:VelocityTilt} the measured velocity response is very noise
+
 As described in section \ref{subsec:SystemImplemtationFPGA} the encoder provided with each motor only has a resolution of 360 counts for a full revolution. At the same time the accuracy of the encoder on the motor is inadequate, as the time between encoder edges at a constant angular velocity is not constant. Table \ref{tab:EncoderDifferenceBetweenEdges} shows the time period between consecutive encoder edges. The data is sampled from the tilt motor encoder, over a period of 14 encoder edges, while a constant voltage is applied to the motor. It is acknowledged that the angular velocity is uneven through one revolution of the tilt frame. It is presumed that this velocity variance can be neglected due to the short time frame of the 14 edges compared to the 1080 for a full revolution. 
 The percentage increase from the minimum time period to the maximum time period is:
 \begin{equation} \label{eq:PercantageIncreaseEncoderProblem}
