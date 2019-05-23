@@ -159,7 +159,7 @@ The angle of the motor, $\theta_m$, is calculated using the the encoder count va
 
 To enable a user from a terminal to control the pan and tilt frames to desired positions, a user interface (UI) and UART task is necessary. The UART task has to receive data from a PC terminal through UART and put it in a queue for the UI task to use. From here a protocol is setup to interpret the received data and control the robot accordingly. A protocol state buffer was initially thought of to hold information about the different states of the FPGA. From here the UI task could pass information on to the user, for him to act on. No time was further spent on this however.
 
-The UART task is assigned the idle priority, meaning it is given CPU time when no other tasks are scheduled. When it is running, it checks if user input has been received. If so it puts data into the UART receive-queue, signaling 
+The UART task is assigned the idle priority, meaning it is given CPU time when no other tasks are scheduled. When it is running, it checks if user input has been received. If so, data is put into the UART receive-queue, signalling the UI task. The UI task then
 
 
 

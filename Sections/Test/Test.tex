@@ -19,11 +19,11 @@ The single controller test is performed with the velocity controller described i
 
 \subsubsection*{Results}
 Table \ref{tab:CPU_utilisation_test} shows the timing of running the controllers including the UART, SPI and UI task. 
-$t_1$ is the duration of two velocity PID-controller tasks and $t_2$ is the duration of two position PID-controllers tasks. $T_c$ is the duration between the first task starts to the same task starts again, as seen on figure \ref{fig:Schedueling_controllers}. This makes it possible to estimate the average CPU utilisation of the PID-controller tasks as seen in equation \ref{eq:CPU_util},
+$t_1$ is the duration of two velocity PID-controller tasks and $t_2$ is the duration of two position PID-controllers tasks. $T_ce$ is the duration between the first task starts to the same task starts again, as seen on figure \ref{fig:Schedueling_controllers}. This makes it possible to estimate the average CPU utilisation of the PID-controller tasks as seen in equation \ref{eq:CPU_util},
 \begin{equation}\label{eq:CPU_util}
     U_{CPU} =\left(\frac{t_{1,avg} + t_{2,avg}}{T_{c,avg}}\right)\cdot 100=\left(\frac{\SI{457,6}{\mu\second}}{\SI{992}{\mu\second}}\right)\cdot 100\approx \SI{46,13}{\percent}
 \end{equation}
-where $ U_{CPU} $ is the CPU utilisation, $t_{1,avg}$ and $ t_{2,avg}$ is the average duration of $t_1$ and $t_2$ and $T_{avg}$ is the average time of $T_c$ as seen on figure \ref{fig:Schedueling_controllers}. 
+where $ U_{CPU,avg} $ is the average CPU utilisation, $t_{1,avg}$ and $ t_{2,avg}$ is the average duration of $t_1$ and $t_2$ and $T_{c,avg}$ is the average time of $T_c$ as seen on figure \ref{fig:Schedueling_controllers}. 
 
 \begin{table}[H]
 \centering
