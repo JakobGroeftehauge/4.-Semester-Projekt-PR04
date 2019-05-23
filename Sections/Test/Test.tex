@@ -5,28 +5,29 @@ This section will introduce the tests prompted by the requirements in section \r
 To ease access to data from the FPGA during tests, a \textit{microblaze} has been implemented, which utilises UART to communicate directly with a computer. This allows for direct access to the position and velocity of the pan and tilt motor making data processing easier. 
 
 \subsection{Microcontroller Timing Test}
-Running multiple tasks on one microcontroller it is imperative to know, how much of the CPU time is utilised. If the CPU utilises too much time the risk of starvation is introduced, thus it is wanted to test whether the system can satisfy the requirement from section \ref{sec:Requirements}: 
+Running multiple tasks on one microcontroller it is imperative to know, how much of the CPU time is utilised. If the CPU is overloaded the risk of starvation is introduced, thus it is wanted to test whether the system can satisfy the requirement from section \ref{sec:Requirements}: 
 \begin{itemize}
-    \item The microcontroller is not to utilise more than 80\% of the total CPU time.
+    \item The PID-controllers must not utilize more than \SI{60}{\percent} of the CPU time on the microcontroller.
     \item It must be verified that the overhead does not compromise the timing of the system.
 \end{itemize}
 
-The test is executed with four controllers, the UART task, the SPI task and the UI task running with freeRTOS. The position controllers are scheduled at a frequency of \SI{200}{\hertz} and the velocity controllers at \SI{1000}{\hertz}. The timing of the tasks is done by driving pins high upon start and low finish of all individual tasks, thus enabling the possibility of timing the tasks with an oscilloscope.
+The test is executed with four controllers, the UART task, the SPI task and the UI task running with freeRTOS. The position controllers are scheduled at a frequency of \SI{200}{\hertz} and the velocity controllers at \SI{1000}{\hertz}. The timing of the tasks is done by driving pins high upon start and low upon end of task cycle of all individual tasks, thus enabling the possibility of timing the tasks with an oscilloscope.
+
 
 \subsubsection*{Results}
 Table \ref{tab:CPU_utilisation_test} shows the timing of running the controllers including the UART, SPI and UI task. Table \ref{tab:Task_Timing} shows the timing of the UART, SPI and UI respectively. 
-Timing the duration of the tasks from the first task initiates to the last task terminates the duration of cycle is determined. T is the duration between the first cycle starts to the next cycle begins, as seen on figure \ref{fig:Schedueling_controllers}. This makes it possible to estimate the average duty cycle of the system:
+Timing the duration of the tasks from the first task initiates to the last task terminates the duration of cycle is determined. $T$ is the duration between the first cycle starts to the next cycle begins, as seen on figure \ref{fig:Schedueling_controllers}. This makes it possible to estimate the average duty cycle of the system:
 \begin{equation}
     D_c=100-\left(\frac{T_{c1,avg}}{T_{avg}}\right)\cdot 100=100-\left(\frac{\SI{457,6}{\mu\second}}{\SI{992}{\mu\second}}\right)\cdot 100\approx 53,87\%
 \end{equation}
-where $T_{c1,avg}$ is the average duration of cycle 1 and $T_{avg}$ is the average time of T on figure \ref{fig:Schedueling_controllers}. 
+where $T_{c1,avg}$ is the average duration of cycle 1 and $T_{avg}$ is the average time of $T$ on figure \ref{fig:Schedueling_controllers}. 
 \begin{table}[H]
 \centering
-\begin{tabular}{l|r|r|r|r|r|l}
-& \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \multicolumn{1}{r}{\textbf{Unit}}                                  \\ \hline
-Duration of cycle 1               & 458        & 456        & 456        & 460        & 458        & \SI{}{\mu\second} \\
-T             & 990        & 988        & 994        & 994        & 994        & \SI{}{\mu\second} \\
-Duty cycle                            & 53,73      & 53,85      & 54,12      & 53,72      & 53,92      & \%                   
+\begin{tabular}{l|r|r|r|r|r}
+& \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} \\ \hline
+Duration of cycle 1 (\SI{}{\mu\second})               & 458        & 456        & 456        & 460        & 458         \\
+$T$ (\SI{}{\mu\second})           & 990        & 988        & 994        & 994        & 994         \\
+Duty cycle (\%)                            & 53,73      & 53,85      & 54,12      & 53,72      & 53,92                       
 \end{tabular}
 \caption{Data regarding the duty cycle of the controller process scheduled with two position and two velocity controllers, the UART, SPI and UI task. The position controllers are scheduled at a rate of \SI{200}{\hertz} and the velocity controllers at \SI{1000}{\hertz}. Figure \ref{fig:Schedueling_controllers} illustrates the test.}
 \label{tab:CPU_utilisation_test}
@@ -38,12 +39,12 @@ Duty cycle                            & 53,73      & 53,85      & 54,12      & 5
 % \usepackage{graphicx}
 \begin{table}[H]
 \centering
-\begin{tabular}{l|c|r|r|r|r|r|l}
- & \multicolumn{1}{r|}{\textbf{Priority}} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{Unit}         \\ \hline
-SPI\_transmit & 5                                      & 9,9        & 9,75       & 9,75       & 9,74       & 9,75       & \SI{}{\mu\second}                      \\
-SPI\_receive  & 5                                      & 5,44       & 5,44       & 5,44       & 5,46       & 5,45       &   \SI{}{\mu\second}                    \\
-UART          & 1                                      & 458        & 500        & 500        & 500        & 501        &  \SI{}{\mu\second}                     \\
-UI            & 1                                      & N/A         & N/A         & N/A         & N/A         & N/A         & \multicolumn{1}{c}{-}
+\begin{tabular}{l|c|r|r|r|r|r}
+ & \multicolumn{1}{r|}{\textbf{Priority}} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5}          \\ \hline
+SPI\_transmit (\SI{}{\mu\second}) & 5                                      & 9,9        & 9,75       & 9,75       & 9,74       & 9,75                             \\
+SPI\_receive (\SI{}{\mu\second})  & 5                                      & 5,44       & 5,44       & 5,44       & 5,46       & 5,45                           \\
+UART (\SI{}{\mu\second})         & 1                                      & 458        & 500        & 500        & 500        & 501                             \\
+UI            & 1                                      & N/A         & N/A         & N/A         & N/A         & N/A         
 \end{tabular}
 \caption{Timing of SPI upon transmission and receiving, the UART task and UI, however the UI task was not able to be timed due to it being too quick. Entries marked with N/A could not be determined from the available data.}
 \label{tab:Task_Timing}
@@ -64,7 +65,7 @@ It has been possible to achieve an average CPU utilisation time of approximately
 \subsection{Processing time - Controllers}
 It is wanted to examine the processing time of the controllers on the microcontroller. The requirement specification in section \ref{sec:Requirements} states:
 \begin{itemize}
-    \item All PID-controllers must be processed within a specified time frame to guarantee a minimum frequency. The minimum frequency and time period is to be determined.
+    \item A maximum execution time for the PID-controller must be determined.
 \end{itemize}
 To estimate a maximum allowed processing time for a controller, the CPU time is divided into five parts, four for the controllers and one for the remaining tasks. With a maximum CPU time utilisation of \SI{80}{\percent}, a single controller is to be processed within $\SI{160}{\mu\second}$.
 
@@ -75,11 +76,11 @@ Initially the microcontroller was tested with only one controller, namely veloci
 As seen on table \ref{tab:Single_Controller_test} the PID-controller has an average processing time of $\SI{111,08}{\mu \second}$ with an 8th order derivative filter. In accordance with the requirement specification this is sufficient for a single controller. %It was however desired to test the influence of the derivative term and the additional filter on the derivative term. According to the test, the derivative term as implemented in the project adds an average of $\SI{16,68}{\mu\second}$ to the processing time.
 
 \begin{table}[H]
-\begin{tabular}{l|c|r|r|r|r|rl}
-\textbf{Controller (Velocity)} & \multicolumn{1}{l|}{\textbf{Filter order}} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \multicolumn{1}{r|}{\textbf{5}} & \multicolumn{1}{r}{\textbf{Unit}}                                  \\ \hline
-PID-controller                    & 4                                 & 104,4 & 104,4 & 104,6 & 104,6 & \multicolumn{1}{r|}{117,8} & \SI{}{\mu\second}      \\
-\multicolumn{1}{c|}{-}  & 6                                 & 107,8 & 107,8 & 108   & 107,8 & \multicolumn{1}{r|}{108}   & \SI{}{\mu\second}        \\
-\multicolumn{1}{c|}{-}            & 8                                 & 111,2 & 111   & 110,8 & 111,2 & \multicolumn{1}{r|}{111,2} & \SI{}{\mu\second}        \\
+\begin{tabular}{l|c|r|r|r|r|r}
+\textbf{Controller (Velocity)} & \multicolumn{1}{l|}{\textbf{Filter order}} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \multicolumn{1}{r|}{\textbf{5}}                                   \\ \hline
+PID-controller (\SI{}{\mu\second})                   & 4                                 & 104,4 & 104,4 & 104,6 & 104,6 & \multicolumn{1}{r|}{117,8}       \\
+- (\SI{}{\mu\second})  & 6                                 & 107,8 & 107,8 & 108   & 107,8 & \multicolumn{1}{r|}{108}           \\
+- (\SI{}{\mu\second})           & 8                                 & 111,2 & 111   & 110,8 & 111,2 & \multicolumn{1}{r|}{111,2}        \\
 % PID without filter                & -                                 & 95,2  & 95,6  & 94,6  & 94,2  & \multicolumn{1}{r|}{95,2}  & \SI{}{\mu\second}        \\
 % PI without D-term                 & -                                 & 94,4  & 94,4  & 94,6  & 94,2  & 94,4                       & \SI{}{\mu\second}     
 \end{tabular}
@@ -92,7 +93,7 @@ A maximum allowed processing time for a single PID-controller is determined to b
 \subsection{SPI Stress Test}
 Using SPI as the only communication between the FPGA and the microcontroller, it is essential to test the reliability of the system to assure that no information is lost during transmission. 
 \begin{itemize}
-    \item Using SPI with a transmission frequency of \SI{2}{\kilo\hertz}, the FPGA is to receive 10000/10000 messages correct with no errors.
+    \item Using SPI with a bit rate of \SI{13,3}{\mega bit}, the FPGA is to receive \SI{99,9}{\percent} messages correct with no errors.
 \end{itemize}
 The test was preformed by sending 10000 messages from the microcontroller to the FPGA. Each message contains the value of a counter, starting at 0 and incrementing to 9999. Subsequent is each message transmitted to a computer with the help of the microblaze, and processed to check if all values are present and in the correct sequence.    
 \begin{table}[H]
@@ -109,19 +110,19 @@ As seen in table \ref{tab:SPI-stresstest} the five test resulted in the same out
 
 \subsection{Test of Controller Designs}
 %opdeling af afsnit
-This section concerns the test of the PID-controllers using different methods for tuning and constellations. The parameters used in each test is shown in table \ref{tab:TestParameters}, and a deduced using the design requirements of \SI{5}{\percent} overshoot, \SI{1,5}{\second} settling time and \SI{0,5}{\second} rise time as described in section \ref{sec:System_Design}.
-\begin{table}[H]
-\centering
-\begin{tabular}{c|c|c|c|c|c|c|c|c|}
-      & \multicolumn{2}{l|}{Position Controllers} & \multicolumn{2}{l|}{Velocity Controller (tilt)} & \multicolumn{4}{c|}{Cascade Controller (tilt)}                                                                                                                                                                                \\ \hline
-      & Tilt                & Pan                 & ZN                      & PP                    & \begin{tabular}[c]{@{}c@{}}ZN\\ Position\end{tabular} & \begin{tabular}[c]{@{}c@{}}ZN\\ Velocity\end{tabular} & \begin{tabular}[c]{@{}c@{}}PP\\ Position\end{tabular} & \begin{tabular}[c]{@{}c@{}}PP\\ Velocity\end{tabular} \\
-$k_P$ & 9.450               & 4.920               & 0.519                   & 1.422                 & 8.740                                                 & 0.519                                                 & 7.528                                                 & 1.420                                                 \\ 
-$k_I$ & 8.550               & 3.170               & 22.860                  & 7.800                 & 7.640                                                 & 22.860                                                & 7.589                                                 & 7.800                                                 \\ 
-$k_D$ & 0.900               & 1.200               & 0.003                   & 0.065                 & 1.220                                                 & 0.003                                                 & 1.030                                                 & 0.065                                                 \\ 
-\end{tabular}
-\caption{Parameters used for each test. ZN is deduced using the Zielger-Nichols method and PP is deduced using pole placement.}
-\label{tab:TestParameters}
-\end{table}
+This section concerns the test of the PID-controllers using different methods for tuning and designs. The parameters used in each test is shown in table \ref{tab:pos_controller_gains}, and are designed using the design guides of \SI{5}{\percent} overshoot, \SI{1,5}{\second} settling time and \SI{0,5}{\second} rise time as described in section \ref{sec:System_Design}.
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{c|c|c|c|c|c|c|c|c|}
+%       & \multicolumn{2}{l|}{Position Controllers} & \multicolumn{2}{l|}{Velocity Controller (tilt)} & \multicolumn{4}{c|}{Cascade Controller (tilt)}                                                                                                                                                                                \\ \hline
+%       & Tilt                & Pan                 & ZN                      & PP                    & \begin{tabular}[c]{@{}c@{}}ZN\\ Position\end{tabular} & \begin{tabular}[c]{@{}c@{}}ZN\\ Velocity\end{tabular} & \begin{tabular}[c]{@{}c@{}}PP\\ Position\end{tabular} & \begin{tabular}[c]{@{}c@{}}PP\\ Velocity\end{tabular} \\
+% $k_P$ & 9.450               & 4.920               & 0.519                   & 1.422                 & 8.740                                                 & 0.519                                                 & 7.528                                                 & 1.420                                                 \\ 
+% $k_I$ & 8.550               & 3.170               & 22.860                  & 7.800                 & 7.640                                                 & 22.860                                                & 7.589                                                 & 7.800                                                 \\ 
+% $k_D$ & 0.900               & 1.200               & 0.003                   & 0.065                 & 1.220                                                 & 0.003                                                 & 1.030                                                 & 0.065                                                 \\ 
+% \end{tabular}
+% \caption{Parameters used for each test. ZN is deduced using the Zielger-Nichols method and PP is deduced using pole placement.}
+% \label{tab:TestParameters}
+% \end{table}
 
 %Test metoden
 \subsubsection*{Single Position Controller using Pole Placement}
