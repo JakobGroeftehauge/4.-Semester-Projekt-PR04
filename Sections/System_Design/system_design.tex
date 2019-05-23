@@ -139,15 +139,17 @@ With this delay added, the phase and gain margins are evaluated by drawing the b
 The tilt and pan motor systems with added PID-controllers, are simulated using a step reference of magnitude 1. This is done to verify the performance of the controllers. To properly emulate the physical system, saturation and associated anti-windup must be added as described in section \ref{subsec:classic_control}, since the physical system can only respond to a limited control signal. Figure \ref{fig:PosStepSat} and \ref{fig:PosStepNoSat} show the difference that the saturation makes. The figure shows that ideally, the controller for the tilt motor honours the specifications, however the specifications for settling time and overshoot are not quite met when saturation is introduced. Even without the saturation, the step response of the pan motor controller does not quite live up to the  requirements, but through experimenting with different zero placement and gains, it was found to be the best compromise between a relatively fast rise time and settling time, while still keeping the overshoot reasonable.
 
 \begin{figure}[h]
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/Pos_step_y_1_noSat.png}
-     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/Pos_step_u_1_noSat.png}
+\begin{subfigure}{0.50\textwidth}
+    %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/Pos_step_y_1_noSat.png}
+    % \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/Pos_step_u_1_noSat.png}
+    \includegraphics[width=0.99 \textwidth]{Sections/System_Design/Images/PoscontrollerWithoutSaturation.pdf}
     \caption{Without saturation.}
     \label{fig:PosStepSat}
-\end{subfigure}\quad
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/Pos_step_y_1_Sat.png}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/Pos_step_u_1_Sat.png}
+\end{subfigure}\hfill
+\begin{subfigure}{0.50\textwidth}
+    %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/Pos_step_y_1_Sat.png}
+    %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/Pos_step_u_1_Sat.png}
+    \includegraphics[width=0.99\textwidth]{Sections/System_Design/Images/PoscontrollerWithSaturation.pdf}
     \caption{With saturation.}
     \label{fig:PosStepNoSat}
 \end{subfigure}
@@ -272,18 +274,20 @@ Looking at the step responses for the model based and Ziegler-Nichols based cont
 
 \begin{figure}[]
 \begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_polePlace_step_y_Sat.png}
-     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_polePlace_step_u_Sat.png}
+    %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_polePlace_step_y_Sat.png}
+     %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_polePlace_step_u_Sat.png}
+     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/VelControllerPP.pdf}
     \caption{Model based design.}
     \label{fig:step_vel_model}
-\end{subfigure}\quad
+\end{subfigure}\hfill
 \begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_ZN_step_y_Sat.png}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_ZN_step_u_Sat.png}
+    %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_ZN_step_y_Sat.png}
+    %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_ZN_step_u_Sat.png}
+    \includegraphics[width = 0.97 \textwidth]{Sections/System_Design/Images/VelControllerZN.pdf}
     \caption{Ziegler-Nichols based design}
     \label{fig:step_vel_ZN}
 \end{subfigure}
-\caption{Step responses of the designed control systems with and without saturation taken into account. MADS SE MIG!!}
+\caption{Step responses of the pole placement based system and the }
 \label{fig:vel_step}
 \end{figure}
 

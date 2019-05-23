@@ -23,17 +23,16 @@ It was also found that the cascaded controller which relied purely on the mathem
 % include the open loop step responses
 
 
-\subsection{Encoder Accuracy}
-%Explain how this effects the step responses and other things
-As the angular velocity is deduced from the encoder output, the performance of the PID-controllers and the accuracy of the encoders is closely linked. As seen in figure \ref{fig:VelocityTilt} the measured velocity response is very noise
+\subsection{Encoder Accuracy and Resolution}
+As the angular velocity is deduced from the encoder output, the performance of the PID-controllers and the accuracy of the encoders is closely linked. As seen in figure \ref{fig:VelocityTilt} the measured velocity response is very noise. The accuracy of the motor encoder has been recognised as one the possible sources of this noise. 
+% As described in section \ref{subsec:SystemImplemtationFPGA} the encoder provided with each motor only has a resolution of 360 counts for a full revolution. At 
+The accuracy of the motor encoder is inadequate, as the time between encoder edges at a constant angular velocity is not constant. Table \ref{tab:EncoderDifferenceBetweenEdges} shows the time period between consecutive encoder edges. The data is sampled from the tilt motor encoder, over a period of 14 encoder edges, while a constant voltage is applied to the motor. It is acknowledged that the angular velocity is uneven through one revolution of the tilt frame. It is presumed that this velocity variance can be neglected due to the short time frame of the 14 edges compared to the 1080 for a full revolution. 
+The percentage increase from the minimum time period to the maximum time period is \SI{59.6}{\percent}.
+% \begin{equation} \label{eq:PercantageIncreaseEncoderProblem}
+%     \Delta t_{max} = \frac{1.66 - 1.04}{1.04} \cdot 100 = \SI{59.6}{\percent} 
+% \end{equation}
 
-As described in section \ref{subsec:SystemImplemtationFPGA} the encoder provided with each motor only has a resolution of 360 counts for a full revolution. At the same time the accuracy of the encoder on the motor is inadequate, as the time between encoder edges at a constant angular velocity is not constant. Table \ref{tab:EncoderDifferenceBetweenEdges} shows the time period between consecutive encoder edges. The data is sampled from the tilt motor encoder, over a period of 14 encoder edges, while a constant voltage is applied to the motor. It is acknowledged that the angular velocity is uneven through one revolution of the tilt frame. It is presumed that this velocity variance can be neglected due to the short time frame of the 14 edges compared to the 1080 for a full revolution. 
-The percentage increase from the minimum time period to the maximum time period is:
-\begin{equation} \label{eq:PercantageIncreaseEncoderProblem}
-    \Delta t_{max} = \frac{1.66 - 1.04}{1.04} \cdot 100 = \SI{59.6}{\percent} 
-\end{equation}
-
-The difference as seen from equation \ref{eq:PercantageIncreaseEncoderProblem} is significant. In this section the consequences of this encoder behaviour and the fact that little is done to compensate for the behaviour and what could have been done is discussed.
+The difference is significant. In this section the consequences of this encoder behaviour and the fact that little is done to compensate for the behaviour and what could have been done is discussed.
 
 \begin{table}[H]
     \centering
@@ -59,12 +58,17 @@ The difference as seen from equation \ref{eq:PercantageIncreaseEncoderProblem} i
     \label{tab:EncoderDifferenceBetweenEdges}
 \end{table}
 
-One way to compensate for the inconsistency would be to group four edges of the encoder signals into one count, resulting in less variance. With this modification the resolution of the encoder module would be 90 counts per revolution, four times lower than the original resolution, which is not desired. This would introduce other problems for the PID-controllers implemented, as the rate at which new data is available would decrease.
+One way to compensate for the inconsistency would be to group four edges of the encoder signals into one count. This would result in percentually less variance between counts than what is experienced with the current implementation. With this modification the resolution of the encoder module would be 90 counts per revolution, four times lower than the original resolution, which is not desired. This would introduce other problems for the PID-controllers implemented, as the rate at which new data is available would decrease.
 %Also it is possible that the variance can be attributed to the inaccuracies of the oscilloscope used to measure. With this modification the resolution of the encoder module would be 90 counts per revolution, four times lower than the original resolution, which is not desired. This would introduce other problems for the PID-controllers implemented, as the rate at which new data is available would decrease.
 
 %As mentioned in section \ref{subsec:SystemImplemtationFPGA} there are two ways to determine the speed from the encoder readings. The issue with the inconsistent distance between encoder counts is relevant for both methods. 
 
-To go around the issue of variance in between encoder edges, the option to count encoder edges in a constant time period could be used. With this method small differences in time inbetween encoder edges would not have as much significance. The tilt frame at the slowest speed however, at which the tilt frame is able to continuously rotate, takes approximately 5 seconds for a full revolution. With 1080 encoder counts for one rotation, this would with a constant time period of $\SI{ 10 }{ \milli \second } $, yield 2-3 counts per time period. A resolution far to low to be utilised for providing feedback to any controller.
+As mentioned in section \ref{subsec:SystemImplemtationFPGA}, another way of determining the angular velocity would be to count encoder edges in a constant time period. Possibly this method compensates for the inaccuracy of the motor encoders   
+
+To go around the issue of variance in between encoder edges, the option to count encoder edges in a constant time period could be used. With this method, small differences in the time between encoder edges would not have as much significance, when the number of encoder counts in the time period is relatively high. Generally the variation is less significant when it compares to a higher value.
+
+
+The tilt frame at the slowest speed however, at which the tilt frame is able to continuously rotate, takes approximately 5 seconds for a full revolution. With 1080 encoder counts for one rotation, this would with a constant time period of $\SI{ 10 }{ \milli \second } $, yield 2-3 counts per time period. A resolution far to low to be utilised for providing feedback to any controller.
 
 % Currently at the slowest speed at which the tilt frame is able to continuously rotate, the tilt frame takes approximately 5 seconds for a full revolution. This yields 1.66 seconds per revolution of the motor. With an encoder resolution of 360 ticks per revolution the amount of encoder counts per second would be $360 / 1.66 \approx 217 $. With a constant time period of $\SI{ 10 }{ \milli \second } $ this yields 2-3 counts per time period. A resolution far to low to be utilised for feedback. Maintaining this motor speed the speed measured would most of the time read the value 2 and occasionally 3. A jump from 2 to 3 corresponds to a \SI{50}{\percent} increase while the other way would result in a \SI{33}{\percent} decrease, changes in readings that when used as feedback would be to much for the PID-controllers to handle.
 
@@ -73,7 +77,7 @@ To go around the issue of variance in between encoder edges, the option to count
 Another, and probably the best option, would be to replace the current encoders with new with much higher resolution and better precision. Encoders with resolution in the 1000- and 10000-range are easily available. Such encoders would make it more viable to perform computation of speed with a constant time period. With the slowest possible speed of the motors at about 5 seconds per revolution of the frame, yielding 1.66 seconds per revolution of the motor and an encoder resolution of 4096 encoder counts per revolution the amount of encoder counts per second would be $4096 / 1.66 \approx 2467$.
 For a constant time period of $\SI{ 1 }{ \milli \second }$, this would only yield 2-3 encoder counts per time period. Far too low for reliable operation. With a constant time period of $\SI{ 10 }{ \milli \second }$, though this would yield 24-25 encoder counts, a more reliable resolution at the expense of a lower sampling rate, that probably could be tolerated.
 
-
+%Poisition, step response
 
 \subsubsection*{The Filtering} \label{subsec:TheFiltering}
 As described in section \ref{subsec:SystemImplementationMicroController}, filtering the feedback data was at first not assumed important to achieve good system response. With the very noisy velocity feedback data presented in figure \ref{fig:StepVelZN} and \ref{fig:StepVelModel} however, it is apparent that filtering is particularly important in this system. In neither of the figures does the system converge to the reference even though integral terms are implemented to correct this. Simulations, presented in figure \ref{fig:StepResponsAddedNoise} and \ref{fig:StepResponsAddedNoiseAndFilter}, indicate that the deviation from the reference could be due to noise affecting the derivative term.
@@ -95,7 +99,7 @@ Trying to understand how noise affects the response of the system, a step respon
      \hfill
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-         \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/StepresponsAddedNoise.png}
+         \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/StepresponsAddedNoise.pdf}
          \caption{Simulation of the system with added noise.}
          \label{fig:StepResponsAddedNoise}
      \end{subfigure}
