@@ -8,7 +8,7 @@ The purpose of this project is to design and implement control of a pan-tilt sys
 The embedded system comes in the form of a Tiva C-series LaunchPad development kit with a TM4C123GH6PM microcontroller for which programs are written in C and on which a real-time operating system is implemented. The digital system comes in the form of a Basys-3 development kit with an Artix-7 FPGA for which logical expressions are written in VHDL.
 An UART protocol is developed, that specifies commands available for the user to control the pan-tilt system. The project examines the response of the pan-tilt system using the Ziegler-Nichols and pole placement tuning methods for the PID-controller as well as comparing the response of a single PID-controller and two PID-controllers in cascade. In addition the difference between modelling and implementation is examined by comparing the responses of simulated and implemented PID-controllers. 
 
-(Noget med konklusionen)
+The project finds that using the cascaded position PID-controller design yields performance worse than that of a single position PID-controller. However this is probably due to poor inner controller design. In addition it is found with a sufficient model the pole placement method yields gains suitable for implementation. 
 
 \end{abstract}
 

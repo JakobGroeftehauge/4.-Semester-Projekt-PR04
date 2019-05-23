@@ -273,21 +273,21 @@ The phase and gain margins are also examined for the velocity controller with th
 Looking at the step responses for the model based and Ziegler-Nichols based controller designs, shown in figure \ref{fig:vel_step}, it can be seen that as expected the model based controller meets the requirement of no overshoot, while the Ziegler-Nichols method does not. It must be noted however, that the model based design asks for a much larger control signal, $u$, which can lead to saturation issues when larger references are introduced.
 
 \begin{figure}[]
-\begin{subfigure}{0.48\textwidth}
+\begin{subfigure}{0.49\textwidth}
     %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_polePlace_step_y_Sat.png}
      %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_polePlace_step_u_Sat.png}
-     \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/VelControllerPP.pdf}
-    \caption{Model based design.}
+     \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/VelControllerPP.pdf}
+    \caption{Pole placement based design.}
     \label{fig:step_vel_model}
 \end{subfigure}\hfill
-\begin{subfigure}{0.48\textwidth}
+\begin{subfigure}{0.49\textwidth}
     %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_ZN_step_y_Sat.png}
     %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_ZN_step_u_Sat.png}
-    \includegraphics[width = 0.97 \textwidth]{Sections/System_Design/Images/VelControllerZN.pdf}
+    \includegraphics[width = 0.99 \textwidth]{Sections/System_Design/Images/VelControllerZN.pdf}
     \caption{Ziegler-Nichols based design}
     \label{fig:step_vel_ZN}
 \end{subfigure}
-\caption{Step responses of the pole placement based system and the }
+\caption{Step responses of the tilt motor with velocity controllers designed using the pole placement method and the Ziegler-Nichols tuning method.}
 \label{fig:vel_step}
 \end{figure}
 
@@ -336,15 +336,17 @@ Figure \ref{fig:RL_cascade} shows that as expected, the poles and zeros stemming
 Looking at the step responses for the two designs, shown in figure \ref{fig:cascade_step}, it can be seen that, ideally, both methods perform quite well in regards to the specifications in section \ref{sec:Requirements}, although the settling time requirement cannot quite be met. The Ziegler-Nichols based design gives slightly less overshoot, but does give an unwanted transient response. This is only the case when saturation is not considered. In the case when saturation is considered, the Ziegler-Nichols based design performs better in terms of overshoot, while both give a settling time which does not quite comply with the specifications.
 
 \begin{figure}[h]
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_y_sat.png}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_u_sat.png}
+\begin{subfigure}{0.49\textwidth}
+    %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_y_sat.png}
+    %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_u_sat.png}
+    \includegraphics[width=0.99\textwidth]{Sections/System_Design/Images/CascadeWithSaturation.pdf}
     \caption{Systems with saturation included.}
     \label{fig:cascade_step_PP}
-\end{subfigure}\quad
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_y_NoSat.png}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_u_NoSat.png}
+\end{subfigure}\hfill
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width=0.99\textwidth]{Sections/System_Design/Images/CascadeWithoutSaturation.pdf}
+    %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_y_NoSat.png}
+    %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/cascade_step_u_NoSat.png}
     \caption{Systems without saturation.}
     \label{fig:cascade_step_NZ}
 \end{subfigure}

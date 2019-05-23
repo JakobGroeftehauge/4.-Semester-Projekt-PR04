@@ -24,7 +24,7 @@ It was also found that the cascaded controller which relied purely on the mathem
 
 
 \subsection{Encoder Accuracy and Resolution}
-As the angular velocity is deduced from the encoder output, the performance of the PID-controllers and the accuracy of the encoders is closely linked. As seen in figure \ref{fig:VelocityTilt} the measured velocity response is very noise. The accuracy of the motor encoder has been recognised as one the possible sources of this noise. 
+As the angular velocity is deduced from the encoder output, the performance of the PID-controllers and the accuracy of the encoders is closely linked. As seen in figure \ref{fig:VelocityTilt} the measured velocity response is very noise. The accuracy of the motor encoder has been recognised as one of the possible sources of this noise. 
 % As described in section \ref{subsec:SystemImplemtationFPGA} the encoder provided with each motor only has a resolution of 360 counts for a full revolution. At 
 The accuracy of the motor encoder is inadequate, as the time between encoder edges at a constant angular velocity is not constant. Table \ref{tab:EncoderDifferenceBetweenEdges} shows the time period between consecutive encoder edges. The data is sampled from the tilt motor encoder, over a period of 14 encoder edges, while a constant voltage is applied to the motor. It is acknowledged that the angular velocity is uneven through one revolution of the tilt frame. It is presumed that this velocity variance can be neglected due to the short time frame of the 14 edges compared to the 1080 for a full revolution. 
 The percentage increase from the minimum time period to the maximum time period is \SI{59.6}{\percent}.
@@ -63,19 +63,22 @@ One way to compensate for the inconsistency would be to group four edges of the 
 
 %As mentioned in section \ref{subsec:SystemImplemtationFPGA} there are two ways to determine the speed from the encoder readings. The issue with the inconsistent distance between encoder counts is relevant for both methods. 
 
-As mentioned in section \ref{subsec:SystemImplemtationFPGA}, another way of determining the angular velocity would be to count encoder edges in a constant time period. Possibly this method compensates for the inaccuracy of the motor encoders   
+As mentioned in section \ref{subsec:SystemImplemtationFPGA}, another way of determining the angular velocity would be to count encoder edges in a constant time period. Possibly this method compensates for the inaccuracy of the motor encoders better than the method utilised, as the variance in the time between encoder edges becomes less significant when the amount of encoder edges between a time period is high. 
 
-To go around the issue of variance in between encoder edges, the option to count encoder edges in a constant time period could be used. With this method, small differences in the time between encoder edges would not have as much significance, when the number of encoder counts in the time period is relatively high. Generally the variation is less significant when it compares to a higher value.
+Currently, the PID-controllers sample the Speed module every \SI{1}{\milli \second}. This requires the Speed module on the FPGA to update the speed value with a frequency of at least \SI{1}{\kilo\hertz}. With a resolution of the motor encoder at 1080 encoder counts for one revolution and one revolution taking approximately 5 seconds for the tilt frame at its slowest speed, this yields an average of 0.2 encoder counts per sample. This would not be adequate for calculating the angular velocity. 
 
+% The tilt frame at the slowest speed however, takes approximately 5 seconds for a full revolution. With 1080 encoder counts for one rotation, this would with a constant time period of $\SI{ 1 }{ \milli \second } $, yield 2-3 counts per time period. A resolution far to low to be utilised for providing feedback to any controller.
 
-The tilt frame at the slowest speed however, at which the tilt frame is able to continuously rotate, takes approximately 5 seconds for a full revolution. With 1080 encoder counts for one rotation, this would with a constant time period of $\SI{ 10 }{ \milli \second } $, yield 2-3 counts per time period. A resolution far to low to be utilised for providing feedback to any controller.
+% To go around the issue of variance in between encoder edges, the option to count encoder edges in a constant time period could be used. With this method, small differences in the time between encoder edges would not have as much significance, when the number of encoder counts in the time period is relatively high. Generally the variation is less significant when it compares to a higher value.
 
 % Currently at the slowest speed at which the tilt frame is able to continuously rotate, the tilt frame takes approximately 5 seconds for a full revolution. This yields 1.66 seconds per revolution of the motor. With an encoder resolution of 360 ticks per revolution the amount of encoder counts per second would be $360 / 1.66 \approx 217 $. With a constant time period of $\SI{ 10 }{ \milli \second } $ this yields 2-3 counts per time period. A resolution far to low to be utilised for feedback. Maintaining this motor speed the speed measured would most of the time read the value 2 and occasionally 3. A jump from 2 to 3 corresponds to a \SI{50}{\percent} increase while the other way would result in a \SI{33}{\percent} decrease, changes in readings that when used as feedback would be to much for the PID-controllers to handle.
 
 % An option to mitigate the sudden changes in encoder readings would be be to constantly compute a moving average of the encoder readings, which would smooth out the differences between the readings. However this would come at the cost of latency. A change in speed would not immediately be read by the result of the moving average, instead being delayed. This delay would introduce problems on its own for the PID-controllers. 
 
-Another, and probably the best option, would be to replace the current encoders with new with much higher resolution and better precision. Encoders with resolution in the 1000- and 10000-range are easily available. Such encoders would make it more viable to perform computation of speed with a constant time period. With the slowest possible speed of the motors at about 5 seconds per revolution of the frame, yielding 1.66 seconds per revolution of the motor and an encoder resolution of 4096 encoder counts per revolution the amount of encoder counts per second would be $4096 / 1.66 \approx 2467$.
-For a constant time period of $\SI{ 1 }{ \milli \second }$, this would only yield 2-3 encoder counts per time period. Far too low for reliable operation. With a constant time period of $\SI{ 10 }{ \milli \second }$, though this would yield 24-25 encoder counts, a more reliable resolution at the expense of a lower sampling rate, that probably could be tolerated.
+The optimal solution would probably be to replace the current motor encoders with encoders with much higher resolution and better precision. Encoders with resolution in the 1000- and 10000-range are easily available. An encoder with better resolution would make it more viable to count encoder edges within a constant time period, even at the lowest possible speed.
+
+% Such encoders would make it more viable to perform computation of speed with a constant time period. With the slowest possible speed of the motors at about 5 seconds per revolution of the frame, yielding 1.66 seconds per revolution of the motor and an encoder resolution of 4096 encoder counts per revolution the amount of encoder counts per second would be $4096 / 1.66 \approx 2467$.
+% For a constant time period of $\SI{ 1 }{ \milli \second }$, this would only yield 2-3 encoder counts per time period. Far too low for reliable operation. With a constant time period of $\SI{ 10 }{ \milli \second }$, though this would yield 24-25 encoder counts, a more reliable resolution at the expense of a lower sampling rate, that probably could be tolerated.
 
 %Poisition, step response
 
@@ -92,41 +95,41 @@ Trying to understand how noise affects the response of the system, a step respon
      \centering
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-    \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/FilteredStepRespons5Order.png}
-    \caption{Fifth order FIR filter applied to raw velocity feedback data.}
+    \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/FilteredStepRespons5Order.pdf}
+    \caption{Fifth order FIR filter applied to raw velocity feedback data}
     \label{fig:FilteredStepRespons5Order}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-         \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/StepresponsAddedNoise.pdf}
+         \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/StepResponsAddedNoise.pdf}
          \caption{Simulation of the system with added noise.}
          \label{fig:StepResponsAddedNoise}
      \end{subfigure}
         \caption{Simulation results when applying a fifth order FIR to the velocity feedback.}
         \label{fig:FilterDiskussionImplementedFilter}
 \end{figure}
-From figure \ref{fig:StepResponsAddedNoise} it is clear that the noise increases the rise time and lowers the value that the response converges towards. On figure \ref{fig:StepResponsAddedNoiseAndFilter} a filter is implemented on the derivative term with transfer function $H(s) = \frac{5}{1+5/s}$. With the noise components at higher frequencies being dampened, the derivative term performs much better allowing for faster response and the system almost converging towards the reference at \SI{20}{\radian \per \second}. Tilføj noget om hvad filteret betyder ift til vores data, uddyb.\\
+From figure \ref{fig:StepResponsAddedNoise} it is clear that the noise increases the rise time and lowers the value that the response converges towards. On figure \ref{fig:StepResponsAddedNoiseAndFilter} a filter is implemented on the derivative term with transfer function $H(s) = \frac{5}{5+s}$. With the noise components at higher frequencies being dampened, the derivative term performs much better allowing for faster response and the system almost converging towards the reference at \SI{20}{\radian \per \second}. This emphasises that it would have been favourable to put more time into deliberately designing a filter, in order to accomplish a response with less error when noise is present.
 
 \begin{figure}[H]
      \centering
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-    \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/FilteredStepRespons20Order.png}
+    \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/FilteredStepRespons20Order.pdf}
     \caption{20th order FIR filter and a first order IIR filter applied to raw velocity feedback data.}
     \label{fig:FilteredStepRespons20Order}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-         \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/StepResponsNoiseAndFilter.png}
+         \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/StepResponsAddedNoiseAndFilter.pdf}
          \caption{Simulation of the system with added noise and filter on the derivative term.}
          \label{fig:StepResponsAddedNoiseAndFilter}
      \end{subfigure}
         \caption{Simulation results when applying FIR and IIR filters to the raw velocity feedback data.}
         \label{fig:FilterDiskussionImplementedFilter20}
 \end{figure}
-To achieve a response with less error, it would have been favourable to put more time into deliberately designing a filter. On figure \ref{fig:FilteredStepRespons20Order} a $20^{th}$ order filter is applied to the raw velocity feedback data. Even though the amplitude of the data is even smaller than with a fifth order filter it is still noisy. To know if the response would meet the chosen requirements, a test would be necessary. The figure also shows that using an infinite impulse response filter, substantially better noise reduction can be achieved using only a first order filter. Implementing an IIR filter may have been beneficial to achieve better performance.
+On figure \ref{fig:FilteredStepRespons20Order} a $20^{th}$ order filter is applied to the raw velocity feedback data. Even though the amplitude of the data is even smaller than with a fifth order filter, it is still noisy. A test would be necessary to see if the response would meet the chosen requirements. The figure also shows that using an infinite impulse response filter, substantially better noise reduction can be achieved using only a first order filter. Implementing an IIR filter may have been beneficial to achieve better performance.
 
 \subsection*{Using built-in hardware in the Tiva launchpad}
 The project description states that the FPGA must be used for interfacing with the pan-tilt system, while the microcontroller must handle the user input and that these two development kits must communicate to each other through SPI. However the processing power available on the microcontroller alone or the amount of logic blocks available on the FPGA alone far exceeds the requirements by the scope of the project. Therefore it is possible to implement the project on just one of the devices. It is clear that the project is constructed in this way to encompass all disciplines taught on the semester. However, it is also wanted to clarify that had this project been ordered by an employer, it would have been implemented on just one of the devices. A typical choice could be to implement the system on the microcontroller. The microcontroller features peripherals implemented in physical hardware, for handling PWM and getting position and velocity readings from an encoder. As these are implemented in hardware in the microcontroller and since new data can be flagged by interrupts, eliminating the need for the microcontroller to poll the data, the microcontroller still has plenty of processing power left while handling all the tasks that the FPGA handles. The use of the microcontroller as interface to the encoder would also eliminate the need for additional SPI functionality.

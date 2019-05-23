@@ -137,14 +137,14 @@ This section concerns the test of the PID-controllers using different methods fo
      \centering
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-         \includegraphics[width=\textwidth]{Sections/Test/Images/StepPanPosModel.png}
+         \includegraphics[width=\textwidth]{Sections/Test/Images/PoscontrollerTestPan.pdf}
          \caption{Pan motor}
          \label{fig:StepPanPos}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-         \includegraphics[width=\textwidth]{Sections/Test/Images/StepTiltPosModel.png}
+         \includegraphics[width=\textwidth]{Sections/Test/Images/PoscontrollerTestTilt.pdf}
          \caption{Tilt motor}
          \label{fig:StepTiltPos}
      \end{subfigure}
@@ -161,14 +161,14 @@ The velocity controller is tested using gains found from the Ziegler-Nichols and
      \centering
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-         \includegraphics[width=\textwidth]{Sections/Test/Images/StepVelocityZN.png}
+         \includegraphics[width=\textwidth]{Sections/Test/Images/VelControllerTestZN.pdf}
          \caption{Ziegler-Nichols}
          \label{fig:StepVelZN}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-         \includegraphics[width=\textwidth]{Sections/Test/Images/StepVelocityModel.png}
+         \includegraphics[width=\textwidth]{Sections/Test/Images/VelControllerTestPP.pdf}
          \caption{Pole Placement}
          \label{fig:StepVelModel}
      \end{subfigure}
@@ -183,14 +183,14 @@ The cascaded PID-controller design is tested using the velocity controller gains
      \centering
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-         \includegraphics[width=\textwidth]{Sections/Test/Images/cascade_ZN_tilt.png}
+         \includegraphics[width=\textwidth]{Sections/Test/Images/CascadeTiltTestZN.pdf}
          \caption{Ziegler-Nichols method}
          \label{fig:Cascade_ZN_tilt}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
-         \includegraphics[width=\textwidth]{Sections/Test/Images/cascade_Model_tilt.png}
+         \includegraphics[width=\textwidth]{Sections/Test/Images/CascadeTiltTestPP.pdf}
          \caption{Pole Placement method}
          \label{fig:cascade_model_tilt}
      \end{subfigure}
@@ -204,7 +204,7 @@ According to figure \ref{fig:cascade_ZN_pan}, the measured signal seems to have 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width = 0.7 \textwidth]{Sections/Test/Images/cascade_ZN_pan.png}
+    \includegraphics[width = 0.7 \textwidth]{Sections/Test/Images/CascadePanTest.pdf}
     \caption{Position step response using a cascaded PID-controller for the pan motor. The measured response being an average of five tests.}
     \label{fig:cascade_ZN_pan}
 \end{figure}
@@ -219,9 +219,9 @@ Table \ref{tab:controller_data} shows the data regarding the performance of the 
          Position & Tilt & Pole placement & 0.8 & 2.86 & 0.34  \\
          Velocity & Tilt & Ziegler-Nichols & 19.2 & N/A & 0.15  \\
          Velocity &Tilt & Pole placement & N/A & N/A & 7.8 \\
-         Cascade & Tilt  & Pole placement & 52 & 11.47 & 0.61 \\
-         Cascade & Tilt & Ziegler-Nichols & 14 & 3.22 & 0.38  \\
-         Cascade & Pan & Ziegler-Nichols & 6.6 & 3.78 & 1.13  \\
+         Cascaded & Tilt  & Pole placement & 52 & 11.47 & 0.61 \\
+         Cascaded & Tilt & Ziegler-Nichols & 14 & 3.22 & 0.38  \\
+         Cascaded & Pan & Ziegler-Nichols & 6.6 & 3.78 & 1.13  \\
          
     \end{tabular}
     \caption{Step response specifications of the different controllers tested. Entries marked with N/A could not be determined from the available data.}

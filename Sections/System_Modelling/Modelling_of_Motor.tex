@@ -40,7 +40,7 @@ Using equation \ref{eq:sysEq1} and \ref{eq:sysEq2} the system is represented on 
 \begin{bmatrix}
 0 & 1 & 0 \\
 0 & \frac{-b}{J} & \frac{K_m}{J}\\
-0 & \frac{-K_m}{L} & \frac{-R_m}{L_m}
+0 & \frac{-K_m}{L_m} & \frac{-R_m}{L_m}
 \end{bmatrix}
 \begin{bmatrix}
 \theta\\
@@ -51,7 +51,7 @@ i
 \begin{bmatrix}
 0 \\
 0 \\
-\frac{1}{L}
+\frac{1}{L_m}
 \end{bmatrix} \\
     y &= 
     \begin{bmatrix}
@@ -68,17 +68,17 @@ i
 
 The system dynamics can also be described by the transfer functions for velocity and position, seen in equation \ref{eq:tf_pos_vel} and \ref{eq:tf_pos}.
 \begin{equation}\label{eq:tf_pos}
-    \frac{\dot{\theta}(s)}{V(s)} = \frac{K_m}{(J\cdot s + b)(L\cdot s + R) + K_m^2}
+    \frac{\dot{\theta}(s)}{V(s)} = \frac{K_m}{(J\cdot s + b)(L_m\cdot s + R_m) + K_m^2}
 \end{equation}
 
 \begin{equation}
-    \frac{\theta(s)}{V(s)} = \frac{K_m}{s\cdot((J\cdot s + b)(L\cdot s + R) + K_m^2)} \qquad 
+    \frac{\theta(s)}{V(s)} = \frac{K_m}{s\cdot((J\cdot s + b)(L_m\cdot s + R_m) + K_m^2)} \qquad 
 \end{equation}
 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{Sections/System_Modelling/Images/Armature_Layout.PNG}
+    \includegraphics[width=0.8\textwidth]{Sections/System_Modelling/Images/motor_armaturer_REAL.pdf}
     \caption{Electrical equivalent circuit diagram of a DC motor and a free-body diagram of the motor shaft. T represents the motor torque, J the inertia of the motor, $\theta$ the position of the shaft and $b\dot{\theta}$ the friction torque. \cite{universityofmichigan2019}}
     \label{fig:Armature_Circuit}
 \end{figure}
