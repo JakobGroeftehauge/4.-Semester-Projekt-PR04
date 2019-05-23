@@ -57,10 +57,10 @@ The PID-controller tasks on the microcontroller are responsible for calculating 
 % Following the controller task functionality described on figure  \ref{fig:PIDControllerFlowchart}, feedback to a controller is supplied whenever the controller sends a request to SPI. The request must contain a slave ID indicating which slave to receive data from. The controller task is then put in a blocked state, while waiting for data. Whenever SPI signals that the requested data is put in the feedback buffer associated with the requesting controller, the controller task is put back into running state. 
 %As mentioned in section \ref{subsec:SystemImplemtationFPGA}, because of possible variance in velocity feedback due to error in interfacing in the encoder, a second order lowpass Finite Impulse Response (FIR) filter is applied to the error. 
 
-The overall flow of the PID-controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. When the feedback data is received, the error between the reference value and feedback value is calculated. Because the derivative term of the PID-controller, amplifies noise, it is beneficial to include a filter in the implementation. The filter can be used specifically on the derivative term, or be applied to the error signal passed to all three terms. Initially the latter approach was implemented, but through tests, it was found that an extra filter specifically on the derivative term was needed as well.
+The overall flow of the PID-controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. When the feedback data is received, the error between the reference value and feedback value is calculated. Because the derivative term of the PID-controller amplifies noise, it is beneficial to include a low pass filter in the implementation. The filter can be used specifically on the derivative term, or be applied to the error signal passed to all three terms. Initially the latter approach was implemented, but through tests, it was found that an extra filter specifically on the derivative term was needed as well. Little focus has 
 
 It is expected that the signal without any noise would be fairly slow, therefore a low cutoff frequency for the filter is chosen. The sampling frequency for the used filter is \SI{0.5}{\hertz}.
-The transfer function for the filter designed in MATLAB using the filterDesigner is:
+The transfer function for the filter designed in MATLAB using the filterDesigner:
 \begin{equation}
     H(z) = \frac{1}{0.0249z^2 + 0.9502z + 0.0249}
 \end{equation}
@@ -71,9 +71,9 @@ The transfer function for the filter designed in MATLAB using the filterDesigner
 
 Because of this to further dampen the noise, a fifth order lowpass FIR filter is applied to the derivative term, with a cutoff frequency at \SI{0.5}{\hertz}. The transfer function used MATLAB using the filterDesigner is:
 \begin{equation}
-    H(z) = \frac{1}{0.0555z^5 + 0.1666z^4 + 0.2777z^3 + 0.2777z^2 + 0.166z + 0.055}
+    H(z) = \frac{1}{0.0555z^5 + 0.1666z^4 + 0.2777z^3 + 0.2777z^2 + 0.1666z + 0.0555}
 \end{equation}
-The use of filters when implementing a controller was initially not assumed to be of high importance, when aiming to achieve good system response. Later this has been discovered to be a wrong assumption and that the choices regarding design of the filters have been poor. In section \ref{sec:Discussion} design of filters will be discussed. \\
+The use of filters when implementing a controller was initially not assumed to be of high importance, when aiming to achieve good system response. Later this has been discovered to be a wrong assumption and that the choices regarding design of the filters have been poor. In section \ref{sec:Discussion} design of filters will be discussed.
 
 
 
@@ -85,7 +85,7 @@ The use of filters when implementing a controller was initially not assumed to b
 % \end{equation}
 % where $A$ is the amplitude, $\omega_a$ is the frequency, $\phi_a$ is the phase and $t$ is the time.
 
-To make sure the integral term does not wind up when an error is present for an extended period of time, anti-windup by conditional integration is implemented. As seen on figure \ref{fig:PIDControllerFlowchart} the controller performs a saturation check before updating the output buffer. Is the output in saturation a flag is set and the output is set equal to either the negative or positive saturation value, depending on sign of the error. On the position controller the saturation limit is equal to the maximum angular velocity of the pan-tilt system, signed depending on direction of rotation. The saturation limit of the velocity controller is equal to the maximum voltage possible to supply the motors which is either \SI{12}{\volt} or \SI{-12}{\volt}.
+To make sure the integral term does not wind up when an error is present for an extended period of time, anti-windup by conditional integration is implemented. As seen on figure \ref{fig:PIDControllerFlowchart} the controller performs a saturation check before updating the output buffer. If the calculated output is in saturation, a flag is set and the output is set equal to either the negative or positive saturation value, depending on sign of the error. On the position controller the saturation limit is equal to the maximum angular velocity of the pan-tilt system, signed depending on direction of rotation. The saturation limit of the velocity controller is equal to the maximum voltage possible to supply the motors which is either \SI{12}{\volt} or \SI{-12}{\volt}.
 
 \begin{figure}[H]
     \centering
