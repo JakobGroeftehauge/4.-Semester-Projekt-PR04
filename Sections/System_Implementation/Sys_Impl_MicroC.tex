@@ -100,8 +100,12 @@ To make sure the integral term does not wind up when an error is present for an 
 
 \subsubsection*{SPI Task}
 %Responsibility and purpose of task 
+%- PID skal kunne modtage data bestemt efter slave ID. For at det kunne det skal buffers være associeret tilknyttet de buffer.
 
-The microcontroller have build in hardware that enables it to transmit and receive data using SPI. The microcontroller is set up as a master, as described in section \ref{subsec:SystemImplemtationFPGA}. To select a desired slave, the a 4-bit address is used. Four general purpose input output pins on the microcontroller are used for selecting a slave, while a hardware controlled pin connected to SPI, is used to enable the slaves. The microcontroller uses a bit rate of \SI{13.3}{\mega bit} when communicating with the slaves on the FPGA. 
+For the PID-controllers to be able to get their respective feedback data, a SPI task is necessary. To 
+he task must handle request from the controllers for getting data from a specific slave.
+
+The microcontroller have build in hardware that enables it to transmit and receive data using SPI. The microcontroller is set up as a master, as described in section \ref{subsec:SystemImplemtationFPGA}. To select a desired slave, the 4-bit address is used. Four general purpose input output pins on the microcontroller are used for selecting a slave, while a hardware controlled pin connected to SPI, is used to enable the slaves. The microcontroller uses a bit rate of \SI{13.3}{\mega bit} when communicating with the slaves on the FPGA. 
 
 % Describe associated buffer/ Hver slave repræsenterer en type info og har derfor en buffer tilknyttet. Beskriv prioritet
 
@@ -114,7 +118,7 @@ As default the SPI task is in the blocked state. Only when a request from one of
     \label{fig:SPIFlowchart}
 \end{figure}
 
-The SPI task is responsible for providing the PID-controllers with values with units same as the reference value. A conversion has to happen so the units match \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second }\qquad . \] The motor encoder on the motor has 360 encoder counts per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
+The SPI task is responsible for providing the PID-controllers with values with units same as the reference value. A conversion has to happen so the units match \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second }\qquad . \] The motor encoder on the motor has 360 encoder counts per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made on the microcontroller is given by equation \ref{eq:velocity_motor}.
 \begin{equation}\label{eq:velocity_motor}
     \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
 \end{equation}
@@ -126,10 +130,10 @@ The gearing between the motor and the frame on the robot is 1:3, so the frame ex
 \end{equation}
 
 
-However a conversion is made in the microcontroller to convert the result to have the units \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \] with respect to the motor. The motor encoder on the motor has 360 encoder ticks per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
-\begin{equation}\label{eq:velocity_motor}
-    \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
-\end{equation}
+% However a conversion is made in the microcontroller to convert the result to have the units \[ \left[ \dot{\theta}_m \right] = \SI{}{\radian \per \second } \] with respect to the motor. The motor encoder on the motor has 360 encoder ticks per revolution, which means that the relation between the angle of the motor measured in radians and the encoder ticks is, $\pi / 180$. As a result the conversion that is made microcontroller is given by equation \ref{eq:velocity_motor}.
+% \begin{equation}\label{eq:velocity_motor}
+%     \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
+% \end{equation}
 
 
 
