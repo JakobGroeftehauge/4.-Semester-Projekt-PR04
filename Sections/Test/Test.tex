@@ -171,7 +171,7 @@ The velocity controller is tested using gains found from the Ziegler-Nichols and
 \end{figure}
 
 \subsubsection*{Cascaded Position Controller for the Tilt Motor}
-The cascaded PID-controller design is tested using the velocity controller gains analysed above and the position controller gains found using the pole placement method based on the velocity controllers. A reference point of $\theta = \frac{3\pi}{2} \SI{}{\radian}$ is used. Figure \ref{fig:Cascade_ZN_tilt} shows that using the Ziegler-Nichols method, the measured signal resembles the simulated response quite well. However using the pole placement method, illustrated on figure \ref{fig:cascade_model_tilt}, the measured response has a lot more overshoot than the simulated response. This  The performance results can be seen in table \ref{tab:controller_data}.
+The cascaded PID-controller design is tested using the velocity controller gains analysed above and the position controller gains found using the pole placement method based on the velocity controllers. A reference point of $\theta = \frac{3\pi}{2} \SI{}{\radian}$ is used. Figure \ref{fig:Cascade_ZN_tilt} shows that using the Ziegler-Nichols method, the measured signal resembles the simulated response quite well. However using the pole placement method, illustrated on figure \ref{fig:cascade_model_tilt}, the measured response has a lot more overshoot than the simulated response. It could appear that this is due to the poor velocity response, which is discussed in section \ref{sec:Discussion}. The performance results are presented in table \ref{tab:controller_data}.
 
 \begin{figure}[h]
      \centering
@@ -193,7 +193,8 @@ The cascaded PID-controller design is tested using the velocity controller gains
 \end{figure}
 
 \subsubsection*{Cascaded Position Controller for the Pan Motor}
-The cascaded controller on the pan motor is executed using a reference point of $\theta = \frac{7\pi}{6}$. The parameters are identical with the ones used for the cascaded tilt controller. According to figure \ref{fig:cascade_ZN_pan}, the measured signal seems to have a slower response than the simulated. However neither the simulated nor the measured response are considered ideal, which is discussed further in section \ref{sec:Discussion}.
+The cascaded controller on the pan motor is executed using a reference point of $\theta = \frac{7\pi}{6}$. Since no cascaded controller has been designed for the pan motor, the parameters are identical with the ones used for the cascaded tilt controller based on the Ziegler-Nichols method. This is done mainly as means to evaluate the accuracy of the pan motor model, by comparing the measured response with the simulated response. But also to assess the importance of customising the gains for the specific motor.
+According to figure \ref{fig:cascade_ZN_pan}, the measured signal seems to have a slower response than the simulated response. However neither the simulated nor the measured response are considered ideal, which highlights the importance of tailoring the gains for the specific motor.
 
 \begin{figure}[h]
     \centering
@@ -220,5 +221,7 @@ Table \ref{tab:controller_data} shows the data regarding the performance of the 
     \caption{Step response specifications of the different controllers tested. Entries marked with N/A could not be determined from the available data.}
     \label{tab:controller_data}
 \end{table}
+
+\subsection{Conclusion }
 
 \end{document}
