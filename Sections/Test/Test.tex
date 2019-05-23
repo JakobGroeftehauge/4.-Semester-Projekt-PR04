@@ -145,11 +145,11 @@ This section concerns the test of the PID-controllers using different methods fo
         \caption{Step response of the position using a single controller with pole placement. The measured response being an average of five tests.}
         \label{fig:singlePosController}
 \end{figure}
-The tests are executed with a reference point of $\theta = \frac{7\pi}{6}$ for the pan motor and $\theta = \frac{3\pi}{2}$. As seen on figure \ref{fig:StepPanPos} the measured response resembles the simulated response in the first part of the transition period. As there is stationary point in the measured response, it could look like that the pan has stopped moving for a bit properly due to friction in the physical setup. On figure \ref{fig:StepTiltPos} the measured response resembles the simulated quite well. The data for the tests can be seen on table \ref{tab:controller_data}. Applicable for both measurements is that they have no overshoot and longer settling times than the simulated. 
+The tests are executed with a reference point of $\theta = \frac{7\pi}{6}\SI{}{\radian}$ for the pan motor and $\theta = \frac{3\pi}{2}\SI{}{\radian}$. As seen on figure \ref{fig:StepPanPos} the measured response has a slower step response compared to the simulated. Furthermore there are stationary points in the measured response, showing that the pan frame has stopped moving. On figure \ref{fig:StepTiltPos} the measured response resembles the simulated quite well. The data for the tests can be seen on table \ref{tab:controller_data}. Applicable for both measurements is that they have no overshoot and longer settling times than the simulated. 
 
 
 \subsubsection*{Velocity Controller for the Tilt Motor}
-The velocity controller is tested using the Ziegler-Nichols and pole placement method on the tilt motor. A reference point of $\SI{20}{\mathrm{rad}/\second}$ is used. As seen on figure \ref{fig:StepVelZN} the measured response initially resembles the simulated signal using the Ziegler-Nichols method. Seen on figure \ref{fig:StepVelModel}, using pole placement a very slow response compared to the simulated is achieved. The reason for this behaviour is discussed in section \ref{sec:Discussion}. Applicable for both tests are that the measured signal oscillates to a point, where it never settles. Data regarding the performance of the controller is seen in table \ref{tab:controller_data}.
+The velocity controller is tested using gains found from the Ziegler-Nichols and pole placement methods on the tilt motor. A reference point of $\Dot{\theta}=\SI{20}{\radian \per \second}$ is used. As seen on figure \ref{fig:StepVelZN} the measured response initially resembles the simulated signal using the Ziegler-Nichols method. Seen on figure \ref{fig:StepVelModel}, using pole placement a very slow response compared to the simulated is achieved in addition to a steady state error. Studying data from figure \ref{fig:StepVelZN} further it appears like a small steady state error is present as well. The reason for this behaviour is discussed in section \ref{sec:Discussion}. Applicable for both tests are that the measured signal is corrupted by noise. Data regarding the performance of the controllers are presented in table \ref{tab:controller_data}.
 
 \begin{figure}[h]
      \centering
@@ -170,8 +170,8 @@ The velocity controller is tested using the Ziegler-Nichols and pole placement m
         \label{fig:VelocityTilt}
 \end{figure}
 
-\subsubsection*{Cascade Position Controller for the Tilt Motor}
-The cascaded PID-controller design is tested on the tilt motor using the Ziegler-Nichols and pole placement method with a reference point of $\theta = \frac{3\pi}{2}$. Figure \ref{fig:Cascade_ZN_tilt} shows that using the Ziegler-Nichols method, the measured signal resembles the simulated response quite well. However using the pole placement method, illustrated on figure \ref{fig:cascade_model_tilt}, the measured response has a lot more overshoot than the simulated. The results can be seen in table \ref{tab:controller_data}.
+\subsubsection*{Cascaded Position Controller for the Tilt Motor}
+The cascaded PID-controller design is tested using the velocity controller gains analysed above and the position controller gains found using the pole placement method based on the velocity controllers. A reference point of $\theta = \frac{3\pi}{2} \SI{}{\radian}$ is used. Figure \ref{fig:Cascade_ZN_tilt} shows that using the Ziegler-Nichols method, the measured signal resembles the simulated response quite well. However using the pole placement method, illustrated on figure \ref{fig:cascade_model_tilt}, the measured response has a lot more overshoot than the simulated response. This  The performance results can be seen in table \ref{tab:controller_data}.
 
 \begin{figure}[h]
      \centering
@@ -192,7 +192,7 @@ The cascaded PID-controller design is tested on the tilt motor using the Ziegler
         \label{fig:CascadeTilt}
 \end{figure}
 
-\subsubsection*{Cascade Position Controller for the Pan Motor}
+\subsubsection*{Cascaded Position Controller for the Pan Motor}
 The cascaded controller on the pan motor is executed using a reference point of $\theta = \frac{7\pi}{6}$. The parameters are identical with the ones used for the cascaded tilt controller. According to figure \ref{fig:cascade_ZN_pan}, the measured signal seems to have a slower response than the simulated. However neither the simulated nor the measured response are considered ideal, which is discussed further in section \ref{sec:Discussion}.
 
 \begin{figure}[h]
