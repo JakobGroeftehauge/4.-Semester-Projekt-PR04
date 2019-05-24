@@ -217,7 +217,7 @@ The procedure for designing the velocity controller based on the model is very s
 \begin{figure}[h]
 \begin{subfigure}{0.49\textwidth}
     \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/RL_TiltMotorVelPolePlace.png}
-    \caption{Root locus plot for the tilt position controller with the chosen pole placement}
+    \caption{Root locus plot for the tilt velocity controller with the chosen gains using the pole placement tuning method.}
     \label{fig:vel_root_locus}
 \end{subfigure}\quad
 \begin{subfigure}{0.49\textwidth}
@@ -225,7 +225,7 @@ The procedure for designing the velocity controller based on the model is very s
     \caption{Closed-loop poles and zero locations obtained using the Ziegler-Nichols tuning method.}
     \label{fig:ZN_pole_zero}
 \end{subfigure}
-\caption{?????}
+\caption{Plots showing poles and zeros location for different tuning methods for the tilt velocity controller.}
 \label{fig:vel_poles_zeros}
 \end{figure}
 
@@ -350,7 +350,7 @@ Looking at the step responses for the two designs, shown in figure \ref{fig:casc
     \caption{Systems without saturation.}
     \label{fig:cascade_step_NZ}
 \end{subfigure}
-\caption{Bode plots of the closed-loop system with velocity controllers designed using the model and using the Ziegler-Nichols method.}
+\caption{Bode plots of the closed-loop system with velocity controllers designed using the pole placement and the Ziegler-Nichols method.}
 \label{fig:cascade_step}
 \end{figure}
 

@@ -21,7 +21,7 @@ The single controller test is performed with the velocity controller described i
 Table \ref{tab:CPU_utilisation_test} shows the timing of running the controllers including the UART, SPI and UI task. 
 $t_1$ is the duration of two velocity PID-controller tasks and $t_2$ is the duration of two position PID-controllers tasks. $T_c$ is the duration between the first task starts to the same task starts again, as seen on figure \ref{fig:Schedueling_controllers}. The UART task is not directly included in the calculations, however, as seen on table \ref{tab:Task_Timing}, it is so short, that it is deemed negligible. The SPI task is called directly from the PID-controller tasks, thus indirectly included in the calculations. This makes it possible to estimate the average CPU utilisation of the PID-controller tasks as seen in equation \ref{eq:CPU_util},
 \begin{equation}\label{eq:CPU_util}
-    U_{CPU} =\left(\frac{t_{1,avg} + t_{2,avg}}{T_{c,avg}}\right)\cdot 100=\left(\frac{\SI{457,6}{\mu\second}}{\SI{992}{\mu\second}}\right)\cdot 100\approx \SI{46,13}{\percent}
+    U_{CPU} =\left(\frac{t_{1,avg} + t_{2,avg}}{T_{c,avg}}\right)\cdot 100=\left(\frac{\SI{457,6}{\mu\second}}{\SI{992}{\mu\second}}\right)\cdot 100\approx \SI{46,13}{\percent} \qquad , 
 \end{equation}
 where $ U_{CPU,avg} $ is the average CPU utilisation, $t_{1,avg}$ and $ t_{2,avg}$ is the average duration of $t_1$ and $t_2$ and $T_{c,avg}$ is the average time of $T_c$ as seen on figure \ref{fig:Schedueling_controllers}. 
 
@@ -138,14 +138,14 @@ This section concerns the test of the PID-controllers using different methods fo
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
          \includegraphics[width=\textwidth]{Sections/Test/Images/PoscontrollerTestPan.pdf}
-         \caption{Pan motor}
+         \caption{Pan motor.}
          \label{fig:StepPanPos}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
          \includegraphics[width=\textwidth]{Sections/Test/Images/PoscontrollerTestTilt.pdf}
-         \caption{Tilt motor}
+         \caption{Tilt motor.}
          \label{fig:StepTiltPos}
      \end{subfigure}
         \caption{Step response of the position using a single controller with pole placement. The measured response being an average of five tests.}
@@ -162,14 +162,14 @@ The velocity controller is tested using gains found from the Ziegler-Nichols and
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
          \includegraphics[width=\textwidth]{Sections/Test/Images/VelControllerTestZN.pdf}
-         \caption{Ziegler-Nichols}
+         \caption{Ziegler-Nichols method.}
          \label{fig:StepVelZN}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
          \includegraphics[width=\textwidth]{Sections/Test/Images/VelControllerTestPP.pdf}
-         \caption{Pole Placement}
+         \caption{Pole Placement method.}
          \label{fig:StepVelModel}
      \end{subfigure}
         \caption{Step response of a single velocity controller on the tilt motor. The measured response being an average of five tests.}
@@ -184,14 +184,14 @@ The cascaded PID-controller design is tested using the velocity controller gains
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
          \includegraphics[width=\textwidth]{Sections/Test/Images/CascadeTiltTestZN.pdf}
-         \caption{Ziegler-Nichols method}
+         \caption{Ziegler-Nichols method.}
          \label{fig:Cascade_ZN_tilt}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
          \includegraphics[width=\textwidth]{Sections/Test/Images/CascadeTiltTestPP.pdf}
-         \caption{Pole Placement method}
+         \caption{Pole Placement method.}
          \label{fig:cascade_model_tilt}
      \end{subfigure}
         \caption{Step response of a cascaded PID-controller for the position of the tilt motor. The measured response being an average of five tests.}
@@ -220,11 +220,11 @@ Table \ref{tab:controller_data} shows the data regarding the performance of the 
          Velocity & Tilt & Ziegler-Nichols & 19.2 & N/A & 0.15  \\
          Velocity &Tilt & Pole placement & N/A & N/A & 7.8 \\
          Cascaded & Tilt  & Pole placement & 52 & 11.47 & 0.61 \\
-         Cascaded & Tilt & Ziegler-Nichols & 14 & 3.22 & 0.38  \\
-         Cascaded & Pan & Ziegler-Nichols & 6.6 & 3.78 & 1.13  \\
+         Cascaded & Tilt & Combined & 14 & 3.22 & 0.38  \\
+         Cascaded & Pan & Combined & 6.6 & 3.78 & 1.13  \\
          
     \end{tabular}
-    \caption{Step response specifications of the different controllers tested. Entries marked with N/A could not be determined from the available data.}
+    \caption{Step response specifications of the different controllers tested. Entries marked with N/A could not be determined from the available data. The controllers using the combined method is tuned using Ziegler-Nichols for the inner loop and pole placement for the outer loop.}
     \label{tab:controller_data}
 \end{table}
 

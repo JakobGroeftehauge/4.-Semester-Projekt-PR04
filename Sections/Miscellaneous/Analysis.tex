@@ -231,7 +231,7 @@ Different methods can be chosen when discretising a continuous system. These are
 
 %Using the forward rectangular rule to map from the s- to the z-domain, the entire left-half plane of the s-domain is mapped into the z-domain into a rectangular shape. The forward rectangular rule maps the left-half plane of the s-domain into a circle placed in the right-half of the z-domain. The trapezoidal rule fits the left-half plane of the s-domain into the unit-circle of the z-domain. The phenomena are illustrated on figure \ref{fig:mapping_s_to_z}.  
 
-Implementing a discrete PID-controller, utilising the Tustin method, can be done as seen in equation \ref{eq:discrete_control}, 
+Implementing a discrete PID-controller, utilising the Tustin method  \cite{Tustin}, can be done as seen in equation \ref{eq:discrete_control}, 
 \begin{equation}\label{eq:discrete_control}
 \begin{split}
         u(kT+T) &= k_P\cdot e(kT+T)\\&+u_I(kT) + k_I\frac{T}{2} \cdot (e(kT+T)+e(kT))\\ &+k_D \frac{2}{T}\cdot(e(kT+T)-e(kT))-u_D(kT) \quad ,

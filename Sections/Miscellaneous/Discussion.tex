@@ -8,7 +8,7 @@ During the project, choices have been made with regards to design of controllers
 
 Looking at table \ref{tab:controller_data} it is seen that the specifications established in section \ref{sec:Requirements} have not been completely met by any of the implemented controllers. In this regard, it must be acknowledged that none of the simulations meet all the specifications either. A more experienced control engineer might have settled on less strict requirements.
 %In hindsight these specifications, especially the one about settling time, have probably been slightly unrealistic from the beginning. 
-Over all it has been possible to achieve performances which are not too dissimilar from those that were found through simulation. It is likely that manually tuning the parameters of the controllers, based on the values presented in this report, could improve the performance. Had more time been available, this would have been interesting to study further. After all, one of the main advantages of the PID-controller is the fact that it is simple to tune. 
+Over all it has been possible to achieve performances which are not too dissimilar from those that were found through simulation. It is likely that manually tuning the parameters of the controllers, based on the values presented in this report, could improve the performance. Had more time been available, this would have been interesting to study further. After all, one of the main advantages of the PID-controller is the fact that it is simple to tune. Had more time been available it would also have been interesting to explore the effects of using then modern state feedback method introduced in section \ref{sec:Analysis}, and compare the performance results to those achieved using the PID-controllers.
 
 Initially, it was expected that the cascaded controller design would yield better performance when implemented compared to a single controller, since it theoretically offers better rejection towards noise. However, with the chosen designs the cascaded controllers actually performed worse than the single controller designs in both simulations and implementation. This is likely because the velocity controllers should have been designed to have a faster response. For cascade control to make sense, the dynamics of the inner loop should be at least five times faster than the dynamics of the outer loop. Furthermore, the velocity controller should have had a high gain to limit disturbances. Had these requirement been properly met in designing the velocity controllers, the cascade control performance may have been better. It should also be mentioned that it has later been found that using a full PID in an inner loop is unconventional. Usually either PI or just P control is used for inner loops \cite{}.
 %Due to the fact that the control signals on the physical setup is limited to \SI{\pm 12}{\volt}, the controllers were designed in a way that attempted to minimise how much the controls signal saturates. At the same time, the design and tuning of the cascaded controller also becomes more complex, since there are more zeros and pole to consider, and more parameters to tune. 
@@ -96,14 +96,14 @@ Trying to understand how noise affects the response of the system, a step respon
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
     \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/FilteredStepRespons5Order.pdf}
-    \caption{Fifth order FIR filter applied to raw velocity feedback data}
+    \caption{Fifth order FIR filter applied to raw velocity feedback data.}
     \label{fig:FilteredStepRespons5Order}
      \end{subfigure}
      \hfill
      \begin{subfigure}[b]{0.49\textwidth}
          \centering
          \includegraphics[width=\textwidth]{Sections/Miscellaneous/Images/StepResponsAddedNoise.pdf}
-         \caption{Simulation of the system with added noise.}
+         \caption{Simulation of the system with an added sine wave as noise.}
          \label{fig:StepResponsAddedNoise}
      \end{subfigure}
         \caption{Simulation results when applying a fifth order FIR to the velocity feedback.}
@@ -147,8 +147,8 @@ The project description states that the FPGA must be used for interfacing with t
 
 
 
-\subsection*{Modern Control}
-As mentioned in section \ref{sec:Analysis} other control techniques than the PID-controller are available. Modern control techniques uses state feedback to control the system and requires an immense knowledge of the system in question, hence the PID-control was prefered for the project. However it is of great interest to examine the possibility of using modern techniques, enabling the possibility of using observers and estimating otherwise unknown states such as the current. An integral controller with an observer and anti-windup as illustrated on figure \ref{fig:Integral_Observer_Diagram} could be advantageous to implement. The aforementioned constellation introduces four gains to be found namely the feedback gain, $F$, the integral gain, $F_I$, the observer gain, $L$, and anti-windup gain, $M$. The controller leaves a lot of customizability, in the sense that the gains can be tuned to achieve the wanted response of the system, however at the cost of great complexity compared to the PID-controller.
+% \subsection*{Modern Control}
+% As mentioned in section \ref{sec:Analysis} other control techniques than the PID-controller are available. Modern control techniques uses state feedback to control the system and requires an immense knowledge of the system in question, hence the PID-control was preferred for the project. However it is of great interest to examine the possibility of using modern techniques, enabling the possibility of using observers and estimating otherwise unknown states such as the current. An integral controller with an observer and anti-windup as illustrated on figure \ref{fig:Integral_Observer_Diagram} could be advantageous to implement. The aforementioned constellation introduces four gains to be found namely the feedback gain, $F$, the integral gain, $F_I$, the observer gain, $L$, and anti-windup gain, $M$. The controller leaves a lot of customisability, in the sense that the gains can be tuned to achieve the wanted response of the system, however at the cost of great complexity compared to the PID-controller.
 
 
 \end{document}
