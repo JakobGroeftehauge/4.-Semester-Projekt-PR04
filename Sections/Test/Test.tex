@@ -90,7 +90,7 @@ This yields an overhead in terms of CPU-time of \SI{5.7}{\percent}.
 
 
 \subsection{SPI Stress Test}
-Using SPI as the only communication between the FPGA and the microcontroller, it is essential to test the reliability of the system to ensure that no information is lost during transmission. 
+Using SPI as the only communication between the FPGA and the microcontroller, it is essential to test the reliability of the system to ensure that no information is lost during transmission. It is wanted to test the requirement stated in section \ref{sec:Requirements}:
 \begin{itemize}
     \item Using SPI with a bit rate of \SI{13,3}{\mega bit}, the FPGA is to receive \SI{99,9}{\percent} messages correct with no errors.
 \end{itemize}
@@ -151,7 +151,7 @@ This section concerns the test of the PID-controllers using different methods fo
         \caption{Step response of the position using a single controller with pole placement. The measured response being an average of five tests.}
         \label{fig:singlePosController}
 \end{figure}
-The tests are executed with a reference point of $\theta = \frac{7\pi}{6}\SI{}{\radian}$ for the pan motor and $\theta = \frac{3\pi}{2}\SI{}{\radian}$. As seen on figure \ref{fig:StepPanPos} the measured response has a slower step response compared to the simulated. Furthermore there are stationary points in the measured response, showing that the pan frame has stopped moving. On figure \ref{fig:StepTiltPos} the measured response resembles the simulated quite well. The data for the tests can be seen on table \ref{tab:controller_data}. Applicable for both measurements is that they have no overshoot and longer settling times than the simulated. 
+The tests are executed with a reference point of $\theta = \frac{7\pi}{6}\SI{}{\radian}$ for the pan motor and $\theta = \frac{3\pi}{2}\SI{}{\radian}$ for the tilt motor. As seen on figure \ref{fig:StepPanPos} the measured response has a slower step response compared to the simulated. Furthermore there are stationary points in the measured response, showing that the pan frame has stopped moving. On figure \ref{fig:StepTiltPos} the measured response resembles the simulated quite well. The data for the tests can be seen on table \ref{tab:controller_data}. Applicable for both measurements is that they have no overshoot and longer settling times than the simulated. 
 
 
 \subsubsection*{Velocity Controller for the Tilt Motor}
@@ -229,7 +229,7 @@ Table \ref{tab:controller_data} shows the data regarding the performance of the 
 \end{table}
 
 \subsection{Conclusion}
-It has been possible to achieve an average CPU utilisation time of approximately \SI{46,13}{\percent}, thus satisfying the project stated requirement of the PID-controllers utilising a maximum of \SI{60}{\percent} of the CPU time. A maximum allowed processing time for a single PID-controller is determined to be $\SI{150}{\micro \second}$. Furthermore the processing time of a single PID-controller yielding a processing time $\SI{107,8}{\micro \second}$, thus satisfying the requirement. An average overhead is estimated to approximately $\SI{5,7}{\percent}$, hence not deemed to compromise the timing of the system.
+It has been possible to achieve an average CPU utilisation time for the PID-controllers of approximately \SI{46,13}{\percent}, thus satisfying the project stated requirement of the PID-controllers utilising a maximum of \SI{60}{\percent} of the CPU time. A maximum allowed processing time for a single PID-controller is determined to be $\SI{150}{\micro \second}$. Furthermore the processing time of a single PID-controller yielding a processing time $\SI{107,8}{\micro \second}$, thus satisfying the requirement. An average overhead is estimated to approximately $\SI{5,7}{\percent}$, hence not deemed to compromise the timing of the system.
 
 The SPI communication has been tested to satisfy the requirement of transmitting at a bit rate of \SI{13,3}{\mega bit} with a success rate of 10000/10000 messages successfully received, thus complying with the requirement of a success rate of \SI{99,9}{\percent}.
 

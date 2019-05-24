@@ -55,7 +55,7 @@ The PID-controller tasks on the microcontroller are responsible for calculating 
 % Following the controller task functionality described on figure  \ref{fig:PIDControllerFlowchart}, feedback to a controller is supplied whenever the controller sends a request to SPI. The request must contain a slave ID indicating which slave to receive data from. The controller task is then put in a blocked state, while waiting for data. Whenever SPI signals that the requested data is put in the feedback buffer associated with the requesting controller, the controller task is put back into running state. 
 %As mentioned in section \ref{subsec:SystemImplemtationFPGA}, because of possible variance in velocity feedback due to error in interfacing in the encoder, a second order lowpass Finite Impulse Response (FIR) filter is applied to the error. 
 
-The overall flow of the PID-controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. All controller tasks implemented follow the same general structure, however, the coefficients used to calculated the PID-terms differ. When the feedback data is received, the error between the reference and feedback value is calculated. Because the derivative term of the PID-controller amplifies noise, it is beneficial to include a low pass filter in the implementation \cite{PID_Lecture}. The filter can be used specifically on the derivative term, or be applied to the error signal passed to all three terms. Initially the latter approach was implemented, but through tests, it was found that an extra filter specifically on the derivative term was needed as well. Designing these filters has not been highly prioritised and thus not much thought has gone into the filter design. This has been discovered to possibly be a poor prioritisation, and will be discussed in section \ref{sec:Discussion}. The filters are designed using the MATLAB Filter Designer. The filter design seen equation \ref{eq:general_filter},
+The overall flow of the PID-controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. All controller tasks implemented follow the same general structure, however, the coefficients used to calculated the PID-terms differ. When the feedback data is received, the error between the reference and feedback value is calculated. Because the derivative term of the PID-controller amplifies noise, it is beneficial to include a low pass filter in the implementation \cite{PID_Lecture}. The filter can be used specifically on the derivative term, or be applied to the error signal passed to all three terms. Initially the latter approach was implemented, but through tests, it was found that an extra filter specifically on the derivative term was needed as well. Designing these filters has not been highly prioritised and thus not much thought has gone into the filter design. This has been discovered to possibly be a poor prioritisation, and will be discussed in section \ref{sec:Discussion}. The filters are designed using the MATLAB Filter Designer. The filter design seen in equation \ref{eq:general_filter},
 \begin{equation}\label{eq:general_filter}
     H(z) = \frac{1}{0.0249z^2 + 0.9502z + 0.0249} \qquad ,
 \end{equation}
@@ -87,22 +87,22 @@ is used for filtering the derivative term.
 % \end{equation}
 % where $A$ is the amplitude, $\omega_a$ is the frequency, $\phi_a$ is the phase and $t$ is the time.
 
-To make sure the integral term does not wind up when an error is present for an extended period of time, anti-windup by conditional integration is implemented. As seen on figure \ref{fig:PIDControllerFlowchart} the controller performs a saturation check before updating the output buffer. If the calculated output is in saturation, a flag is raised and the output is set to either the negative or positive saturation value, depending on the sign of the error. On the position controller the saturation limit is equal to the maximum angular velocity, found by test to be approximately \SI{20}{\radian\per\second}, of the pan-tilt system. The saturation limit of the velocity controller is equal to the maximum voltage possible to supply the motors which is either \SI{12}{\volt} or \SI{-12}{\volt}.
+To make sure the integral term does not wind up when in saturation for an extended period of time, anti-windup by conditional integration is implemented. As seen on figure \ref{fig:PIDControllerFlowchart} the controller performs a saturation check before updating the output buffer. If the calculated output is in saturation, a flag is raised and the output is set to either the negative or positive saturation value, depending on the sign of the error. On the position controller the saturation limit is equal to the maximum angular velocity, found by test to be approximately \SI{22}{\radian\per\second}, of the pan-tilt system. The saturation limit of the velocity controller is equal to the maximum voltage possible to supply the motors which is \SI{\pm12}{\volt}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/PIDControllerFlowchart.pdf}
-    \caption{Flowchart describing the code execution in the PID-controller task on the microcontroller.}
+    \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/PidControllerFlowchart.pdf}
+    \caption{Flowchart describing the code execution in the PID-controller tasks on the microcontroller.}
     \label{fig:PIDControllerFlowchart}
 \end{figure}
 
 \subsubsection*{SPI Task}
 %Responsibility and purpose of task 
-For the PID-controllers to be able to get their respective feedback data, a SPI task is necessary. The task is responsible for processing requests coming from each controller, receive data from the seven different slaves and then put it in the correct state buffer. To do this each controller and the belonging feedback state buffer is associated with a slave ID. The ID is then connected to a slave on the FPGA, containing data only relevant to the requesting controller. The tilt PWM slave, pan PWM slave and protocol slave does not have associated state buffers, since they require no feedback. 
+For the PID-controllers to be able to get their respective feedback data, an SPI task is necessary. The task is responsible for processing requests coming from each controller, receive data from the seven different slaves and put it in the correct state buffer. To do this each controller task and the belonging feedback state buffer is associated with a slave ID. The ID is connected to a slave on the FPGA, containing data only relevant to the requesting controller. The tilt PWM slave and pan PWM slave do not have associated state buffers, since the data received via these connections is not used. 
 
-The microcontroller have build in hardware that enables transmitting and receiving data using SPI. To enable the slaves, a hardware controlled slave-select pin connected to SPI is used. Then to select a specific slave, four general purpose input output pins on the microcontroller are used. By setting the pins high or low, each slave can be selected by their 4-bit address as mentioned in section \ref{subsec:SystemImplemtationFPGA}. Data is transferred at a bit rate of \SI{13.3}{\mega bit}.
+The microcontroller has built-in hardware that enables transmitting and receiving data using SPI. To enable the slaves, a hardware controlled slave-select pin connected to SPI is used. To select a specific slave, four general purpose input output pins on the microcontroller are used. By setting the pins high or low, each slave can be selected by their 4-bit address as mentioned in section \ref{subsec:SystemImplemtationFPGA}. Data is transferred at a bit rate of \SI{13.3}{\mega bit}.
 
-As default the SPI task is in the blocked state. Only when a request enters the SPI-queue the SPI task is given CPU time. Then as seen on figure \ref{fig:OverviewTaskDiagramSimple}, the task deciphers the request, enables and selects the correct slave after which both data is transmitted and received. If the slave ID has an associated state buffer, then the received data is put in that state buffer signalling the PID-controller sending the request.    
+As default the SPI task is in the blocked state. Only when a request enters the SPI-queue the SPI task is given CPU time. As seen on figure \ref{fig:SPIFlowchart}, the task deciphers the request and enables the correct slave after which data is transmitted and received. If the slave ID has an associated state buffer, the data received from the transmission is put in that state buffer, while signalling the semaphore for the PID-controller sending the request.
 
 \begin{figure}[H]
     \centering
@@ -110,21 +110,18 @@ As default the SPI task is in the blocked state. Only when a request enters the 
     \caption{Flowchart describing the code execution in the SPI task on the microcontroller.}
     \label{fig:SPIFlowchart}
 \end{figure}
-
-To make sure the feedback and reference values provided to each controllers have the same units, the feedback value coming from the FPGA has to be converted. The relation between the angle of the motor measured in radians, and the corresponding number of encoder counts is $\pi / 180$. As a result the conversion is given by table \ref{tab:conversionposvel}.
+As the PID-controllers are designed based on standard SI-units, it is necessary to perform a conversion to make sure the feedback complies with this standard. The relation between the angle of the motor measured in radians, and the corresponding number of encoder counts is $\pi / 180$. As a result the conversion is given by table \ref{tab:conversionposvel}.
 
 \begin{table}[H]
 \centering
 \begin{tabular}{c|c}
 Conversion to an angle $\left[\SI{}{\radian}\right]$ & Conversion to an angular velocity $\left [ \SI{}{\radian \per \second }\right ]$ \\ \hline
- $\theta_{m} = \frac{\pi}{180} \cdot \mathrm{FPGA_{pos}}$ & $\dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}$ 
+ $\theta_{m} = \frac{\pi}{180} \cdot \theta_{\mathrm{FPGA}} $ & $\dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}$ 
 \end{tabular}
-\caption{Unit conversion table, for data received from position and velocity slaves.}
+\caption{Unit conversions for data received from position and velocity slaves.}
 \label{tab:conversionposvel}
 \end{table}
-The angle of the motor, $\theta_m$, is calculated using the the encoder count value, $\mathrm{FPGA_{pos}}$. The angular velocity, $\dot{\theta}_m$, uses $\dot{\theta}_{\mathrm{FPGA}}$, made by the speed module on the FPGA.
-
-
+The angle of the motor, $\theta_m$, is calculated using the the encoder count value, $\theta_{pos}$. The angular velocity feedback, $\dot{\theta}_m$, is calculated based on $\dot{\theta}_{\mathrm{FPGA}}$, provided by the Speed module on the FPGA.
 %The gearing between the motor and the frame on the pan-tilt system is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. 
 
 
@@ -147,19 +144,14 @@ The angle of the motor, $\theta_m$, is calculated using the the encoder count va
 %     \dot{\theta}_{m} = \frac{\frac{\pi}{180}}{ \dot{\theta}_{\mathrm{FPGA}} }\cdot 10^{5}
 % \end{equation}
 
-
-
-
-
 \subsubsection*{UI Task and UART Task}
 %Responsibility and purpose of task and the conversion of degrees to radians
 %To enable a user to control the pan and tilt frames to desired positions, a UI task is necessary. For this to be possible, the task needs access to the position reference buffers shown
+To enable a user to control the pan and tilt frames to desired positions, a user interface (UI) and UART task is necessary. The UART task is responsible of receive data from a PC terminal through UART and put it in a queue from where the UI task consumes the data. From here a protocol implemented to interpret the received data and control the pan-tilt system accordingly. An FPGA state buffer was initially thought of to save information about different states of the FPGA. From here the UI task could pass information on to the user, but it was deemed a low priority and no further time was spent on this.
 
-To enable a user to control the pan and tilt frames to desired positions, a user interface (UI) and UART task is necessary. The UART task has to receive data from a PC terminal through UART and put it in a queue for the UI task to use. From here a protocol is set up to interpret the received data and control the pan-tilt system accordingly. A FPGA state buffer was initially thought of to hold information about different states of the FPGA. From here the UI task could pass information on to the user, but it was deemed a low priority and no further time was spent on this.
-
-The UART task is assigned the idle priority, meaning it is given CPU time when no other tasks are scheduled. When it is running, it checks if user input has been received. If so, data is put into the UART receive-queue, signalling the UI task. The UI task then checks which command the received data corresponds with and then acts as described in table \ref{tab:UART_UI_PROTOCOL}. To make it more intuitive when the user uses the, \textit{Go to position} command, the desired positions of the frames are entered in degrees instead of radians. The conversion is handled by the UI task as seen on equation \ref{eq:DegreesToRadiansConversion},
+The UART task is assigned the lowest priority, meaning it is given CPU time when no other tasks are scheduled. When it is running, it checks if user input has been received. If so, data is put into the UART receive-queue, signalling the UI task. The UI task checks which command the received data corresponds with and acts as described in table \ref{tab:UART_UI_PROTOCOL}. To make it more intuitive when the user uses the, \textit{Go to position} command, the desired absolute positions of the frames are entered in degrees instead of radians. The conversion is handled by the UI task as seen on equation \ref{eq:DegreesToRadiansConversion},
 \begin{equation} \label{eq:DegreesToRadiansConversion}
-    pos_{radians} = \frac{pos_{degrees}}{60}\cdot \pi
+    pos_{radians} = \frac{pos_{degrees}\cdot3}{180}\cdot \pi
 \end{equation}
 where $pos_{radians}$ is the reference point, that goes to the pan-tilt position controllers.
 
@@ -176,9 +168,9 @@ where $pos_{radians}$ is the reference point, that goes to the pan-tilt position
 Reset & 1 & Begin the reset command. \\ \hline
 Home motor & 2 & \begin{tabular}[c]{@{}c@{}}The tilt and pan frame\\ returns to index position.\end{tabular} \\ \hline
 Go to position & 6 & \begin{tabular}[c]{@{}c@{}}Makes the tilt or pan frame \\ go to a specific position.\end{tabular} \\ \hline
-Abort & 1 & Shuts down controllers.  
+Abort & 1 & Shuts down controller task.  
 \end{tabular}
-\caption{UART Protocol showing the different commands available for the user of the system.}
+\caption{UART Protocol showing the different commands available for the user of the system. Number of bytes indicate how many characters is needed to pass the command, a detailed guide for user operation is included in the digital appendix outlined in section \ref{sec:digital_appendix}. }
 \label{tab:UART_UI_PROTOCOL}
 \end{table}
 
@@ -222,7 +214,7 @@ Abort & 1 & Shuts down controllers.
 
 Logic has been implemented on the FPGA to evaluate the position and speed of the motors, to provide a PWM-signal to control the motors and to communicate over SPI with the microcontroller. On the microcontroller, FreeRTOS a real-time operating system, has been used for implementing four PID-controller tasks. For the controllers to get their respective feedback data, a SPI task communicating with seven slaves has been implemented.
 The embedded system also includes a UART task to pass on user commands to
-a UI task, which then on the basis of a protocol, controls the pan-tilt system.
+a UI task, which on the basis of a developed protocol, controls the pan-tilt system.
 
 
 \end{document}
