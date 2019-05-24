@@ -5,7 +5,7 @@
 
 % introduction, quickly describe which tunings methods are to be explored. List the specifications which are attempted to be met.
 %If it is not already mentioned earlier, mention that the design is done by assuming the controller to be continuous rather than discretising the plant
-As mentioned in section \ref{sec:Requirements} the controller design method explored in this project will focus on different configurations of a PID-controller. Both single and cascaded controllers will be examined, meaning that both position and velocity controllers are to be designed. The performance specifications mentioned in section \ref{sec:Requirements} is used as a guideline of the design. However, the main focus will be on comparing different controller configurations rather than meeting the performance specifications. As mentioned in section \ref{sec:Delimination}, the controllers designed in this section will be designed in the continuous time domain, afterwards additional steps will be taken to approximate the effect of the discrete controllers and verify performance.
+As mentioned in section \ref{sec:Requirements} the controller design method explored in this project will focus on different configurations of a PID-controller. Both single and cascaded controller will be examined, meaning that both position and velocity controllers are to be designed. The performance specifications mentioned in section \ref{sec:Requirements} is used as a guideline of the design. However, the main focus will be on comparing different controller configurations rather than meeting the performance specifications. As mentioned in section \ref{sec:Delimination}, the controllers designed in this section will be designed in the continuous time domain, afterwards additional steps will be taken to approximate the effect of the discrete controllers and verify performance.
 
 % \begin{table}[]
 %     \centering
@@ -26,7 +26,7 @@ As mentioned in section \ref{sec:Requirements} the controller design method expl
 % Argue why the specific reference is used for the step response
 % block diagram representing the controller with, and without saturation. Showing step responses with and without saturation, argue that for future responses, a model with saturation is used, in order be able to compare to tests. Maybe also present an argument for anti-windup, if not presented previously.
 %looking at the step response, discuss how well it matches the specifications
-A single position PID-controller must be designed for each motor. To design the control systems, the \textit{root locus plot} will be utilised to calculate the appropriate gains for the proportional, integral and derivative terms. Considering a closed-loop system of the form shown in equation \ref{eq:closedLoopSystem},
+A single position PID-controller must be designed for each motor. To design the control systems, the root locus plot will be utilised to calculate the appropriate gains for the proportional, integral and derivative terms. Considering a closed-loop system of the form shown in equation \ref{eq:closedLoopSystem},
 
 \begin{equation}\label{eq:closedLoopSystem}
     H_{cl}(s)=\frac{K\cdot G(s)}{1+K\cdot G(s)} \qquad ,
@@ -160,11 +160,11 @@ The tilt and pan motor systems with added PID-controllers, are simulated using a
 
 \subsection{Velocity Controller Design} \label{subsec:vel_controller_design}
 As mentioned in section \ref{sec:Delimination}, it is wanted to explore the performance of a cascaded controller design. To achieve this, a velocity controller must be designed. As mentioned in section \ref{sec:Analysis} the range of motion for the pan motor is physically limited. Therefore it has been prioritised to focus on designing a velocity controller for the tilt motor, as the unlimited range makes testing the velocity controller possible, without jeopardising the pan-tilt system. Two different methods of designing velocity controllers will be explored. One will use the pole placement approach used in section \ref{subsec:position_control_model}, the other will utilise the Ziegler-Nichols approach, which can be used without a mathematical model of the system to be controlled.
-When working with a cascaded control design, it is desired that any inner controllers are faster than the outer loop, as well as critically or over damped \cite{CascadeControl}. It is therefore worked towards designing a controller yielding no overshoot while still achieving a fast rise time.
+When working with a cascade control design, it is desired that any inner controllers are faster than the outer loop, as well as critically or over damped \cite{CascadeControl}. It is therefore worked towards designing a controller yielding no overshoot while still achieving a fast rise time.
 
 \subsubsection*{Ziegler-Nichols Tuning}
 %The Ziegler-Nichols tuning method provides a method for tuning a PID-controller without knowing specific information about the dynamics of the plant. 
-The Ziegler-Nichols method uses the step response of the physical system to calculate the controller gains. When using the Ziegler-Nichols method it is not possible to dictate performance specification. Instead, the method aims to achieve a decay ratio, $\zeta$, of approximately 0.25, for the closed loop system. The method assumes that the plant can be described by a delayed first order system of the form seen in equation \ref{eq:NZ_plant_eq},
+The Ziegler-Nichols method uses the step response of the physical system to calculate the controller gains. When using the Ziegler-Nichols method it is not possible to dictate performance specification. Instead, the method aims to achieve a decay ratio, $\zeta$, of approximately 0.25, for the closed-loop system. The method assumes that the plant can be described by a delayed first order system of the form seen in equation \ref{eq:NZ_plant_eq},
 
 \begin{equation}
     \frac{y(s)}{u(s)} = \frac{A_{ss}}{\tau s + 1} e^{-s t_d} \qquad ,
@@ -186,7 +186,7 @@ where the constants $R$ and $L$ are identified from the step response. $R$ is fo
     \centering
     \includegraphics[width = 0.8\textwidth]{Sections/System_Design/Images/Ziegler-Nichols_Stepresponse_anno.png}
     %\includegraphics[width = 1\textwidth]{Sections/System_Design/Images/Ziegler-Nichols_Stepresponse.png}
-    \caption{Open loop velocity step response for the tilt motor, used for tuning using Ziegler-Nichols.}
+    \caption{Open-loop velocity step response for the tilt motor, used for tuning using Ziegler-Nichols.}
     \label{fig:stepPlantNZ}
 \end{figure}
 
@@ -300,7 +300,7 @@ Looking at the step responses for the model based and Ziegler-Nichols based cont
 
 \subsection{Cascaded Controller Design}
 % A cascaded controller utilises multiple PID for controllers to control a plant. The cascade controller has an outer controller feeding an inner controller, a cascade controller can consist of more than than one nested controller, though this project will only focus on cascaded controllers with one nested controller. Each controller will regulate different parameters, therefore it is a prerequisite that there is a correlation between the parameters controlled by the different controllers. The advantages of using a cascade controller compared to a single controller, is better disturbance rejection and lower sensitivity to parameter variation. 
-\begin{figure}[]
+\begin{figure}[h]
     \centering
     \includegraphics[width = 0.7 \textwidth]{Sections/System_Design/Images/cascade_controller.pdf}
     \caption{Block diagram of a cascaded controller. $K_{Pos}$ being the position controller, $K_{Vel}$ being the velocity controller, $P_{Vel}$ returns the velocity of the plant and $P_{Pos}$ returns the position of the plant.}
@@ -315,7 +315,7 @@ Figure \ref{fig:cascaded_design} shows the principles of the cascaded controller
 
 Since it has been decided to focus on only designing velocity controllers for the tilt motor, it is only relevant to focus the cascaded design on the tilt motor. 
 When considering the plant as the combination of the closed-loop velocity control system and an integrator to transfer from velocity to position, the design approach is identical as have been used throughout most of this section. 
-Figure \ref{fig:RL_cascade} shows that as expected, the poles and zeros stemming from the closed-loop velocity control systems, appear as open-loop poles and zeros in the root locus plot of the position control system. To design the PID position controllers, very similar zero placements methods  are used. In the case of the model based velocity controller, zeros are placed at $s = -6.1$ and $s = -1.2$ while for the Ziegler-Nichols based controller zeros are placed at $s = -6.2$ and $s = -1$. Even though the zeros stemming from the PID-controllers are placed almost identically, the root loci are quite different due to the different poles and zeros stemming from the velocity controllers. From the closed-loop pole locations, it is expected that the response from the control system based on the Ziegler-Nichols tuning will have a faster response, but also quite a bit more overshoot. From the bode plots to be found in the digital appendix, outlined in section \ref{sec:digital_appendix} it can be seen that the sampling frequency of \SI{1000}{\hertz} is sufficient. From the phase and gain margins plot, also to be found in the digital appendix, it can be seen that the Ziegler-Nichols based design has a slightly smaller phase margin at \SI{75.7}{\degree} to the \SI{118}{\degree} of the model based design.
+Figure \ref{fig:RL_cascade} shows that as expected, the poles and zeros stemming from the closed-loop velocity control systems, appear as open-loop poles and zeros in the root locus plot of the position control system. To design the PID position controllers, very similar zero placements methods  are used. In the case of the model based velocity controller, zeros are placed at $s = -6.1$ and $s = -1.2$ while for the Ziegler-Nichols based controller zeros are placed at $s = -6.2$ and $s = -1$. Even though the zeros stemming from the PID-controllers are placed almost identically, the root loci are quite different due to the different poles and zeros stemming from the velocity controllers. From the closed-loop pole locations, it is expected that the response from the control system based on the Ziegler-Nichols tuning will have a faster response, but also quite a bit more overshoot. From the bode plots to be found in the digital appendix, outlined in section \ref{sec:digital_appendix} it can be seen that the sampling frequency of \SI{200}{\hertz} is sufficient. From the phase and gain margins plot, also to be found in the digital appendix, it can be seen that the Ziegler-Nichols based design has a slightly smaller phase margin at \SI{75.7}{\degree} to the \SI{118}{\degree} of the model based design.
 % If both the pole placement and Ziegler-Nichols approaches are examined, maybe they should be presented in the same plots.
 
 \begin{figure}[h]

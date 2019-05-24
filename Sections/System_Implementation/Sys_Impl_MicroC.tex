@@ -2,7 +2,7 @@
 \begin{document}
 
 \subsection{Microcontroller} \label{subsec:SystemImplementationMicroController}
-It is imperative that the microcontroller is in control of the overall timing of the system, in order to guarantee a consistent timing of the controllers. Therefore, the microcontroller is responsible for pulling data from specific slaves on the FPGA using SPI. As described in section \ref{sec:Requirements}, it is decided to accommodate a cascaded controller design consisting of two PID-controllers on each motor. This yields a total of four tasks needed to be scheduled regarding the motor control. Furthermore the microcontroller needs to handle the user interaction. The program will be structured as seen on figure \ref{fig:OverviewTaskDiagramSimple}. The task diagram is simplified displaying only one of the cascaded controllers for controlling only one motor, as the second cascaded controller is identical in its structure. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}. In FreeRTOS tasks have assigned a priority, meaning that high priority tasks are ensured to be scheduled and completed before tasks of lower priority. To achieve a real-time system prioritisation of tasks is vital.
+It is imperative that the microcontroller is in control of the overall timing of the system, in order to guarantee a consistent timing of the controllers. Therefore, the microcontroller is responsible for pulling data from specific slaves on the FPGA using SPI. As described in section \ref{sec:Requirements}, it is decided to accommodate a cascaded controller design consisting of two PID-controllers on each motor. This yields a total of four tasks needed to be scheduled regarding the motor control. Furthermore the microcontroller needs to handle the user interaction. The program will be structured as seen on figure \ref{fig:OverviewTaskDiagramSimple}. The task diagram is simplified displaying only one of the cascaded controller for controlling only one motor, as the second cascaded controller is identical in its structure. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}. In FreeRTOS tasks have assigned a priority, meaning that high priority tasks are ensured to be scheduled and completed before tasks of lower priority. To achieve a real-time system prioritisation of tasks is vital.
 
 % task will have presedence over lower priority tasks.. 
 
@@ -15,7 +15,7 @@ It is imperative that the microcontroller is in control of the overall timing of
 %For the PID-controllers to be able to receive data from the FPGA, SPI is used as mentioned in section \ref{subsec:SystemImplemtationFPGA}. When data is received from the slaves, it is put in buffers accessible only by specific controllers in order for the cascade control to work. To avoid critical section problems with several tasks trying to access the same buffers at the same time, mutex' is implemented. Output from each cascade must then go back to SPI for it to be delivered to the correct slaves. Figure (\ref{fig:OverviewTaskDiagramSimple}) shows a simple overview of the tasks and how they are coupled. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}.
 
 % System clock frequency set to 80Mhz
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
     %\includegraphics[width=\textwidth]{Sections/System_Implementation/Images/OverviewTaskDiagramSimple.pdf}
     \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/Task diagram reduced.pdf}
@@ -63,7 +63,7 @@ is used for the general error and the design shown in equation \ref{eq:derivativ
 \begin{equation}\label{eq:derivative_filter}
     H(z) = \frac{1}{0.0555z^5 + 0.1666z^4 + 0.2777z^3 + 0.2777z^2 + 0.1666z + 0.0555} \qquad ,
 \end{equation}
-is used for filtering the derivative term.
+is used for filtering the derivative term. A Infinite Impulse Response (IIR) filter has also been considered. However since a IIR filter can become unstable, no further time was spent on this idea. In hindsight this might not have been the best choice, why will be discussed in section \ref{sec:Discussion}.
 
 
 %It is expected that the signal without any noise would be fairly slow, therefore a low cutoff frequency for the filter is chosen. The sampling frequency for the used filter is \SI{0.5}{\hertz}.
@@ -100,7 +100,7 @@ To make sure the integral term does not wind up when in saturation for an extend
 %Responsibility and purpose of task 
 For the PID-controllers to be able to get their respective feedback data, an SPI task is necessary. The task is responsible for processing requests coming from each controller, receive data from the seven different slaves and put it in the correct state buffer. To do this each controller task and the belonging feedback state buffer is associated with a slave ID. The ID is connected to a slave on the FPGA, containing data only relevant to the requesting controller. The tilt PWM slave and pan PWM slave do not have associated state buffers, since the data received via these connections is not used. 
 
-The microcontroller has built-in hardware that enables transmitting and receiving data using SPI. To enable the slaves, a hardware controlled slave-select pin connected to SPI is used. To select a specific slave, four general purpose input output pins on the microcontroller are used. By setting the pins high or low, each slave can be selected by their 4-bit address as mentioned in section \ref{subsec:SystemImplemtationFPGA}. Data is transferred at a bit rate of \SI{13.3}{\mega bit}.
+The microcontroller has built-in hardware that enables transmitting and receiving data using SPI. To enable the slaves, a hardware controlled slave-select pin connected to SPI is used. To select a specific slave, four general purpose input output (GPIO) pins on the microcontroller are used. By setting the pins high or low, each slave can be selected by their 4-bit address as mentioned in section \ref{subsec:SystemImplemtationFPGA}. Data is transferred at a bit rate of \SI{13.3}{\mega bit}.
 
 As default the SPI task is in the blocked state. Only when a request enters the SPI-queue the SPI task is given CPU time. As seen on figure \ref{fig:SPIFlowchart}, the task deciphers the request and enables the correct slave after which data is transmitted and received. If the slave ID has an associated state buffer, the data received from the transmission is put in that state buffer, while signalling the semaphore for the PID-controller sending the request.
 
@@ -212,9 +212,9 @@ Abort & 1 & Shuts down controller task.
 \subsection{Conclusion}
 %Which tasks have been implemented, mention slave setup in more detail.
 
-Logic has been implemented on the FPGA to evaluate the position and speed of the motors, to provide a PWM-signal to control the motors and to communicate over SPI with the microcontroller. On the microcontroller, FreeRTOS a real-time operating system, has been used for implementing four PID-controller tasks. For the controllers to get their respective feedback data, a SPI task communicating with seven slaves has been implemented.
-The embedded system also includes a UART task to pass on user commands to
-a UI task, which on the basis of a developed protocol, controls the pan-tilt system.
+Logic has been implemented on the FPGA to evaluate the position and speed of the motors, to provide a PWM-signal to control the motors and to communicate over SPI with the microcontroller. On the microcontroller, FreeRTOS a real-time operating system, has been used for implementing four PID-controller tasks. For the controllers to get their respective feedback data, an SPI task communicating with seven slaves has been implemented.
+The embedded system also includes an UART task to pass on user commands to
+an UI task, which on the basis of a developed protocol, controls the pan-tilt system.
 
 
 \end{document}

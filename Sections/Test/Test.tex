@@ -1,29 +1,28 @@
 \documentclass[../../main.tex]{subfiles}
 \begin{document}
-This section will introduce the tests prompted by the requirements in section \ref{sec:Requirements} and present the results. These results will determine whether it has been possible to comply with the requirement specifications. Additional data from the tests can be seen in the digital appendix. 
+This section will introduce the tests prompted by the requirements in section \ref{sec:Requirements} and present the results. These results will determine whether it has been possible to comply with the requirement specifications. Additional raw data from the tests can be seen in the digital appendix. 
 
-To ease access to data from the FPGA during tests, a \textit{microblaze} has been implemented, which utilises UART to communicate directly with a computer. This allows for direct access to the position and velocity of the pan and tilt motor making data processing easier. 
+To ease access to data from the FPGA during tests, a \textit{MicroBlaze} has been implemented, which utilises UART to communicate directly with a computer. This allows for direct access to the position and velocity of the pan and tilt motor making data processing easier. 
 
 \subsection{Microcontroller Timing Test}
-Running multiple tasks on one microcontroller it is imperative to know, how much of the CPU time is utilised. If the CPU is overloaded the risk of starvation is introduced. In addition it is wanted to examine the processing time of the controllers on the microcontroller, to be able to deduce the overhead, thus it is wanted to test whether the system can satisfy the requirement from section \ref{sec:Requirements}:
+Running multiple tasks on one microcontroller it is essential to know, how much of the CPU time is utilised. If the CPU is overloaded the risk of starvation is introduced. In addition it is wanted to examine the processing time of the controllers on the microcontroller, to be able to deduce the overhead, thus it is wanted to test whether the system can satisfy the requirement from section \ref{sec:Requirements}:
 \begin{itemize}
-    \item The PID-controllers must not utilise more than \SI{60}{\percent} of the CPU time on the microcontroller.
+    \item The PID-controller tasks must not utilise more than \SI{60}{\percent} of the CPU time on the microcontroller.
     \item It must be verified that the overhead does not compromise the timing of the system.
     \item A maximum execution time for the PID-controller must be determined.
 \end{itemize}
 
-To estimate a maximum allowed processing time for a controller, the maximum time for which the PID-controllers may utilise the CPU time is divided into four parts. With a maximum CPU time utilisation of \SI{60}{\percent}, a single controller is to be processed within $\SI{150}{\micro \second}$.
+To estimate a maximum allowed processing time for a controller, the maximum time for which the PID-controller tasks may utilise the CPU time is divided into four parts. With a maximum CPU time utilisation of \SI{60}{\percent}, and the possibility of four concurrent controller tasks executing at a rate of \SI{1000}{\hertz}, a single controller is to be processed within a time period of $\SI{150}{\micro \second}$.
 
-The single controller test is performed with the velocity controller described in section \ref{sec:System_Integration_N_Implementation} using a fifth order derivative filter. The CPU utilisation test is executed with four controllers, the UART task and the SPI task running with FreeRTOS. The UI task is not taken into account, because no user input is required for the test. The position controllers are scheduled at a frequency of \SI{200}{\hertz} and the velocity controllers at \SI{1000}{\hertz}. The timing of the tasks are done by driving pins high upon start and low upon end of the task cycle of all individual tasks, thus enabling the possibility of timing the tasks with an oscilloscope.
+The single controller test is performed with the velocity controller described in section \ref{sec:System_Integration_N_Implementation} using a fifth order filter on the derivative term. The CPU utilisation test is executed with four controllers, the UART task and the SPI task scheduled by FreeRTOS. The UI task is not taken into account, because no user input is required for the test. The position controllers are scheduled at a frequency of \SI{200}{\hertz} and the velocity controllers at \SI{1000}{\hertz}. The timing of the tasks are done by driving GPIO pins high upon start and low upon end of the task cycle of all individual tasks, thus enabling the possibility of timing the tasks with an oscilloscope.
 
 
 \subsubsection*{Results}
-Table \ref{tab:CPU_utilisation_test} shows the timing of running the controllers including the UART, SPI and UI task. 
-$t_1$ is the duration of two velocity PID-controller tasks and $t_2$ is the duration of two position PID-controllers tasks. $T_c$ is the duration between the first task starts to the same task starts again, as seen on figure \ref{fig:Schedueling_controllers}. The UART task is not directly included in the calculations, however, as seen on table \ref{tab:Task_Timing}, it is so short, that it is deemed negligible. The SPI task is called directly from the PID-controller tasks, thus indirectly included in the calculations. This makes it possible to estimate the average CPU utilisation of the PID-controller tasks as seen in equation \ref{eq:CPU_util},
+Table \ref{tab:CPU_utilisation_test} shows the timing of running the controllers including the UART, SPI and UI task. $T_c$ is the duration between the first task starts to the same task starts again, as seen on figure \ref{fig:Schedueling_controllers}. $t_1$ is the duration of two velocity PID-controller tasks and $t_2$ is the duration of two position PID-controllers tasks. The UART task is not directly included in the calculations, however, as seen on table \ref{tab:Task_Timing}, it is so short, that it is deemed negligible. The SPI task is called directly from the PID-controller tasks, thus indirectly included in the calculations. This makes it possible to estimate the average CPU utilisation, $ U_{CPU,avg} $, of the PID-controller tasks as seen in equation \ref{eq:CPU_util},
 \begin{equation}\label{eq:CPU_util}
-    U_{CPU} =\left(\frac{t_{1,avg} + t_{2,avg}}{T_{c,avg}}\right)\cdot 100=\left(\frac{\SI{457,6}{\mu\second}}{\SI{992}{\mu\second}}\right)\cdot 100\approx \SI{46,13}{\percent} \qquad , 
+    U_{CPU,avg} =\left(\frac{t_{1,avg} + t_{2,avg}}{T_{c,avg}}\right)\cdot 100=\left(\frac{\SI{457,6}{\mu\second}}{\SI{992}{\mu\second}}\right)\cdot 100\approx \SI{46,13}{\percent} \qquad , 
 \end{equation}
-where $ U_{CPU,avg} $ is the average CPU utilisation, $t_{1,avg}$ and $ t_{2,avg}$ is the average duration of $t_1$ and $t_2$ and $T_{c,avg}$ is the average time of $T_c$ as seen on figure \ref{fig:Schedueling_controllers}. 
+where $t_{1,avg}$ and $ t_{2,avg}$ are the average duration of $t_1$ and $t_2$ and $T_{c,avg}$ is the average time of $T_c$ as seen on figure \ref{fig:Schedueling_controllers}. 
 
 \begin{table}[H]
 \centering
@@ -54,7 +53,7 @@ where $ U_{CPU,avg} $ is the average CPU utilisation, $t_{1,avg}$ and $ t_{2,avg
 \label{tab:Task_Timing}
 \end{table}
 
-Table \ref{tab:Task_Timing} shows the timing of the UART and the velocity PID-controller task respectively. As seen in the table, the PID-controller has an average processing time of $\SI{107,8}{\micro \second}$ with an fifth order derivative filter. In accordance with the requirement specification this is sufficient for a single controller.
+Table \ref{tab:Task_Timing} shows the timing of the UART and the velocity PID-controller task respectively. Deduced from the data presented in the table, it can be calculated that the PID-controller can be processed in an average time of $\SI{107,8}{\micro \second}$ with an fifth order filter on the derivative term. In accordance with the requirement specification this is sufficient for a single controller.
 \begin{figure}
     \centering
     \includegraphics[width=0.7\textwidth]{Sections/Test/Images/TestMicrocontrollerTiming.png}
@@ -62,12 +61,11 @@ Table \ref{tab:Task_Timing} shows the timing of the UART and the velocity PID-co
     \label{fig:Schedueling_controllers}
 \end{figure}
 
-It is possible to get an estimation of the overhead of the system by comparing the values of table \ref{tab:Task_Timing} and \ref{tab:CPU_utilisation_test}. This is done by comparing the total time of executing four PID-controllers with the time of processing a single PID-controller.
-This yields an overhead in terms of CPU-time of \SI{5.7}{\percent}.
+It is possible to get an estimation of the overhead of the system by comparing the values of table \ref{tab:Task_Timing} and \ref{tab:CPU_utilisation_test}. This is done by comparing the total time of executing four PID-controllers with the time of processing a single PID-controller. This yields an estimated overhead in terms of CPU time as seen in equation \ref{eq:overhead}.
 
-% \begin{equation}\label{eq:overhead}
-%     \mathrm{overhead}=\frac{T_{c}-(T_{controller}\cdot 4)}{T_{c1}}\cdot 100 \approx \SI{5,7}{\percent} \qquad ,
-% \end{equation}
+\begin{equation}\label{eq:overhead}
+    \mathrm{overhead}=\frac{T_{c}-(T_{controller}\cdot 4)}{T_{c1}}\cdot 100 \approx \SI{5,7}{\percent} \qquad ,
+\end{equation}
 % where $T_{controller}$ is the processing time of a single velocity controller.
 
 %%%%%-----
@@ -94,21 +92,21 @@ Using SPI as the only communication between the FPGA and the microcontroller, it
 \begin{itemize}
     \item Using SPI with a bit rate of \SI{13,3}{\mega bit}, the FPGA is to receive \SI{99,9}{\percent} messages correct with no errors.
 \end{itemize}
-The test was preformed by sending 10000 messages from the microcontroller to the FPGA. Each message contains the value of a counter, starting at 0 and incrementing to 9999. Subsequent is each message transmitted to a computer with the help of the microblaze, and processed to check if all values are present and in the correct sequence.  
+The test was preformed by sending 10000 messages from the microcontroller to the FPGA. Each message contains the value of a counter, starting at 0 and incrementing to 9999. Each message is subsequently transmitted to a computer with the help of the MicroBlaze, and processed to check if all values are present and in the correct sequence.  
 
-
+\subsubsection*{Results}
 
 \begin{table}[H]
 \centering
 \begin{tabular}{c|c c c}
-\textbf{Test no.} & \textbf{Transmission Rate {[}Hz{]}} & \textbf{Messages sent} & \textbf{Messages received} \\ \hline
-1 & \num{2e3} & 10000 & 10000 \\
-2 & \num{2e3} & 10000 & 10000 \\
-3 & \num{2e3} & 10000 & 10000 \\
-4 & \num{2e3} & 10000 & 10000 \\
-5 & \num{2e3} & 10000 & 10000
+\textbf{Test no.} & \textbf{Bit rate {[}Mbit{]}} & \textbf{Messages sent} & \textbf{Messages received} \\ \hline
+1 & 13.3 & 10000 & 10000 \\
+2 & 13.3 & 10000 & 10000 \\
+3 & 13.3 & 10000 & 10000 \\
+4 & 13.3 & 10000 & 10000 \\
+5 & 13.3 & 10000 & 10000
 \end{tabular}
-\caption{Data regarding the five test performed with SPI.}
+\caption{Data regarding the SPI stress test.}
 \label{tab:SPI-stresstest}
 \end{table}
 
@@ -116,7 +114,7 @@ As seen in table \ref{tab:SPI-stresstest} the five test resulted in the same out
 
 \subsection{Test of Controller Designs}\label{subsec:testControllerDesign}
 %opdeling af afsnit
-This section concerns the test of the PID-controllers using different methods for tuning and designs. The parameters used in each test is shown in table \ref{tab:pos_controller_gains}, and are designed using the design guides of \SI{5}{\percent} overshoot, \SI{1,5}{\second} settling time and \SI{0,5}{\second} rise time as described in section \ref{sec:System_Design}.
+This section concerns the test of the PID-controllers using different methods for tuning and designs. The parameters used in each test is shown in table \ref{tab:pos_controller_gains}, and are designed using the design guides of \SI{5}{\percent} overshoot, \SI{1,5}{\second} settling time and \SI{0,5}{\second} rise time.
 % \begin{table}[H]
 % \centering
 % \begin{tabular}{c|c|c|c|c|c|c|c|c|}
@@ -148,14 +146,14 @@ This section concerns the test of the PID-controllers using different methods fo
          \caption{Tilt motor.}
          \label{fig:StepTiltPos}
      \end{subfigure}
-        \caption{Step response of the position using a single controller with pole placement. The measured response being an average of five tests.}
+        \caption{Step response of the position using a single controller with pole placement. The measured response is an average of five tests.}
         \label{fig:singlePosController}
 \end{figure}
-The tests are executed with a reference point of $\theta = \frac{7\pi}{6}\SI{}{\radian}$ for the pan motor and $\theta = \frac{3\pi}{2}\SI{}{\radian}$ for the tilt motor. As seen on figure \ref{fig:StepPanPos} the measured response has a slower step response compared to the simulated. Furthermore there are stationary points in the measured response, showing that the pan frame has stopped moving. On figure \ref{fig:StepTiltPos} the measured response resembles the simulated quite well. The data for the tests can be seen on table \ref{tab:controller_data}. Applicable for both measurements is that they have no overshoot and longer settling times than the simulated. 
+The tests are executed with a reference point of $\theta = \frac{7\pi}{6}\SI{}{\radian}$ for the pan motor and $\theta = \frac{3\pi}{2}\SI{}{\radian}$ for the tilt motor. As seen on figure \ref{fig:StepPanPos} the measured response has a slower step response compared to the simulated response. Furthermore there are stationary points in the measured response, showing that the pan frame has stopped moving. On figure \ref{fig:StepTiltPos} the measured response resembles the simulated quite well. The data for the tests can be seen on table \ref{tab:controller_data}. Applicable for both measurements is that they have close to no overshoot and longer settling times than the simulated and specified in the requirements. 
 
 
 \subsubsection*{Velocity Controller for the Tilt Motor}
-The velocity controller is tested using gains found from the Ziegler-Nichols and pole placement methods on the tilt motor. A reference point of $\Dot{\theta}=\SI{20}{\radian \per \second}$ is used. As seen on figure \ref{fig:StepVelZN} the measured response initially resembles the simulated signal using the Ziegler-Nichols method. Seen on figure \ref{fig:StepVelModel}, using pole placement a very slow response compared to the simulated is achieved in addition to a steady state error. Studying data from figure \ref{fig:StepVelZN} further it appears like a small steady state error is present as well. The reason for this behaviour is discussed in section \ref{sec:Discussion}. Applicable for both tests are that the measured signal is corrupted by noise. Data regarding the performance of the controllers are presented in table \ref{tab:controller_data}.
+The velocity controller is tested using gains found from the Ziegler-Nichols and pole placement methods on the tilt motor. A reference point of $\Dot{\theta}=\SI{20}{\radian \per \second}$ is used. As seen on figure \ref{fig:StepVelZN} the measured response initially resembles the simulated signal using the Ziegler-Nichols method. Seen on figure \ref{fig:StepVelModel}, using pole placement a very slow response compared to the simulated is achieved in addition to a steady state error. Studying data from figure \ref{fig:StepVelZN} further it appears like a small steady state error is present as well. The reason for this behaviour is discussed in section \ref{sec:Discussion}. Applicable for both tests is that the measured signals are corrupted by noise. Data regarding the performance of the controllers are presented in table \ref{tab:controller_data}.
 
 \begin{figure}[h]
      \centering
@@ -172,12 +170,12 @@ The velocity controller is tested using gains found from the Ziegler-Nichols and
          \caption{Pole Placement method.}
          \label{fig:StepVelModel}
      \end{subfigure}
-        \caption{Step response of a single velocity controller on the tilt motor. The measured response being an average of five tests.}
+        \caption{Step response of a single velocity controller on the tilt motor. The measured response is an average of five tests.}
         \label{fig:VelocityTilt}
 \end{figure}
 
 \subsubsection*{Cascaded Position Controller for the Tilt Motor}
-The cascaded PID-controller design is tested using the velocity controller gains analysed above and the position controller gains found using the pole placement method based on the velocity controllers. A reference point of $\theta = \frac{3\pi}{2} \SI{}{\radian}$ is used. Figure \ref{fig:Cascade_ZN_tilt} shows that using the Ziegler-Nichols method, the measured signal resembles the simulated response quite well. However using the pole placement method, illustrated on figure \ref{fig:cascade_model_tilt}, the measured response has a lot more overshoot than the simulated response. It could appear that this is due to the poor velocity response, which is discussed in section \ref{sec:Discussion}. The performance results are presented in table \ref{tab:controller_data}.
+The cascaded PID-controller design is tested using the velocity controller gains analysed previously and the position controller gains found using the pole placement method with the velocity controllers taken into account. A reference point of $\theta = \frac{3\pi}{2} \SI{}{\radian}$ is used. Figure \ref{fig:Cascade_ZN_tilt} shows that using the Ziegler-Nichols method, the measured signal resembles the simulated response quite well. However using the pole placement method, illustrated on figure \ref{fig:cascade_model_tilt}, the measured response has a lot more overshoot than the simulated response. It could appear that this is due to the poor velocity controller response, which is discussed in section \ref{sec:Discussion}. The performance results are presented in table \ref{tab:controller_data}.
 
 \begin{figure}[h]
      \centering
@@ -199,7 +197,7 @@ The cascaded PID-controller design is tested using the velocity controller gains
 \end{figure}
 
 \subsubsection*{Cascaded Position Controller for the Pan Motor}
-The cascaded controller on the pan motor is executed using a reference point of $\theta = \frac{7\pi}{6}$. Since no cascaded controller has been designed for the pan motor, the parameters are identical with the ones used for the cascaded tilt controller based on the Ziegler-Nichols method. This is done mainly as means to evaluate the accuracy of the pan motor model, by comparing the measured response with the simulated response. But also to assess the importance of customising the gains for the specific motor.
+The cascaded controller on the pan motor is executed using a reference point of $\theta = \frac{7\pi}{6}$. Since no cascaded controller has been designed for the pan motor, the controller gains are identical with the ones used for the cascaded tilt controller based on the Ziegler-Nichols method. This is done mainly as means to evaluate the accuracy of the pan motor model, by comparing the measured response with the simulated response. This is also done to assess the importance of customising the gains for the specific motor.
 According to figure \ref{fig:cascade_ZN_pan}, the measured signal seems to have a slower response than the simulated response. However neither the simulated nor the measured response are considered ideal, which highlights the importance of tailoring the gains for the specific motor.
 
 \begin{figure}[h]
@@ -210,7 +208,7 @@ According to figure \ref{fig:cascade_ZN_pan}, the measured signal seems to have 
 \end{figure}
 
 \subsubsection*{Results}
-Table \ref{tab:controller_data} shows the data regarding the performance of the different PID-controllers. As it is seen none of the designed controllers satisfies the specifications of less than \SI{5}{\percent} overshoot, \SI{1,5}{\second} settling time and \SI{0,5}{\second} rise time, however some controllers achieved better results than others. The single position PID-controller seems to have the overall best performance in relation the the requirement specifications. The reason for the deviations comparing the simulation and the measured are discussed in section \ref{sec:Discussion}.
+Table \ref{tab:controller_data} shows the data regarding the performance of the different PID-controllers. As it is seen none of the designed controllers satisfy the specifications of less than \SI{5}{\percent} overshoot, \SI{1,5}{\second} settling time and \SI{0,5}{\second} rise time, however some controllers achieved better results than others. The single position PID-controller seems to have the overall best performance in relation the the requirement specifications. The reason for the deviations comparing the simulated and the measured responses are discussed in section \ref{sec:Discussion}.
 \begin{table}[H]
     \centering
     \begin{tabular}{c|c|c|c|c|c}
@@ -229,7 +227,7 @@ Table \ref{tab:controller_data} shows the data regarding the performance of the 
 \end{table}
 
 \subsection{Conclusion}
-It has been possible to achieve an average CPU utilisation time for the PID-controllers of approximately \SI{46,13}{\percent}, thus satisfying the project stated requirement of the PID-controllers utilising a maximum of \SI{60}{\percent} of the CPU time. A maximum allowed processing time for a single PID-controller is determined to be $\SI{150}{\micro \second}$. Furthermore the processing time of a single PID-controller yielding a processing time $\SI{107,8}{\micro \second}$, thus satisfying the requirement. An average overhead is estimated to approximately $\SI{5,7}{\percent}$, hence not deemed to compromise the timing of the system.
+It has been possible to achieve an average CPU utilisation time for the PID-controllers of approximately \SI{46,13}{\percent}, thus satisfying the project stated requirement of the PID-controllers utilising a maximum of \SI{60}{\percent} of the CPU time. A maximum allowed processing time for a single PID-controller is determined to be $\SI{150}{\micro \second}$. Furthermore the processing time of a single PID-controller is $\SI{107,8}{\micro \second}$, thus satisfying the requirement. An average overhead is estimated to approximately $\SI{5,7}{\percent}$, hence not deemed to compromise the timing of the system.
 
 The SPI communication has been tested to satisfy the requirement of transmitting at a bit rate of \SI{13,3}{\mega bit} with a success rate of 10000/10000 messages successfully received, thus complying with the requirement of a success rate of \SI{99,9}{\percent}.
 

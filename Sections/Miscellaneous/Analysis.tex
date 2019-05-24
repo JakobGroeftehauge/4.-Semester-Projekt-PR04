@@ -15,7 +15,7 @@ Each frame is actuated by a \SI{12}{\volt} DC motor equipped with an incremental
 Figure \ref{fig:Open_Close_loop} shows a simple \textit{controller} setup.
 The plant is the system which is to be controlled. The controller outputs a control signal which is the input to the plant. 
 In this project the plant would be an electric motor for which the control signal could be a voltage and the output could be an angular velocity.
-If a perfect model of the plant exists, and no external disturbances act on the system, a controller can be designed that controls the plant purely based on a reference input. This type of system would be classified as open-loop. In reality, such a system cannot be obtained, so to properly control the system, it is beneficial to monitor the output of the plant. The output is subtracted from the reference, yielding an error used as input for the controller. This type of feedback yields a closed loop system and makes the system more robust. 
+If a perfect model of the plant exists, and no external disturbances act on the system, a controller can be designed that controls the plant purely based on a reference input. This type of system would be classified as open-loop. In reality, such a system cannot be obtained, so to properly control the system, it is beneficial to monitor the output of the plant. The output is subtracted from the reference, yielding an error used as input for the controller. This type of feedback yields a closed-loop system and makes the system more robust. 
 
 The problem description states that a position controller has to be designed, however such a controller can take on many forms, leading to different design approaches and methods. Generally speaking, controller design can be divided into two categories, classical control, which operates in the frequency domain, and modern control which operates in the time domain. Both approaches will be examined in this section.
 
@@ -126,7 +126,7 @@ where $F$ is the feedback matrix, which can be designed to yield the desired sys
 
 
 
-One approach to design the feedback matrix is pole assignment, where the feedback matrix is calculated to yield specific closed loop poles in order to achieve a desired response. This requires the designer to decide exactly where the poles should be placed, which for somewhat complex systems can be difficult.
+One approach to design the feedback matrix is pole assignment, where the feedback matrix is calculated to yield specific closed- loop poles in order to achieve a desired response. This requires the designer to decide exactly where the poles should be placed, which for somewhat complex systems can be difficult.
 A Different approach is using the linear quadratic regulator method. This algorithm is based around the minimising of a cost function concerning the optimisation of operating a linear system. This method provides a way to apply a weight to each state and each control signal and thereby influence which will be prioritised higher. As an example, the states can be prioritised highly giving a fast response, at the cost of more aggressive control signals.
 
 Since both of the these design methods are based on a linear model of the system, it is a prerequisite that a very accurate model of the plant, which is defined by the $A$ and $B$ matrices, is known. 

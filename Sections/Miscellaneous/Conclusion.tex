@@ -12,7 +12,7 @@ Using the ARTIX-7 FPGA and the TM4C123GH6PM microcontroller an implementation ha
 
 A program containing tasks for handling data transmission via SPI, communication with a user through UART, and execution of the PID-controller algorithms has been developed and implemented on the microcontroller. The tasks are scheduled by the FreeRTOS operating system.
 
-An average CPU utilisation of \SI{46}{\percent} is determined satisfying the requirement that the PID controllers are not to utilise more than \SI{60}{\percent} of the total CPU time. An approximate overhead of \SI{5,7}{\percent} is found and considering the CPU utilisation, it is deemed, that the overhead does not compromise the timing of the system. A UI task, utilising a UART driver handling the peripheral UART modules, has been developed to manage different user commands, for which a protocol has been designed.
+An average CPU utilisation of \SI{46}{\percent} is determined satisfying the requirement that the PID-controllers are not to utilise more than \SI{60}{\percent} of the total CPU time. An approximate overhead of \SI{5,7}{\percent} is found and considering the CPU utilisation, it is deemed, that the overhead does not compromise the timing of the system. An UI task, utilising an UART driver handling the peripheral UART modules, has been developed to manage different user commands, for which a protocol has been designed.
 
 Functionality has been developed to allow for communication between the microcontroller and the FPGA via the SPI protocol. 
 Tests have shown messages transmitted via SPI to the FPGA, at a bit rate of \SI{13.3}{\mega\hertz}, to be received correctly 10000/10000 times. This complies with the requirement of \SI{99,9}{\percent} messages correctly received.
@@ -32,7 +32,7 @@ With an overshoot of \SI{0,8}{\percent}, a rise time of \SI{0,34}{\second} and a
 The cascaded controller achieving the best performance, had an overshoot of \SI{14}{\percent}, a rise time of \SI{0,38}{\second} and a settling time of \SI{3,22}{\second} using the Ziegler-Nichols method. 
 
 
-%tuning - results
+%tuning - resultsPI
 %The Ziegler-Nichols and pole placement tuning methods are used to visualise the benefits and examine the effects on the response of the system. All simulations are made based on specifications of \SI{5}{\percent} overshoot, \SI{1,5}{\second} settling time and \SI{0,5}{\second} rise time. From the tests made in the project it is apparent that it is imperative to have knowledge of the plant to achieve a true simulation of the system. None of the tests using pole placement or Ziegler-Nichols yields a response, satisfies the requirement specifications. However it is shown that the single position controller using pole placement on the tilt motor has the best result with an overshoot of \SI{0,8}{\percent}, a settling time of \SI{2,86}{\second} and a rise time of \SI{0,34}{\second}. Being the system with most known parameters, it complies well with aforementioned statement.   %model vs. implementation
 
 %implementation - 

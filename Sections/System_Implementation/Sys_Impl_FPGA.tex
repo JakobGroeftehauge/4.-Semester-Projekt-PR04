@@ -117,6 +117,12 @@ For the system to know if the angular velocity of a motor is zero, a zero-flag i
 \subsubsection*{PWM Module}
 The PWM module takes a 10-bit duty cycle reference and a direction signal as input. As output it provides signals that interface with the H-bridges on the pan-tilt system. These signals comes in the form of a 10-bit phase-corrected PWM-signal at a frequency of approximately \SI{48.8}{\kilo \hertz} along with a signal for inverting the polarity in the H-bridge to control the direction.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{Sections/System_Implementation/Images/FPGAProcessPWMOutput.pdf}
+    \caption{FLowchart describing the process in the PWM module that outputs a PWM-signal according to the duty cycle reference}
+    \label{fig:my_label}
+\end{figure}
 
 \subsubsection*{Reset Module}
 The purpose of the Reset module is to provide the Encoder modules with a reference position.
