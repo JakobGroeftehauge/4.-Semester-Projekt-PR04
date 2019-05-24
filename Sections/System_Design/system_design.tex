@@ -48,14 +48,14 @@ where $k_p$,$k_d$ and $k_i$ are the respective gains, this type of controller ad
 
 where $z_1$ and $z_2$ describe zero positions.
 
-To figure out where to place the zeros, it must first be considered where the poles for the closed-loop system should ideally be placed. In order to achieve the predominant goal of having a stable system, all closed-loop poles must be placed to the left of the imaginary axis in the complex plane. To further determine appropriate locations for the poles, the time domain specifications shown in table \ref{tab:performanceSpec} must be considered. These can be used to produce frequency domain rules, which indicate an area in the complex plane in which the poles should be located to honour the specifications. These rules are based on the transfer function of a second order system without zeros shown in equation \ref{eq:basic_second_order_tf},
+To figure out where to place the zeros, it must first be considered where the poles for the closed-loop system should ideally be placed. In order to achieve the predominant goal of having a stable system, all closed-loop poles must be placed to the left of the imaginary axis in the complex plane. To further determine appropriate locations for the poles, the time domain specifications described in section \ref{sec:Requirements} must be considered. These can be used to produce frequency domain rules, which indicate an area in the complex plane in which the poles should be located to honour the specifications. These rules are based on the transfer function of a second order system without zeros shown in equation \ref{eq:basic_second_order_tf},
 
 \begin{equation} \label{eq:basic_second_order_tf}
     H(s) = \frac{\omega_n^2}{s^2 + 2\zeta \omega_n s + \omega_n^2} \qquad ,
 \end{equation}
 
 where $\omega_{n}$ is the undamped natural frequency of the system and $\zeta$ is the damping ratio. 
-The closed-loop system for position control has four poles, although only three dominant ones, and two zeros, so the frequency domains rules will have to be used only as guidelines. To obtain a rise time shorter than $t_r$ the minimum magnitude, $w_n$, of the poles can be approximated as $w_n\geq\frac{1.8}{t_r}$. To obtain a \SI{1}{\percent} settling time faster than $t_s$, the magnitude of the real part of the poles, $\sigma = \omega_n \zeta$ can be found as $\sigma \geq \frac{-\ln{0.01}}{t_s} $. Lastly, to keep an overshoot below \SI{5}{\percent}, it must be true that $\zeta \geq \sqrt{\frac{(\frac{\ln{0.05}}{-\pi})^2}{1+(\frac{\ln{0.05}}{-\pi})^2}}$, which defines a cone shaped region in the complex plane, in which the poles should be placed \cite{}. The region based on the specifications can be seen on figure \ref{fig:system_requirements}.
+The closed-loop system for position control has four poles, although only three dominant ones, and two zeros, so the frequency domains rules will have to be used only as guidelines. To obtain a rise time shorter than $t_r$ the minimum magnitude, $w_n$, of the poles can be approximated as $w_n\geq\frac{1.8}{t_r}$. To obtain a \SI{1}{\percent} settling time faster than $t_s$, the magnitude of the real part of the poles, $\sigma = \omega_n \zeta$ can be found as $\sigma \geq \frac{-\ln{0.01}}{t_s} $. Lastly, to keep an overshoot below \SI{5}{\percent}, it must be true that $\zeta \geq \sqrt{\frac{(\frac{\ln{0.05}}{-\pi})^2}{1+(\frac{\ln{0.05}}{-\pi})^2}}$, which defines a cone shaped region in the complex plane, in which the poles should be placed \cite{TimeDomainSpecifications}. The region based on the specifications can be seen on figure \ref{fig:system_requirements}.
 % remember that the poles have to be in the left half plane, introduce how the specifications map to the root locus plot.
 
 
@@ -178,7 +178,7 @@ k_p = \frac{1.2}{RL}\;, \quad k_i = \frac{k_p}{2L}\;, \quad k_d = \frac{k_p}{0.5
 \label{eq:controllerGains}
 \end{equation}
 
-where the constants $R$ and $L$ are identified from the step response. $R$ is found by drawing magnitude the tangent to the steepest part of the transition between zero and the steady state. The gradient of the tangent is equal to $R$, found by $R = \frac{A_{ss}}{\tau}$. $L$ is equal to the latency of the system, and is defined as the distance between the y-axis and the intersection between the tangent and the x-axis \cite{}. 
+where the constants $R$ and $L$ are identified from the step response. $R$ is found by drawing magnitude the tangent to the steepest part of the transition between zero and the steady state. The gradient of the tangent is equal to $R$, found by $R = \frac{A_{ss}}{\tau}$. $L$ is equal to the latency of the system, and is defined as the distance between the y-axis and the intersection between the tangent and the x-axis \cite{Ziegler-Nichols}. 
 
 
 
@@ -190,7 +190,7 @@ where the constants $R$ and $L$ are identified from the step response. $R$ is fo
     \label{fig:stepPlantNZ}
 \end{figure}
 
-In figure \ref{fig:stepPlantNZ} the data points sampled from the velocity step response of the physical system are plotted. The initial spike seen in the figure might be caused by friction but will not be discussed further. The disturbances, marked with the yellow ellipse, on the figure will be explained further in the discussion. Due to the seemingly noisy data in the plot, the Curve Fitting tool in MATLAB has been used to fit a curve that, it is displayed as the red line. The red line is described as the expression introduced in equation \ref{eq:NZ_plant_eq}. Using MATLAB $R = 203.4 $ and $L = 11.4 \cdot 10^{-3}$ are found. Using the found values for R and L and the equations introduced in equation \ref{eq:controllerGains} the controller gains are found and can be seen in table \ref{tab:pos_controller_gains}.
+In figure \ref{fig:stepPlantNZ} the data points sampled from the velocity step response of the physical system are plotted. The initial spike seen in the figure might be caused by friction but will not be discussed further. The disturbances, marked with the yellow ellipse, on the figure will be explained further in the discussion. Due to the seemingly noisy data in the plot, the Curve Fitting tool in MATLAB has been used to fit a curve that, it is displayed as the red line. The red line is described as the expression introduced in equation \ref{eq:NZ_plant_eq}. Using MATLAB $R = 203.4 $ and $L = 11.4 \cdot 10^{-3}$ are found. Using the found values for $R$ and $L$ and the equations introduced in equation \ref{eq:controllerGains} the controller gains are found and can be seen in table \ref{tab:pos_controller_gains}.
 
 % \begin{equation}
 %     k_p = 0.5194, \quad k_i = 22.86, \quad k_d = 3.0 \cdot 10^{-3}

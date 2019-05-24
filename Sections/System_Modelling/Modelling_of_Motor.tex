@@ -12,17 +12,17 @@ In order to analyse and the pan-tilt system and design appropriate controllers, 
     L_m \frac{di}{dt} + R_m i = V -K_m \dot{\theta}
     \label{eq:sysEq2}
 \end{equation}
-
+%{L{5.5 cm} L{1 cm} | C{3 cm} C{3 cm}}
 \begin{table}[]
     \centering
-    \begin{tabular}{L{5 cm} L{0.5 cm}  C{1.5 cm} | C{3 cm} C{3 cm}}
-        \textbf{Parameter} &  &  &  \textbf{Pan} &  \textbf{Tilt} \\ \hline
-        Moment of inertia & $J$ & [\si{\kilogram\square\meter}] & 0.02 & \num{5.6e-3}\\
-        Inductance & $L_m$ & [\si{\henry}] & \num{2.75e-6} & \num{2.75e-6}\\
-        Resistance & $R_m$ & [\si{\ohm}] & 4.65 & 4.65 \\
+    \begin{tabular}{l l | c c}
+        \textbf{Parameter} &  &  \textbf{Pan} &  \textbf{Tilt} \\ \hline
+        Moment of inertia & $J$ [\si{\kilogram\square\meter}] & 0.02 & \num{5.6e-3}\\
+        Inductance & $L_m$ [\si{\henry}] & \num{2.75e-6} & \num{2.75e-6}\\
+        Resistance & $R_m$ [\si{\ohm}] & 4.65 & 4.65 \\
         Back emf/motor torque constant
-        & $K_m$ & [\si{\volt \second \per \radian}] & 0.49 & 0.49 \\
-         Viscous friction constant & $b$ & [\si{\newton\meter\second}] & \num{7.38e-4} & \num{7.38e-4}  \\
+        & $K_m$ [\si{\volt \second \per \radian}] & 0.49 & 0.49 \\
+         Viscous friction constant & $b$ [\si{\newton\meter\second}] & \num{7.38e-4} & \num{7.38e-4}  \\
         
     \end{tabular}
     \caption{Parameters used for modelling the pan and tilt motor. $R_m$, $K_m$, and $b$ is found experimentally, $J$ is estimated and $L$ is from \cite{universityofmichigan2019}.}
@@ -71,7 +71,7 @@ The system dynamics can also be described by the transfer functions for velocity
     \frac{\dot{\theta}(s)}{V(s)} = \frac{K_m}{(J\cdot s + b)(L_m\cdot s + R_m) + K_m^2}
 \end{equation}
 
-\begin{equation}
+\begin{equation}\label{eq:tf_pos_vel}
     \frac{\theta(s)}{V(s)} = \frac{K_m}{s\cdot((J\cdot s + b)(L_m\cdot s + R_m) + K_m^2)} \qquad 
 \end{equation}
 
@@ -79,7 +79,7 @@ The system dynamics can also be described by the transfer functions for velocity
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{Sections/System_Modelling/Images/motor_armaturer_REAL.pdf}
-    \caption{Electrical equivalent circuit diagram of a DC motor and a free-body diagram of the motor shaft. T represents the motor torque, J the inertia of the motor, $\theta$ the position of the shaft and $b\dot{\theta}$ the friction torque \cite{universityofmichigan2019}.}
+    \caption{Electrical equivalent circuit diagram of a DC motor and a free-body diagram of the motor shaft. $T$ represents the motor torque, $J$ the inertia of the motor, $\theta$ the position of the shaft and $b\dot{\theta}$ the friction torque \cite{universityofmichigan2019}.}
     \label{fig:Armature_Circuit}
 \end{figure}
 
