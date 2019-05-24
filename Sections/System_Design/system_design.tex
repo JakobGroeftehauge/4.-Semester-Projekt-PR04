@@ -122,13 +122,13 @@ where $t_{sampling} = \SI{0.001}{\second}$, to the transfer function of the PID-
 With this delay added, the phase and gain margins are evaluated by drawing the bode plot of the open-loop transfer function and evaluating the phase at the frequency. This yields \SI{0}{\deci \bel} gain, and evaluating the gain at the frequency which gives \SI{-180}{\degree} phase. As seen in figure \ref{fig:pos_stability_plot}, the gain margins for the tilt and pan motors are \SI{100}{\deci \bel} and \SI{105}{\deci \bel} respectively, while the phase margins are \SI{85.6}{\degree} and \SI{77.9}{\degree}. These margins are quite large, which is good, since that allows room for more uncertainties in the plant model. Future bode plots and margin plots referenced in this section can be found in the digital appendix.
 
 \begin{figure}[h]
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/SM_PanMotorPos2.png}
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/SM_PanMotorPos2.png}
     \caption{Pan motor.}
     \label{fig:pos_stability_plot_pan}
 \end{subfigure}\quad
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/SM_TiltMotorPos.png}
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/SM_TiltMotorPos.png}
     \caption{Tilt motor.}
     \label{fig:pos_stability_plot_tilt}
 \end{subfigure}
@@ -160,7 +160,7 @@ The tilt and pan motor systems with added PID-controllers, are simulated using a
 
 \subsection{Velocity Controller Design} \label{subsec:vel_controller_design}
 As mentioned in section \ref{sec:Delimination}, it is wanted to explore the performance of a cascaded controller design. To achieve this, a velocity controller must be designed. As mentioned in section \ref{sec:Analysis} the range of motion for the pan motor is physically limited. Therefore it has been prioritised to focus on designing a velocity controller for the tilt motor, as the unlimited range makes testing the velocity controller possible, without jeopardising the pan-tilt system. Two different methods of designing velocity controllers will be explored. One will use the pole placement approach used in section \ref{subsec:position_control_model}, the other will utilise the Ziegler-Nichols approach, which can be used without a mathematical model of the system to be controlled.
-When working with a cascaded control design, it is desired that any inner controllers are faster than the outer loop, as well as critically or over damped \cite{}. It is therefore worked towards designing a controller yielding no overshoot while still achieving a fast rise time.
+When working with a cascaded control design, it is desired that any inner controllers are faster than the outer loop, as well as critically or over damped \cite{CascadeControl}. It is therefore worked towards designing a controller yielding no overshoot while still achieving a fast rise time.
 
 \subsubsection*{Ziegler-Nichols Tuning}
 %The Ziegler-Nichols tuning method provides a method for tuning a PID-controller without knowing specific information about the dynamics of the plant. 
@@ -184,7 +184,7 @@ where the constants $R$ and $L$ are identified from the step response. $R$ is fo
 
 \begin{figure}
     \centering
-    \includegraphics[width = 1\textwidth]{Sections/System_Design/Images/Ziegler-Nichols_Stepresponse_anno.png}
+    \includegraphics[width = 0.8\textwidth]{Sections/System_Design/Images/Ziegler-Nichols_Stepresponse_anno.png}
     %\includegraphics[width = 1\textwidth]{Sections/System_Design/Images/Ziegler-Nichols_Stepresponse.png}
     \caption{Open loop velocity step response for the tilt motor, used for tuning using Ziegler-Nichols.}
     \label{fig:stepPlantNZ}
@@ -319,13 +319,13 @@ Figure \ref{fig:RL_cascade} shows that as expected, the poles and zeros stemming
 % If both the pole placement and Ziegler-Nichols approaches are examined, maybe they should be presented in the same plots.
 
 \begin{figure}[h]
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/RL_cascadePP.pdf}
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/RL_cascadePP.pdf}
     \caption{Cascade control with velocity controller based on model.}
     \label{fig:RL_cascade_PP}
 \end{subfigure}\hfill
-\begin{subfigure}{0.48\textwidth}
-    \includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/RL_cascadeNZ.pdf}
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/RL_cascadeNZ.pdf}
     \caption{Cascade control with velocity controller based on Ziegler-Nichols.}
     \label{fig:RL_cascade_NZ}
 \end{subfigure}

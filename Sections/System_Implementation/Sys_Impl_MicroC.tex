@@ -2,10 +2,7 @@
 \begin{document}
 
 \subsection{Microcontroller} \label{subsec:SystemImplementationMicroController}
-
-\subsubsection*{System overview}
-\label{subsec:SystemImplementationOperatingSystem}
-It is imperative that the microcontroller is in control of the overall timing of the system. Therefore, the microcontroller is responsible for pulling data from specific slaves on the FPGA. As described in section \ref{sec:Requirements}, it is decided to accommodate a cascaded controller design consisting of two PID-controllers on each motor. This yields a total of four tasks needed to be scheduled regarding the motor control. Furthermore the microcontroller needs to handle the user interface. The program will be structured as seen on figure \ref{fig:OverviewTaskDiagramSimple}. The task diagram is simplified displaying only one of the cascaded controllers for controlling only one motor, as the second cascaded controller is identical in structure. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}. In FreeRTOS tasks have assigned a priority, meaning that high priority tasks are ensured to be scheduled and completed before tasks of lower priority. To achieve a real-time system prioritisation of tasks is vital.
+It is imperative that the microcontroller is in control of the overall timing of the system, in order to guarantee a consistent timing of the controllers. Therefore, the microcontroller is responsible for pulling data from specific slaves on the FPGA using SPI. As described in section \ref{sec:Requirements}, it is decided to accommodate a cascaded controller design consisting of two PID-controllers on each motor. This yields a total of four tasks needed to be scheduled regarding the motor control. Furthermore the microcontroller needs to handle the user interaction. The program will be structured as seen on figure \ref{fig:OverviewTaskDiagramSimple}. The task diagram is simplified displaying only one of the cascaded controllers for controlling only one motor, as the second cascaded controller is identical in its structure. A more detailed task diagram can be found in the digital appendix section \ref{sec:digital_appendix}. In FreeRTOS tasks have assigned a priority, meaning that high priority tasks are ensured to be scheduled and completed before tasks of lower priority. To achieve a real-time system prioritisation of tasks is vital.
 
 % task will have presedence over lower priority tasks.. 
 
@@ -20,8 +17,9 @@ It is imperative that the microcontroller is in control of the overall timing of
 % System clock frequency set to 80Mhz
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/OverviewTaskDiagramSimple.pdf}
-    \caption{Simplified task diagram showing the different tasks running on the microcontroller.}
+    %\includegraphics[width=\textwidth]{Sections/System_Implementation/Images/OverviewTaskDiagramSimple.pdf}
+    \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/Task diagram reduced.pdf}
+    \caption{Simplified task diagram showing the different tasks running on the microcontroller. Circles represent tasks and squares represents buffers.}
     \label{fig:OverviewTaskDiagramSimple}
 \end{figure}
 
@@ -48,7 +46,7 @@ It is imperative that the microcontroller is in control of the overall timing of
 
 \subsubsection*{PID-controller Tasks}
 % How and which values need to be transported where Reference output controlling PWM
-The PID-controller tasks on the microcontroller are responsible for calculating the control signal, which is used to control voltage supplied to the motors. As seen on figure \ref{fig:OverviewTaskDiagramSimple} each controller needs three state buffers, two for input and one for the output. The velocity controller outputs to the SPI-queue. The PID-controller is responsible for requesting data when it is needed. To request feedback data, the controller needs to signal the SPI task via the SPI-queue. When the feedback data is available, the controller task is signaled with a semaphore connected to the feedback state buffer. When the controller is waiting for feedback data to be updated the task enters the blocked state, where it uses no CPU resources. 
+The PID-controller tasks on the microcontroller are responsible for calculating the control signals, which are used to control the duty cycle references. As seen on figure \ref{fig:OverviewTaskDiagramSimple} each controller needs three state buffers, two for input and one for the output. The velocity controller outputs to the SPI-queue. The PID-controller task is responsible for requesting feedback data when it is needed. To request feedback data, the controller task needs to signal the SPI task via the SPI-queue. When the feedback data is available, the controller task is signaled with a semaphore connected to the feedback state buffer. When the controller is waiting for feedback data to be updated, the task enters the blocked state, where it uses no CPU resources. 
 
 
 % For each controller to be able to function they need three buffers. One buffer holding a reference value and another providing a feedback value. The third buffer is responsible for storing the controller output. In case of a velocity controller the reference buffer contains output from a position controller, while the output buffer is a queue passing on values to SPI. 
@@ -57,7 +55,7 @@ The PID-controller tasks on the microcontroller are responsible for calculating 
 % Following the controller task functionality described on figure  \ref{fig:PIDControllerFlowchart}, feedback to a controller is supplied whenever the controller sends a request to SPI. The request must contain a slave ID indicating which slave to receive data from. The controller task is then put in a blocked state, while waiting for data. Whenever SPI signals that the requested data is put in the feedback buffer associated with the requesting controller, the controller task is put back into running state. 
 %As mentioned in section \ref{subsec:SystemImplemtationFPGA}, because of possible variance in velocity feedback due to error in interfacing in the encoder, a second order lowpass Finite Impulse Response (FIR) filter is applied to the error. 
 
-The overall flow of the PID-controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. When the feedback data is received, the error between the reference value and feedback value is calculated. Because the derivative term of the PID-controller amplifies noise, it is beneficial to include a low pass filter in the implementation. The filter can be used specifically on the derivative term, or be applied to the error signal passed to all three terms. Initially the latter approach was implemented, but through tests, it was found that an extra filter specifically on the derivative term was needed as well. Designing these filters has not been highly prioritised and thus not much thought has gone into the filter design. This has been discovered to possibly be a poor prioritisation, and will be discussed in section \ref{sec:Discussion}. The filters are designed using the MATLAB Filter Designer. The filter design seen equation \ref{eq:general_filter},
+The overall flow of the PID-controller task can be seen on figure \ref{fig:PIDControllerFlowchart}. All controller tasks implemented follow the same general structure, however, the coefficients used to calculated the PID-terms differ. When the feedback data is received, the error between the reference and feedback value is calculated. Because the derivative term of the PID-controller amplifies noise, it is beneficial to include a low pass filter in the implementation \cite{PID_Lecture}. The filter can be used specifically on the derivative term, or be applied to the error signal passed to all three terms. Initially the latter approach was implemented, but through tests, it was found that an extra filter specifically on the derivative term was needed as well. Designing these filters has not been highly prioritised and thus not much thought has gone into the filter design. This has been discovered to possibly be a poor prioritisation, and will be discussed in section \ref{sec:Discussion}. The filters are designed using the MATLAB Filter Designer. The filter design seen equation \ref{eq:general_filter},
 \begin{equation}\label{eq:general_filter}
     H(z) = \frac{1}{0.0249z^2 + 0.9502z + 0.0249} \qquad ,
 \end{equation}
@@ -94,7 +92,7 @@ To make sure the integral term does not wind up when an error is present for an 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/PIDControllerFlowchart.pdf}
-    \caption{Flowchart describing the code execution in the PID-controller-task on the microcontroller.}
+    \caption{Flowchart describing the code execution in the PID-controller task on the microcontroller.}
     \label{fig:PIDControllerFlowchart}
 \end{figure}
 
@@ -127,7 +125,7 @@ Conversion to an angle $\left[\SI{}{\radian}\right]$ & Conversion to an angular 
 The angle of the motor, $\theta_m$, is calculated using the the encoder count value, $\mathrm{FPGA_{pos}}$. The angular velocity, $\dot{\theta}_m$, uses $\dot{\theta}_{\mathrm{FPGA}}$, made by the speed module on the FPGA.
 
 
-%The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. 
+%The gearing between the motor and the frame on the pan-tilt system is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. 
 
 
 
@@ -138,7 +136,7 @@ The angle of the motor, $\theta_m$, is calculated using the the encoder count va
 % \end{equation}
 
 
-% The gearing between the motor and the frame on the robot is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. The angle of the motor, $ \theta_{m} $, is described by equation \ref{eq:angle_of_motor}, where $FPGA_{pos}$ is the encoder value provided by the FPGA.
+% The gearing between the motor and the frame on the pan-tilt system is 1:3, so the frame experiences one revolution for every three revolutions the motor experiences. The angle of the motor, $ \theta_{m} $, is described by equation \ref{eq:angle_of_motor}, where $FPGA_{pos}$ is the encoder value provided by the FPGA.
 % \begin{equation}\label{eq:angle_of_motor}
 %      \theta_{m} = \frac{\pi}{180} \cdot \mathrm{FPGA_{pos}}
 % \end{equation}
@@ -157,7 +155,7 @@ The angle of the motor, $\theta_m$, is calculated using the the encoder count va
 %Responsibility and purpose of task and the conversion of degrees to radians
 %To enable a user to control the pan and tilt frames to desired positions, a UI task is necessary. For this to be possible, the task needs access to the position reference buffers shown
 
-To enable a user to control the pan and tilt frames to desired positions, a user interface (UI) and UART task is necessary. The UART task has to receive data from a PC terminal through UART and put it in a queue for the UI task to use. From here a protocol is set up to interpret the received data and control the robot accordingly. A FPGA state buffer was initially thought of to hold information about different states of the FPGA. From here the UI task could pass information on to the user, but it was deemed a low priority and no further time was spent on this.
+To enable a user to control the pan and tilt frames to desired positions, a user interface (UI) and UART task is necessary. The UART task has to receive data from a PC terminal through UART and put it in a queue for the UI task to use. From here a protocol is set up to interpret the received data and control the pan-tilt system accordingly. A FPGA state buffer was initially thought of to hold information about different states of the FPGA. From here the UI task could pass information on to the user, but it was deemed a low priority and no further time was spent on this.
 
 The UART task is assigned the idle priority, meaning it is given CPU time when no other tasks are scheduled. When it is running, it checks if user input has been received. If so, data is put into the UART receive-queue, signalling the UI task. The UI task then checks which command the received data corresponds with and then acts as described in table \ref{tab:UART_UI_PROTOCOL}. To make it more intuitive when the user uses the, \textit{Go to position} command, the desired positions of the frames are entered in degrees instead of radians. The conversion is handled by the UI task as seen on equation \ref{eq:DegreesToRadiansConversion},
 \begin{equation} \label{eq:DegreesToRadiansConversion}
@@ -224,7 +222,7 @@ Abort & 1 & Shuts down controllers.
 
 Logic has been implemented on the FPGA to evaluate the position and speed of the motors, to provide a PWM-signal to control the motors and to communicate over SPI with the microcontroller. On the microcontroller, FreeRTOS a real-time operating system, has been used for implementing four PID-controller tasks. For the controllers to get their respective feedback data, a SPI task communicating with seven slaves has been implemented.
 The embedded system also includes a UART task to pass on user commands to
-a UI task, which then on the basis of a protocol, controls the robot.
+a UI task, which then on the basis of a protocol, controls the pan-tilt system.
 
 
 \end{document}
