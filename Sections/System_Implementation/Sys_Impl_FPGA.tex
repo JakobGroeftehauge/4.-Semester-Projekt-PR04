@@ -45,7 +45,7 @@ The logic implemented in the FPGA is divided into modules, which will be describ
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{Sections/System_Implementation/Images/FPGALogicBothMotors.pdf}
+    \includegraphics[width=0.7\textwidth]{Sections/System_Implementation/Images/FPGALogicBothMotors.pdf}
     \caption{Overview of the relation between the implemented modules on the FPGA. Arrows indicate direction of information flow between modules.}
     \label{fig:FPGALogicBothMotors}
 \end{figure}
@@ -62,7 +62,7 @@ The logic implemented in the FPGA is divided into modules, which will be describ
 \subsubsection*{Encoder Module}
 % Hvad er modulets ansvaret 
 
-Each motor is equipped with a \textit{motor encoder}, which is interfaced with an encoder module on the FGPA. The Encoder module takes pulses as input from the motor encoders and outputs a signed value based on the number of encoder counts indicating the motor position. 
+Each motor is equipped with a motor encoder, which is interfaced with an encoder module on the FGPA. The Encoder module takes pulses as input from the motor encoders and outputs a signed value based on the number of encoder counts indicating the motor position. 
 
 %The motor encoder provides information via its two outputs, channel A and channel B, from where a direction and a position relative to the previous position can be calculated.
 The Encoder module looks at channel A and B from the motor encoder continuously, and updates the position whenever a falling or rising edge occur on either of the channels. The position is either incremented or decremented depending on the turn direction of the motor, indicated by the pattern of encoder edges.     
@@ -115,13 +115,13 @@ For the system to know if the angular velocity of a motor is zero, a zero-flag i
 % \end{figure}
 
 \subsubsection*{PWM Module}
-The PWM module takes a 10-bit duty cycle reference and a direction signal as input. As output it provides signals that interface with the H-bridges on the pan-tilt system. These signals comes in the form of a 10-bit phase-corrected PWM-signal at a frequency of approximately \SI{48.8}{\kilo \hertz} along with a signal for inverting the polarity in the H-bridge to control the direction.
+The PWM module takes a 10-bit duty cycle reference and a direction signal as input. As output it provides signals that interface with the H-bridges on the pan-tilt system. These signals comes in the form of a 10-bit phase-corrected PWM-signal at a frequency of approximately \SI{48.8}{\kilo \hertz} along with a signal for inverting the polarity in the H-bridge to control the direction. Figure \ref{fig:FPGAProcessPWMOut} shows a flowchart describing the process in the PWM module that generates the PWM-signal.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{Sections/System_Implementation/Images/FPGAProcessPWMOutput.pdf}
-    \caption{FLowchart describing the process in the PWM module that outputs a PWM-signal according to the duty cycle reference}
-    \label{fig:my_label}
+    \caption{Flowchart describing the process in the PWM module which outputs a PWM-signal according to a duty cycle reference.}
+    \label{fig:FPGAProcessPWMOut}
 \end{figure}
 
 \subsubsection*{Reset Module}
@@ -169,14 +169,16 @@ Initially, the module was designed to be able to provide the microcontroller wit
 
 The SPI module on the FPGA is responsible of interfacing with the microcontroller. On figure \ref{fig:SPILogicSimple} an overview of the SPI module is provided. The module contains seven internal SPI slaves. Four slaves are responsible for transmitting the feedback information used for the PID-controllers in the microcontroller. Two slaves are used for receiving the duty cycle references sent from the microcontroller. The last slave is used for the Protocol module.
 
-The microcontroller is the master device controlling the slaves. To enable the slaves, as seen on figure \ref{fig:SPILogicSimple}, SSEN is used. To access a specific slave a 4-bit address is used, where the signals SS1-SS4 specifies the address allowing the Slave Select Decoder to select the slave. Master-Out-Slave-In (MOSI) transfers data from the microcontroller to the slaves. The MISO OR gate is implemented due to internal tri-state buffers not being available on the FPGA. The Master-In-Slave-Out (MISO) signal line transfer data to the microcontroller. A data transfer is controlled by the Serial Clock (SCK) by shifting data from the slave to the master and vice versa at the same time. The SCK-signal is controlled by the microcontroller, thus the FPGA only has to keep position and velocity slaves updated with the newest position and velocity feedback data. 
-
-\begin{figure}[]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/SPILogicSimple.pdf}
     \caption{Overview of the SPI module implemented on the FPGA, showing the seven slaves, the slave-select-module and logical MISO OR-module used to OR the output of all the slaves. All named signals on the right side of the figure interface with the microcontroller, which is the SPI Master. } % through just one PMOD-connector on the Basys 3 - kit }
     \label{fig:SPILogicSimple}
 \end{figure}
+
+The microcontroller is the master device controlling the slaves. To enable the slaves, as seen on figure \ref{fig:SPILogicSimple}, SSEN is used. To access a specific slave a 4-bit address is used, where the signals SS1-SS4 specifies the address allowing the Slave Select Decoder to select the slave. Master-Out-Slave-In (MOSI) transfers data from the microcontroller to the slaves. The MISO OR gate is implemented due to internal tri-state buffers not being available on the FPGA. The Master-In-Slave-Out (MISO) signal line transfer data to the microcontroller. A data transfer is controlled by the Serial Clock (SCK) by shifting data from the slave to the master and vice versa at the same time. The SCK-signal is controlled by the microcontroller, thus the FPGA only has to keep position and velocity slaves updated with the newest position and velocity feedback data. 
+
+
 
 
 %It contains seven internal slaves where four of them hold information needed by the microcontroller, two hold the PWM and directed from the microcontroller that is needed to control the motors and the last slave is used to give certain messages to the FPGA to initialise different states.

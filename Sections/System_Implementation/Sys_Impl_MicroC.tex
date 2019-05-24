@@ -87,14 +87,16 @@ is used for filtering the derivative term. A Infinite Impulse Response (IIR) fil
 % \end{equation}
 % where $A$ is the amplitude, $\omega_a$ is the frequency, $\phi_a$ is the phase and $t$ is the time.
 
-To make sure the integral term does not wind up when in saturation for an extended period of time, anti-windup by conditional integration is implemented. As seen on figure \ref{fig:PIDControllerFlowchart} the controller performs a saturation check before updating the output buffer. If the calculated output is in saturation, a flag is raised and the output is set to either the negative or positive saturation value, depending on the sign of the error. On the position controller the saturation limit is equal to the maximum angular velocity, found by test to be approximately \SI{22}{\radian\per\second}, of the pan-tilt system. The saturation limit of the velocity controller is equal to the maximum voltage possible to supply the motors which is \SI{\pm12}{\volt}.
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Sections/System_Implementation/Images/PidControllerFlowchart.pdf}
-    \caption{Flowchart describing the code execution in the PID-controller tasks on the microcontroller.}
+    \caption{Flowchart describing the code in the PID-controller tasks on the microcontroller.}
     \label{fig:PIDControllerFlowchart}
 \end{figure}
+
+To make sure the integral term does not wind up when in saturation for an extended period of time, anti-windup by conditional integration is implemented. As seen on figure \ref{fig:PIDControllerFlowchart} the controller performs a saturation check before updating the output buffer. If the calculated output is in saturation, a flag is raised and the output is set to either the negative or positive saturation value, depending on the sign of the error. On the position controller the saturation limit is equal to the maximum angular velocity, found by test to be approximately \SI{22}{\radian\per\second}, of the pan-tilt system. The saturation limit of the velocity controller is equal to the maximum voltage possible to supply the motors which is \SI{\pm12}{\volt}.
+
+
 
 \subsubsection*{SPI Task}
 %Responsibility and purpose of task 
@@ -161,7 +163,7 @@ where $pos_{radians}$ is the reference point, that goes to the pan-tilt position
 %The UI-task consists of two states: "Waiting for command" and "Waiting for queue". The state machine is illustrated in figure
 %\ref{fig:UITaskStateDiagram}. 
 
-\begin{table}[]
+\begin{table}[H]
 \centering
 \begin{tabular}{l|c|l}
  Command & Number of bytes & Description \\ \hline

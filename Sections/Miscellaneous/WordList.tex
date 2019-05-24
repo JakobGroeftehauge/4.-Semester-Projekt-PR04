@@ -6,23 +6,28 @@
     \item \textbf{Pan-tilt system}: A robot with a motor to control a frame for panning and a motor for tilting.
     \item \textbf{Incremental encoder}: An encoder which does not keep track of the absolute position, but requires an external reference point.
     \item \textbf{Index signal}: A reference signal which provides a fixed reference point for the position.
+    \item \textbf{Model}: A mathematical description of a system, e.g. electric motors. 
     \item \textbf{Frame}: A set of aluminium extrusions bolted together which a motor can rotate. On the pan-tilt system there is two frames, referred to as the tilt-frame and pan-frame. They are similar but not identical.
     %\item \textbf{FPGA}: Field Programmable Gate Array, an integrated circuit of logic blocks that can be reprogrammed.
     % \item \textbf{SPI}: Serial peripheral interface. A serial communications protocol.
     % \item \textbf{PWM}: Pulse width modulation. A way of varying the voltage by switching between on and off-states.
     % \item \textbf{H-bridge}: Hardware component which enables switching the polarity of a voltage.
-    \item \textbf{Saturation}: The point at which the the system cannot perform better due to physical limitations, e.g. a motor reaching its maximum angular velocity.
     \item \textbf{Controller}: The control algorithm responsible for regulation of a given system.
+    \item \textbf{Pole placement}: Method to place closed-loop poles of a plant in predetermined locations in the s-domain.
+    \item \textbf{Saturation}: The point at which the the system cannot perform better due to physical limitations, e.g. a motor reaching its maximum angular velocity.
     %\item \textbf{Lag}: The delay between experiencing a change in reference before seeing that same change in the output of a regulated system. 
     \item \textbf{Single controller}: A controller design utilising only a single control loop as opposed to cascade control.
     \item \textbf{Cascade control}: A control design utilising several nested control loops.
-    %\item \textbf{Root locus}: A way of graphically showing how the roots of system change as gain is applied to the system increases.
-    \item \textbf{Basys3 Artix-7 kit}: The FPGA used for the project. It is a development kit which contains the FPGA and peripherals like switches, LED'S, buttons, etc.
-    \item \textbf{Model}: A mathematical description of a system, e.g. electric motors. 
-    \item \textbf{Pole placement}: Method to place closed-loop poles of a plant in predetermined locations in the s-domain.
-    \item \textbf{Motor encoder}: Used to describe the physical encoder on the motor.
-    \item \textbf{Overhead}: Excess computation time not used on running tasks.
+    \item \textbf{Real-time}: The ability to guarantee that a task can initiate to a given time.
     \item \textbf{TM4C123GH6PMI}: The microcontroller used for the project.
+    \item \textbf{Basys3 Artix-7 kit}: The FPGA used for the project. It is a development kit which contains the FPGA and peripherals like switches, LED'S, buttons, etc.
+    \item \textbf{Overhead}: Excess computation time not used on running tasks.
+    \item \textbf{Modules}: Self-contained software unit communicating through multiple input and output.
+    %\item \textbf{Root locus}: A way of graphically showing how the roots of system change as gain is applied to the system increases.
+    \item \textbf{Motor encoder}: Used to describe the physical encoder on the motor.
+    \item \textbf{Back emf}: Electromotive voltage which opposes the change of current which induced it. 
+    \item \textbf{Microblaze}: Soft microprocessor core, which is designed for Xilinx FPGAs.
+    
     
     
     % \item \textbf{UART}: Universal asynchronous receiver transmitter.
@@ -30,13 +35,13 @@
     
     %\item \textbf{PID-controller}: Proportional, Integral, Derivative controller.
     %\item \textbf{Feedforward}: Feedforward uses measurement of the reference to eliminate steady state error.
-    \item \textbf{Real-time}: The ability to guarantee that a task can initiate to a given time.
+    
     %\item \textbf{FreeRTOS}: An open-source real time operating system.
     %\item \textbf{C}: Programming language. 
-    \item \textbf{Modules}: Self-contained software unit communicating through multiple input and output.
+    
     %\item \textbf{VHDL}: Very high speed integrated circuit Hardware Descriptive Language.
-    \item \textbf{Back emf}: Electromotive voltage which opposes the change of current which induced it. 
-    \item \textbf{Microblaze}: Soft microprocessor core, which is designed for Xilinx FPGAs.
+    
+
 \end{itemize}
 
 \end{document}

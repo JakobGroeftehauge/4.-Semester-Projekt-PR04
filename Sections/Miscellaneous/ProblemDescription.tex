@@ -4,14 +4,21 @@
 The theme of the project is regulation and control of robot systems. The project revolves around control of a \textit{pan-tilt system} sketched in figure \ref{fig:Pan_Tilt_Drawing}. 
 The pan-tilt system is actuated by two DC motors which are interfaced using H-bridges. The system is equipped with \textit{incremental encoders} on the motors, as well as hall effect sensors to provide \textit{index signals}.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Sections/Miscellaneous/Images/PhysicalMotorModel.png}
+    \caption{Technical drawing of the pan-tilt system. All dimensions are in \SI{}{\milli \meter}.}
+    \label{fig:Pan_Tilt_Drawing}
+\end{figure}
+
 To honour requirements stated in the given project description \cite{christoffersloth}, it has been chosen to set out to design and test several different controller designs and tuning methods to allow control of the angular position of the two motors. This includes developing a mathematical \textit{model} of the system. Reference inputs for controlling the positions must be supplied through a user interface. To accommodate this an embedded program must be designed with appropriate tasks.
 
 Additionally the given project description has the following requirements to the project:
 
 \begin{itemize}
     \item The control algorithms must be implemented on a microcontroller.
-    \item Data exchanged between the microcontroller and the \textit{FPGA} must be transmitted using the \textit{SPI}-protocol. 
-    \item The FPGA must control the \textit{PWM}-signal to the motors through the H-bridges.
+    \item Data exchanged between the microcontroller and the FPGA must be transmitted using the SPI-protocol. 
+    \item The FPGA must control the PWM-signal to the motors through the H-bridges.
     \item The FPGA must be used for determining the position of the motors using the encoders on the motors.
 \end{itemize}
 
@@ -25,12 +32,7 @@ Based on the requirements stated, figure \ref{fig:SystemOverviewIntroduction} sh
 
 
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.5\textwidth]{Sections/Miscellaneous/Images/PhysicalMotorModel.png}
-    \caption{Technical drawing of the pan-tilt system. All dimensions are in \SI{}{\milli \meter}.}
-    \label{fig:Pan_Tilt_Drawing}
-\end{figure}
+
 
 % The project description states that the motor must be interfaced using an \textit{FPGA}, and that the motor control algorithms must be processed on the microcontroller. Each motor is fitted with an encoder that generates pulses as the motor turns, making it possible to determine the offset of the motor from a start position. The FPGA will be responsible for interfacing the encoders, as well as providing the \textit{PWM} signal controlling the voltage supplied to the motor. All communication between the two devices shall go through an \textit{SPI} connection in which the microcontroller is the master. The structure of the hardware implementation is provided in  and can be seen on the block diagram in figure \ref{fig:SystemOverviewIntroduction}.
 

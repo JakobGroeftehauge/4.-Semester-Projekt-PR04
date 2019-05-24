@@ -8,7 +8,7 @@ The pan-tilt system is made of aluminium extrusions and can be divided into two 
 
 From initial experiments with the pan-tilt system it is found that significant friction is present in joints and bearings. It is also found that the friction varies according to the position of the frame. Probably these irregularities stem from the physical setup being poorly constructed, as it is visibly skewed.  
 
-Each frame is actuated by a \SI{12}{\volt} DC motor equipped with an incremental encoder \cite{Encoder}. The resolution of the encoders is 360 counts per revolution of the output shaft. The encoders make it possible to determine an offset from the initial position. The gearing between the motors and the frames on the robot is 3:1, so the frame experiences one revolution for every three revolutions the motor experiences. Hall effect sensors provide an index signal for each frame. The index signals are used to provide a reference point for the incremental encoders. From the change in position relative to the time, the velocity of the motor can be calculated. Both motors are connected to an H-bridge, which can be enabled with a PWM-signal to control the voltage over the motors. In accordance with the datasheet of the H-Bridge, L6203 \cite{Hbridge} \ref{sec:digital_appendix}, it requires a PWM frequency typically around \SI{30}{\kilo\hertz} and up to \SI{100}{\kilo\hertz} to function. The H-bridge also makes is possible to change the polarity of the voltage supplied, yielding a change in the motors turning direction.
+Each frame is actuated by a \SI{12}{\volt} DC motor equipped with an incremental encoder \cite{Encoder}. The resolution of the encoders is 360 counts per revolution of the output shaft. The encoders make it possible to determine an offset from the initial position. The gearing between the motors and the frames on the pan-tilt system is 3:1, so the frame experiences one revolution for every three revolutions the motor experiences. Hall effect sensors provide an index signal for each frame. The index signals are used to provide a reference point for the incremental encoders. From the change in position relative to the time, the velocity of the motor can be calculated. Both motors are connected to an H-bridge, which can be enabled with a PWM-signal to control the voltage over the motors. In accordance with the datasheet of the H-Bridge, L6203 \cite{Hbridge} \ref{sec:digital_appendix}, it requires a PWM frequency typically around \SI{30}{\kilo\hertz} and up to \SI{100}{\kilo\hertz} to function. The H-bridge also makes is possible to change the polarity of the voltage supplied, yielding a change in the motors turning direction.
 
 \subsection{Controller Design}
 
@@ -53,7 +53,7 @@ The problem description states that a position controller has to be designed, ho
 
 
 
-\subsection*{Classical Control Methods}\label{subsec:classic_control}
+\subsubsection*{Classical Control Methods}\label{subsec:classic_control}
 
 
 A traditional method for designing a controller for a motor is to use a PID-controller. Though many controller configurations using parts of the PID-controllers design exists, only the full PID-controller will be examined. The block diagram of a PID-controller can be seen on figure \ref{fig:anti-windup}. As seen on the block diagram
@@ -87,7 +87,7 @@ If no model of the plant is available other means for tuning is present. Two heu
 % Having a transfer function of a given plant, $G(s,K)$, with an unknown parameter K, it is possible to describe the movement of the poles in the s-plane using the root locus method. By looking at the rise time, overshoot and settling time it is possible to estimate where in the s-plane the poles can be placed to ensure the desired behavior of the system. %Limitations for the placement of the poles can be found. 
 % With the root locus method, it is possible to tweak the controller in such a manner, that the system satisfies the requirements.
 
-Physical systems have limitation such as maximum ratings. When modelling such systems these limitations can be taken into account by introducing saturation to the control signal. The saturation will level the signal at the saturation limit if the signal exceeds the saturation limits. Having a system in saturation the integral term will continue to windup as long as an error is present between the reference and the output. This is not a desired behaviour, since it will take time for the integral term to decrease for the control signal to go below the saturation limit. To circumvent this, anti-windup can be implemented. %However this is not a desired behaviour, creating a slower response of the control signal, $v$, goes below saturation. Figure \ref{fig:anti-windup} illustrates the implementation of back calculation for a PID-controller. When the system is in saturation, and therefor not able to increase, the control signal $u$ is constant. The time tracking constant, $\frac{1}{T_t}$ determines how quick the integrator is changed.
+Physical systems have limitation such as maximum ratings. When modelling such systems these limitations can be taken into account by introducing \textit{saturation} to the control signal. The saturation will level the signal at the saturation limit if the signal exceeds the saturation limits. Having a system in saturation the integral term will continue to windup as long as an error is present between the reference and the output. This is not a desired behaviour, since it will take time for the integral term to decrease for the control signal to go below the saturation limit. To circumvent this, anti-windup can be implemented. %However this is not a desired behaviour, creating a slower response of the control signal, $v$, goes below saturation. Figure \ref{fig:anti-windup} illustrates the implementation of back calculation for a PID-controller. When the system is in saturation, and therefor not able to increase, the control signal $u$ is constant. The time tracking constant, $\frac{1}{T_t}$ determines how quick the integrator is changed.
 When implementing anti-windup it can be executed using back-calculation or conditional integration. The implementation of back calculation can be seen on figure \ref{fig:anti-windup}. This approach feeds a fraction of the difference between the commanded output signal and the saturated signal back to the integrator. This way keeping the commanded output signal close to the saturation limits, while in saturation. Conditional integration works by feeding zero into the integrator, thus keeping the integration term constant, when the control signal is saturated. 
 
 \begin{figure}
@@ -97,7 +97,7 @@ When implementing anti-windup it can be executed using back-calculation or condi
     \label{fig:anti-windup}
 \end{figure}
 
-Instead of using a \textit{single} controller for the plant, sometimes it can be beneficial to implement multiple controllers in a cascaded design. % as shown on figure \ref{fig:cascaded_design_analysis}. 
+Instead of using a \textit{single controller} for the plant, sometimes it can be beneficial to implement multiple controllers in a \textit{cascaded} design. % as shown on figure \ref{fig:cascaded_design_analysis}. 
 Here, the plant is perceived as multiple simpler plants that feed into each other. The outermost control loop will then supply the reference signal for the next and so on. If designed correctly, this design will provide better noise rejection and lower sensitivity to parameter variations. This is because disturbances acting on the inner loop will be isolated from, and ideally invisible to the outer control loops. On the pan-tilt system a cascade constituting three controllers would be a inner current controller, a velocity controller and then an outer position controller.
 
 \subsubsection*{Modern Control Methods}
@@ -152,12 +152,7 @@ where $F$ is the state feedback matrix, $F_I$ is the integral matrix and $X_{I}$
 
 where $t$ is the time, $y$ is the output, $r$ is the reference and $\tau$ is the integration variable.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\textwidth]{Sections/Miscellaneous/Images/Anti_Windup_Integral_Observer.pdf}
-    \caption{Block diagram of an integral controller with observer and anti-windup.}
-    \label{fig:Integral_Observer_Diagram}
-\end{figure}
+
 
 State feedback requires that every state is measured, which is rarely possible. However means to estimate states of a given system are available. The estimation can be achieved by introducing an observer to the system, which is illustrated on figure \ref{fig:Integral_Observer_Diagram}. The observer aims to mirror the plant and by that making it possible to approximate a given state.
 The observer introduces an observer gain, $L$, which is proportional with the difference between the output from the plant and the estimated observer output. The observer state space model is as seen in equation \ref{eq:Obs_state_space}, 
@@ -171,7 +166,16 @@ The observer introduces an observer gain, $L$, which is proportional with the di
 
 where $\hat{x}$ is the estimated state and $\hat{y}$ is the estimated output.
 
+
+
 As with the classical control, saturation might be considered in modern control. This can be handled by introducing a matrix $M$, as seen in figure \ref{fig:Integral_Observer_Diagram}, which can alter the system dynamics when in saturation. This can act as a form of anti-windup.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Sections/Miscellaneous/Images/Anti_Windup_Integral_Observer.pdf}
+    \caption{Block diagram of an integral controller with observer and anti-windup.}
+    \label{fig:Integral_Observer_Diagram}
+\end{figure}
 
 % To take into account that there are physical limitation in form of saturation an anti-windup in form of the gain $M$ on figure \ref{fig:Integral_Observer_Diagram} can be added. The anti-windup subtracts $v$ with the control signal, $u$ and multiplies it with the gain, $M$. If there is a different it prevent the integral term to windup. 
 % If saturation occur the dynamic of the observer controller changes to:
@@ -223,7 +227,7 @@ As with the classical control, saturation might be considered in modern control.
 \subsection*{Implementation of Discrete Controller}
 %modelling, continuous vs discrete
 %more implementing methods
-Upon designing a controller it is important to keep in mind that an actual implementation in software is discrete rather than continuous. 
+Upon designing a controller it is important to keep in mind that implementation in software is discrete rather than continuous. 
 The plant, for which the controller is designed, is continuous. Since the plant and the controller exists in different domains, mathematical analysis of the combined system is not possible. One way to get around this, is to design the controller in continuous time while effects of the discretisation are kept in mind. The controller can also be designed directly in the discrete domain. However, that requires the plant model to be converted into a discrete time representation. 
 %The controller can be designed continuous and then discretisised to render the possibility of implementation. Another approach is discretising the plant and then designing the controller discrete. However this requires a method of mapping between the domains.
 Different methods can be chosen when discretising a continuous system. These are based on different approaches to numerical integration. Three common approaches exist, the forward rectangular rule, the backward rectangular rule and the trapezoidal rule. Each has advantages and disadvantages, although only the trapezoidal method will be examined further, as it gives the best approximation of the integral.
@@ -287,7 +291,7 @@ where $u(kT+T)$ is the control signal in discrete time. $T$ is the sampling time
 \subsection*{Microcontroller}
 Implementing at least two controllers on the same microcontroller and having to accommodate other tasks in parallel, it would be advantageous to implement some sort of scheduling algorithm. The easiest way of implementing a scheduling algorithm is by the use of an operating system. Various types of operating systems exist, though in this project only two operating systems have been evaluated, Run To Complete Scheduler (RTCS) seen in section \ref{sec:digital_appendix} and FreeRTOS. The RTCS uses a cooperative scheduling algorithm, where the task voluntarily has to yield processing time on the CPU. This method provides little overhead, though the risk of a task blocking the CPU, is greater as no master can reallocate resources while another task in running. 
  % The run to complete scheduler (RTCS) constitutes such an algorithm and is based on a cooperative scheduling where a running task wont be interrupted by other tasks, unless the task voluntarily yield control. Thus to achieve a seemingly multitasking system all tasks must cooperate to prevent starvation of tasks. 
-As default, FreeRTOS uses a preemptive scheduling algorithm, where a central master is responsible for the allocation of resources. The central master can preempt a task whenever it is necessary, therefore minimising the probability of starvation occurring. FreeRTOS, using preemptive scheduling, does however provide a greater overhead compared to the RTCS, using cooperative scheduling. If time-critical tasks exists in the system, it is preferred to use an operating system providing real-time capabilities. A real-time system ensures that important tasks are guaranteed to complete within a given time frame from when the task is signaled to run. FreeRTOS provides functionalities to operate as a real-time system, such as prioritisation of tasks.   
+As default, FreeRTOS uses a preemptive scheduling algorithm, where a central master is responsible for the allocation of resources. The central master can preempt a task whenever it is necessary, therefore minimising the probability of starvation occurring. FreeRTOS, using preemptive scheduling, does however provide a greater overhead compared to the RTCS, using cooperative scheduling. If time-critical tasks exists in the system, it is preferred to use an operating system providing \textit{real-time} capabilities. A real-time system ensures that important tasks are guaranteed to complete within a given time frame from when the task is signaled to run. FreeRTOS provides functionalities to operate as a real-time system, such as prioritisation of tasks.   
 
 % could also be implemented, which opposed to the RTCS allow the scheduler to preempt tasks when the allocated CPU time of the task is used. Switching between tasks does however introduce overhead.\\
 

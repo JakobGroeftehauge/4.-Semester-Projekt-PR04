@@ -41,6 +41,14 @@ where $t_{1,avg}$ and $ t_{2,avg}$ are the average duration of $t_1$ and $t_2$ a
 % \usepackage{graphicx}
 % Please add the following required packages to your document preamble:
 % \usepackage{graphicx}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Sections/Test/Images/TestMicrocontrollerTiming.png}
+    \caption{Illustration of the scheduling of the four PID-controller tasks, the UART and SPI tasks. $t_2$ is the duration of both position PID-controllers run at a rate of \SI{200}{\hertz}. $t_1$ is the duration of both velocity PID-controllers run at a rate of \SI{1000}{\hertz}.  $T_c$ is the duration between the first task starts to the same task starts again. } 
+    \label{fig:Schedueling_controllers}
+\end{figure}
+
+Table \ref{tab:Task_Timing} shows the timing of the UART and the velocity PID-controller task respectively. Deduced from the data presented in the table, it can be calculated that the PID-controller can be processed in an average time of $\SI{107,8}{\micro \second}$ with an fifth order filter on the derivative term. In accordance with the requirement specification this is sufficient for a single controller.
 \begin{table}[H]
 \centering
 \begin{tabular}{lrrrrr}
@@ -52,15 +60,6 @@ where $t_{1,avg}$ and $ t_{2,avg}$ are the average duration of $t_1$ and $t_2$ a
 \caption{Duration of the  UART task and velocity PID-controller task.}
 \label{tab:Task_Timing}
 \end{table}
-
-Table \ref{tab:Task_Timing} shows the timing of the UART and the velocity PID-controller task respectively. Deduced from the data presented in the table, it can be calculated that the PID-controller can be processed in an average time of $\SI{107,8}{\micro \second}$ with an fifth order filter on the derivative term. In accordance with the requirement specification this is sufficient for a single controller.
-\begin{figure}
-    \centering
-    \includegraphics[width=0.7\textwidth]{Sections/Test/Images/TestMicrocontrollerTiming.png}
-    \caption{Illustration of the scheduling of the four PID-controller tasks, the UART and SPI tasks. $t_2$ is the duration of both position PID-controllers run at a rate of \SI{200}{\hertz}. $t_1$ is the duration of both velocity PID-controllers run at a rate of \SI{1000}{\hertz}.  $T_c$ is the duration between the first task starts to the same task starts again. } 
-    \label{fig:Schedueling_controllers}
-\end{figure}
-
 It is possible to get an estimation of the overhead of the system by comparing the values of table \ref{tab:Task_Timing} and \ref{tab:CPU_utilisation_test}. This is done by comparing the total time of executing four PID-controllers with the time of processing a single PID-controller. This yields an estimated overhead in terms of CPU time as seen in equation \ref{eq:overhead}.
 
 \begin{equation}\label{eq:overhead}
@@ -96,6 +95,7 @@ The test was preformed by sending 10000 messages from the microcontroller to the
 
 \subsubsection*{Results}
 
+As seen in table \ref{tab:SPI-stresstest} the five test resulted in the same outcome, with all messages being received and in the correct sequence. 
 \begin{table}[H]
 \centering
 \begin{tabular}{c|c c c}
@@ -109,8 +109,6 @@ The test was preformed by sending 10000 messages from the microcontroller to the
 \caption{Data regarding the SPI stress test.}
 \label{tab:SPI-stresstest}
 \end{table}
-
-As seen in table \ref{tab:SPI-stresstest} the five test resulted in the same outcome, with all messages being received and in the correct sequence. 
 
 \subsection{Test of Controller Designs}\label{subsec:testControllerDesign}
 %opdeling af afsnit

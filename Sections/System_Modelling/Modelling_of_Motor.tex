@@ -78,20 +78,7 @@ An estimation for the value of the moment of inertia will be calculated based on
 
 The inertia estimates are based on a simplified representation of the pan-tilt system shown in figure \ref{fig:DrawingFrames}. This representation ignores bolts, brackets, gears, etc. Furthermore, the extrusions are considered as solid boxes, thus ignoring the profile shape.
 
-\begin{figure}[h]
-\begin{subfigure}{0.49\textwidth}
-    \includegraphics[width = 0.99\textwidth]{Sections/System_Modelling/Images/tiltFrameDrawing.pdf}
-    \caption{Representation of the tilt frame.}
-    \label{fig:drawingTiltFrame}
-\end{subfigure}\hfill
-\begin{subfigure}{0.49\textwidth}
-    \includegraphics[width = 0.99\textwidth]{Sections/System_Modelling/Images/panFrameDrawing.pdf}
-    \caption{Representation of the pan and tilt frame.}
-    \label{fig:drawingPanFrame}
-\end{subfigure}
-\caption{Simplified representation of the pan and tilt frames used for estimating the inertia.}
-\label{fig:DrawingFrames}
-\end{figure}
+
 
 %Based on the simplified representation, the inertia accruing to the tilt frame around the axis $a_{tilt}$ can be found. Using a formula to calculate the inertia of a box with dimensions $w_t\times l_t\times h_t$ and subtracting the inertia of the inner box of dimensions $w_{ct}\times l_{ct}\times h_t$, equation \ref{eq:J_tilt} is found, where $\rho_t$ is the density of the tilt frame.
 
@@ -100,6 +87,8 @@ Based on the simplified representation, the inertia of the tilt frame can be fou
     J_{a_{tilt}} =  w_{t} \,h_{t}\, l_{t}\,\rho_{t}\frac{1}{12}(l_{t}^2+h_{t}^2)-w_{ct}\, h_{t} \, l_{ct} \, \rho_{t}\frac{1}{12}(h_{t}^2+l_{ct}^2) \qquad ,
 \end{equation}
 where $\rho_t$ is the average density of the tilt frame.
+
+
 
 The inertia of the pan frame can be found in a similar manner, however to properly estimate the inertia relevant to the pan motor, the tilt frame, must be considered as well. The inertia of the tilt frame, about the axis $a_{pan}$, depends on the angle, $\theta$, at which the tilt motor is positioned. Finding the inertia of the inclined tilt frame is non-trivial and requires triple integration. 
 %The derivation is carried out in the document "Derivations and Estimations for Inertia" found in the digital appendix outlined in section \ref{sec:digital_appendix}. 
@@ -126,6 +115,21 @@ The resulting formula is non-linear as it will give the largest value at $\theta
  %   J_{inc,\,lin} = \frac{1}{24}h\,l\,w\, \rho (h^2+l^2+2w^2)
 %\end{equation}
 
+\begin{figure}[H]
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width = 0.99\textwidth]{Sections/System_Modelling/Images/tiltFrameDrawing.pdf}
+    \caption{Representation of the tilt frame.}
+    \label{fig:drawingTiltFrame}
+\end{subfigure}\hfill
+\begin{subfigure}{0.49\textwidth}
+    \includegraphics[width = 0.99\textwidth]{Sections/System_Modelling/Images/panFrameDrawing.pdf}
+    \caption{Representation of the pan and tilt frame.}
+    \label{fig:drawingPanFrame}
+\end{subfigure}
+\caption{Simplified representation of the pan and tilt frames used for estimating the inertia.}
+\label{fig:DrawingFrames}
+\end{figure}
+
 The total inertia relevant to the pan motor, $J_{a_{pan}}$, can then be found in equation \ref{eq:pan_axis_inertia}, 
 \begin{equation}\label{eq:pan_axis_inertia}
 \begin{split}
@@ -140,7 +144,7 @@ where $J_{p\,a_{pan}}$ is the inertia of the pan frame and $J_{t\,a_{pan}}$ is t
 The densities $\rho_t = \SI{987.7 }{\kilo \gram \per \cubic \meter }$ and $\rho_p = \SI{996.3 }{\kilo \gram \per \cubic \meter } $ are based on values found from technical data of similar aluminium extrusions \cite{extrusion45x45} \cite{extrusion40x40}.
 Evaluating using these values, and the measurements in figure \ref{fig:Pan_Tilt_Drawing} it is found that $J_{a_{pan}} = \SI{0.0602}{\kilo \gram \square \meter } $ and $J_{a_{tilt}} = \SI{0.0169}{\kilo \gram \square \meter }$. Since the model is based on the angular motion for the motor shaft, and not the angular motion of the pan and tilt frames, these values will have to be divided by three. This is because of the gear ratios which dictate that the pan and tilt frames have one third the angular velocity of the motor shaft for the respective frames.
 
-\subsubsection*{ Motor Coefficients }
+\subsubsection*{Motor Coefficients }
 The coefficients of the tilt motor are found experimentally, with the approach described in the Danish article "Modeldannelse" \cite{PalleAndersenModeldannelse}. Same parameters are assumed for the pan motor. In this approach, the angular velocity and current is measured for different voltages. Equation \ref{eq:motor_coefficients} can be used to describe the relationship between the angular velocity, current and voltage, the armature voltage, $u_a$, and the external load, $\tau_b$ for the motor:
 \begin{equation}\label{eq:motor_coefficients}
     \begin{split}
@@ -158,6 +162,11 @@ where $K$ is a coefficient related to the torque of the motor, $\tau_{c}$ is the
 
 \subsection{Analysis of the Modelled Plant}
 
+
+Through discussion with the project supervisor, it has been decided that determining the inductance $L_m$ is not of interest. Instead the value found in the control tutorial \cite{universityofmichigan2019}, provided by the supervisor, is used.
+
+The state space model in equation \ref{eq:stateSpaceSys1} combined with the model parameters from table \ref{tab:modellingParam} is used to calculate the step response and pole locations for the plant seen in figures \ref{fig:polesPlant} and \ref{fig:StepVelPlant}.
+
 \begin{table}[h]
     \centering
     \begin{tabular}{l l | c c}
@@ -170,12 +179,9 @@ where $K$ is a coefficient related to the torque of the motor, $\tau_{c}$ is the
          Viscous friction constant & $b$ [\si{\newton\meter\second}] & \num{7.38e-4} & \num{7.38e-4}  \\
         
     \end{tabular}
-    \caption{Parameters used for modelling the pan and tilt motor. $R_m$, $K_m$, and $b$ is found experimentally, $J$ is estimated and $L$ is from \cite{universityofmichigan2019}.}
+    \caption{Parameters used for modelling the pan and tilt motor. $R_m$, $K_m$, and $b$ is found experimentally, $J$ is estimated and $L_m$ is from \cite{universityofmichigan2019}.}
     \label{tab:modellingParam}
 \end{table}
-Through discussion with the project supervisor, it has been decided that determining the inductance $L_m$ is not of interest. Instead the value found in the control tutorial \cite{universityofmichigan2019}, provided by the supervisor, is used.
-
-The state space model in equation \ref{eq:stateSpaceSys1} combined with the model parameters from table \ref{tab:modellingParam} is used to calculate the step response and pole locations for the plant seen in figures \ref{fig:polesPlant} and \ref{fig:StepVelPlant}.
 
 Analysing the location of the poles, it is apparent that each plant consist of one fast pole and two slower poles. This also complies well with the fact that the plant is comprised of an electrical part and a mechanical part. The electrical part is by nature significantly faster than the mechanical part, therefore yielding the fastest pole. For the dynamics of the system these fast poles are negligible, as the slower poles are dominant. Looking at the zoomed in plot in figure \ref{fig:polesPlant} it can also be seen that the difference in inertia between the two plants manipulates the second fastest pole. Since the tilt frame has a lower moment of inertia, it can be seen that the system becomes faster as the moment of inertia decreases.
 
@@ -188,16 +194,16 @@ Analysing the location of the poles, it is apparent that each plant consist of o
 
 \begin{figure}
 \centering
-\begin{minipage}{.5\textwidth}
+\begin{minipage}{.49\textwidth}
   \centering
-  \includegraphics[width = 0.99\textwidth]{Sections/System_Modelling/Images/polesPlant.png}
-  \captionof{figure}{Placement of poles for the plant.}
+  \includegraphics[width = 0.99\textwidth]{Sections/System_Modelling/Images/polesPlant.pdf}
+  \captionof{figure}{Pole Locations for the motor models. Bottom plot is zoomed to show the slower poles.}
       \label{fig:polesPlant}
-\end{minipage}%
-\begin{minipage}{.5\textwidth}
+\end{minipage}\hfill
+\begin{minipage}{.49\textwidth}
   \centering
-  \includegraphics[width = 0.99 \textwidth]{Sections/System_Modelling/Images/stepResponseVelPlant.png}
-  \captionof{figure}{Velocity step response for the plant.}
+  \includegraphics[width = 0.99 \textwidth]{Sections/System_Modelling/Images/stepResponseVelPlant.pdf}
+  \captionof{figure}{Velocity step response for the motor models.}
   \label{fig:StepVelPlant}
 \end{minipage}
 \end{figure}

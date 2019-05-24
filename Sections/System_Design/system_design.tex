@@ -58,27 +58,29 @@ where $\omega_{n}$ is the undamped natural frequency of the system and $\zeta$ i
 The closed-loop system for position control has four poles, although only three dominant ones, and two zeros, so the frequency domains rules will have to be used only as guidelines. To obtain a rise time shorter than $t_r$ the minimum magnitude, $w_n$, of the poles can be approximated as $w_n\geq\frac{1.8}{t_r}$. To obtain a \SI{1}{\percent} settling time faster than $t_s$, the magnitude of the real part of the poles, $\sigma = \omega_n \zeta$ can be found as $\sigma \geq \frac{-\ln{0.01}}{t_s} $. Lastly, to keep an overshoot below \SI{5}{\percent}, it must be true that $\zeta \geq \sqrt{\frac{(\frac{\ln{0.05}}{-\pi})^2}{1+(\frac{\ln{0.05}}{-\pi})^2}}$, which defines a cone shaped region in the complex plane, in which the poles should be placed \cite{TimeDomainSpecifications}. The region based on the specifications can be seen on figure \ref{fig:system_requirements}.
 % remember that the poles have to be in the left half plane, introduce how the specifications map to the root locus plot.
 
-
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{Sections/System_Design/Images/system_requirements_new.png}
+    \includegraphics[width=0.7\textwidth]{Sections/System_Design/Images/system_requirements_new.pdf}
     \caption{All poles should be placed in the yellow area for the system to meet the required performance specifications.}
     \label{fig:system_requirements}
 \end{figure}
 
+
 It can be seen on figure \ref{fig:PosRootLocus} that in order to follow the frequency domain guidelines found above, the two open-loop poles at the origin should be moved to the left. This should be done while keeping their imaginary parts close enough to zero to stay within the cone shaped region dictated by the requirement of \SI{5}{\percent} overshoot.
 Through experimentation it has been found that placing zeros at $s=-9.5$ and $s=-1$ for the tilt motor and at $s=-3.3$ and $s=-0.8$ for the pan motor, produced satisfactory root loci, which are shown in figure \ref{fig:PosRootLocus}. Based on the plots, an appropriate gain is chosen. For the tilt motor a gain of $s=-0.9$ was chosen while $s=-1.2$ was chosen for the pan motor. The resulting control gains are summarised in table \ref{tab:pos_controller_gains}. The closed-loop pole locations at these gains are also visible from figure \ref{fig:PosRootLocus}.
 
-\begin{table}[]
+
+
+\begin{table}[H]
     \centering
     \begin{tabular}{l | c c c}
         Design methods                      & $k_{p}$ & $k_{i}$ & $k_{d}$ \\
         \hline
-        Position tilt model based   & 9.45 & 8.55 & 0.9     \\
-        Position pan model based    & 4.92 & 3.17 & 1.2     \\
-        Velocity tilt model based   & 1.42 & 7.80 & 0.065   \\
+        Position tilt pole placement based   & 9.45 & 8.55 & 0.9     \\
+        Position pan pole placement based    & 4.92 & 3.17 & 1.2     \\
+        Velocity tilt pole placement based   & 1.42 & 7.80 & 0.065   \\
         Velocity tilt Ziegler-Nichols & 0.52 & 22.86 & 0.003 \\
-        Cascade model based         & 7.53 & 7.59 & 1.03    \\
+        Cascade pole placement based         & 7.53 & 7.59 & 1.03    \\
         Cascade Ziegler-Nichols     & 8.78 & 7.64 & 1.22    \\
     \end{tabular}
     \caption{Controller gains found from the different design methods. }
@@ -88,12 +90,12 @@ Through experimentation it has been found that placing zeros at $s=-9.5$ and $s=
 
 \begin{figure}[h]
 \begin{subfigure}{0.49\textwidth}
-    \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/RL_PanMotorPos2.png}
+    \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/RL_PanMotorPos2.pdf}
     \caption{Root locus pan motor.}
     \label{fig:PosRootLocusPan}
 \end{subfigure}\quad
 \begin{subfigure}{0.49\textwidth}
-    \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/RL_TiltMotorPos.png}
+    \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/RL_TiltMotorPos.pdf}
     \caption{Root locus tilt motor.}
     \label{fig:PosRootLocusTilt}
 \end{subfigure}
@@ -117,9 +119,7 @@ As stated in section \ref{sec:Analysis}, the sampling frequency shall be 20-30 t
     G_{delay}(s) = \frac{1}{\frac{t_{sampling}}{2}\cdot s+1} \qquad ,
 \end{equation}
 
-where $t_{sampling} = \SI{0.001}{\second}$, to the transfer function of the PID-controller. 
-
-With this delay added, the phase and gain margins are evaluated by drawing the bode plot of the open-loop transfer function and evaluating the phase at the frequency. This yields \SI{0}{\deci \bel} gain, and evaluating the gain at the frequency which gives \SI{-180}{\degree} phase. As seen in figure \ref{fig:pos_stability_plot}, the gain margins for the tilt and pan motors are \SI{100}{\deci \bel} and \SI{105}{\deci \bel} respectively, while the phase margins are \SI{85.6}{\degree} and \SI{77.9}{\degree}. These margins are quite large, which is good, since that allows room for more uncertainties in the plant model. Future bode plots and margin plots referenced in this section can be found in the digital appendix.
+where $t_{sampling} = \SI{0.001}{\second}$, to the transfer function of the PID-controller. With this delay added, the phase and gain margins are evaluated by drawing the bode plot of the open-loop transfer function and evaluating the phase at the frequency. This yields \SI{0}{\deci \bel} gain, and evaluating the gain at the frequency which gives \SI{-180}{\degree} phase. As seen in figure \ref{fig:pos_stability_plot}, the gain margins for the tilt and pan motors are \SI{100}{\deci \bel} and \SI{105}{\deci \bel} respectively, while the phase margins are \SI{85.6}{\degree} and \SI{77.9}{\degree}. These margins are quite large, which is good, since that allows room for more uncertainties in the plant model. Future bode plots and margin plots referenced in this section can be found in the digital appendix.
 
 \begin{figure}[h]
 \begin{subfigure}{0.49\textwidth}
@@ -132,7 +132,7 @@ With this delay added, the phase and gain margins are evaluated by drawing the b
     \caption{Tilt motor.}
     \label{fig:pos_stability_plot_tilt}
 \end{subfigure}
-\caption{Bode plots of the closed-loop motor control systems for the pan and tilt motors.}
+\caption{Plots of the phase and gain margins motor control systems for the pan and tilt motors.}
 \label{fig:pos_stability_plot}
 \end{figure}
 
@@ -214,10 +214,10 @@ The procedure for designing the velocity controller based on the model is very s
 
 
 
-\begin{figure}[h]
+\begin{figure}[H]
 \begin{subfigure}{0.49\textwidth}
     \includegraphics[width = 0.99\textwidth]{Sections/System_Design/Images/RL_TiltMotorVelPolePlace.pdf}
-    \caption{Root locus plot for the tilt velocity controller with the chosen gains using the pole placement tuning method.}
+    \caption{Root locus plot for the tilt velocity controller with the chosen gains from pole placement.}
     \label{fig:vel_root_locus}
 \end{subfigure}\quad
 \begin{subfigure}{0.49\textwidth}
@@ -225,13 +225,13 @@ The procedure for designing the velocity controller based on the model is very s
     \caption{Closed-loop poles and zero locations obtained using the Ziegler-Nichols tuning method.}
     \label{fig:ZN_pole_zero}
 \end{subfigure}
-\caption{Plots showing poles and zeros location for different tuning methods for the tilt velocity controller.}
+\caption{Plots showing location of poles and zeros for different tuning methods for the tilt velocity controller.}
 \label{fig:vel_poles_zeros}
 \end{figure}
 
 \subsubsection*{Performance Evaluation of Velocity Controllers}
 
-As with the position controller, the bandwidth of the closed-loop velocity controller systems are evaluated. The cutoff frequencies are found to be at approximately \SI{11}{\radian \per \second} for the model based design, and approximately \SI{28}{\radian \per \second} for the Ziegler-Nichols based design. Therefore it can be concluded that the chosen sampling frequency of \SI{1000}{\hertz} is sufficient. 
+As with the position controller, the bandwidth of the closed-loop velocity controller systems are evaluated. The cutoff frequencies are found to be at approximately \SI{11}{\radian \per \second} for the pole placement based design, and approximately \SI{28}{\radian \per \second} for the Ziegler-Nichols based design. Therefore it can be concluded that the chosen sampling frequency of \SI{1000}{\hertz} is sufficient. 
 %It is worth mentioning however, that a higher bandwidth would have been preferable, especially for the model based controller. 
 The phase and gain margins are also examined for the velocity controller with the delay introduced to emulate the discrete controller. Using MATLAB, it is found that the gain for both design approaches is infinite, as the phase never crosses \SI{-180}{\degree}. A phase margin of \SI{145}{\degree} for the pole placement based design and a phase margin of \SI{50}{\degree} for the Ziegler-Nichols based design is found. While the margin is significantly lower for the Ziegler-Nichols method, it is deemed sufficient.
 
@@ -270,9 +270,9 @@ The phase and gain margins are also examined for the velocity controller with th
 % \label{fig:vel_stability_plots}
 % \end{figure}
 
-Looking at the step responses for the model based and Ziegler-Nichols based controller designs, shown in figure \ref{fig:vel_step}, it can be seen that as expected the model based controller meets the requirement of no overshoot, while the Ziegler-Nichols method does not. It must be noted however, that the model based design asks for a much larger control signal, $u$, which can lead to saturation issues when larger references are introduced.
+Looking at the step responses for the pole placement based and Ziegler-Nichols based controller designs, shown in figure \ref{fig:vel_step}, it can be seen that as expected the pole placement based controller meets the requirement of no overshoot, while the Ziegler-Nichols method does not. It must be noted however, that the pole placement based design asks for a much larger control signal, $u$, which can lead to saturation issues when larger references are introduced.
 
-\begin{figure}[]
+\begin{figure}[H]
 \begin{subfigure}{0.49\textwidth}
     %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_polePlace_step_y_Sat.png}
      %\includegraphics[width = 0.97\textwidth]{Sections/System_Design/Images/vel_polePlace_step_u_Sat.png}
@@ -300,12 +300,7 @@ Looking at the step responses for the model based and Ziegler-Nichols based cont
 
 \subsection{Cascaded Controller Design}
 % A cascaded controller utilises multiple PID for controllers to control a plant. The cascade controller has an outer controller feeding an inner controller, a cascade controller can consist of more than than one nested controller, though this project will only focus on cascaded controllers with one nested controller. Each controller will regulate different parameters, therefore it is a prerequisite that there is a correlation between the parameters controlled by the different controllers. The advantages of using a cascade controller compared to a single controller, is better disturbance rejection and lower sensitivity to parameter variation. 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width = 0.7 \textwidth]{Sections/System_Design/Images/cascade_controller.pdf}
-    \caption{Block diagram of a cascaded controller. $K_{Pos}$ being the position controller, $K_{Vel}$ being the velocity controller, $P_{Vel}$ returns the velocity of the plant and $P_{Pos}$ returns the position of the plant.}
-    \label{fig:cascaded_design}
-\end{figure}
+
 Figure \ref{fig:cascaded_design} shows the principles of the cascaded controller design. Designing the inner controller, i.e. the velocity controller has been described in section \ref{subsec:vel_controller_design}. From the figure it can be seen that when designing the outer position controller, the inner controller has to be regarded as part of the plant. 
 %From figure \ref{fig:cascaded_design} the transfer function in equation \ref{eq:tf_cascaded_design} can be derived.
 
@@ -313,9 +308,16 @@ Figure \ref{fig:cascaded_design} shows the principles of the cascaded controller
 %     \frac{\theta}{V}=\frac{K_{pos}\cdot\frac{K_{vel}\cdot P_{vel}}{1+K_{vel}\cdot P_{vel}}\cdot P_{pos}}{1+ K_{pos}\cdot\frac{K_{vel}\cdot P_{vel}}{1+K_{vel}\cdot P_{vel}}\cdot P_{pos}}
 % \end{equation}
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width = 0.7 \textwidth]{Sections/System_Design/Images/cascade_controller.pdf}
+    \caption{Block diagram of a cascaded controller. $K_{Pos}$ being the position controller, $K_{Vel}$ being the velocity controller, $P_{Vel}$ returns the velocity of the plant and $P_{Pos}$ returns the position of the plant.}
+    \label{fig:cascaded_design}
+\end{figure}
+
 Since it has been decided to focus on only designing velocity controllers for the tilt motor, it is only relevant to focus the cascaded design on the tilt motor. 
 When considering the plant as the combination of the closed-loop velocity control system and an integrator to transfer from velocity to position, the design approach is identical as have been used throughout most of this section. 
-Figure \ref{fig:RL_cascade} shows that as expected, the poles and zeros stemming from the closed-loop velocity control systems, appear as open-loop poles and zeros in the root locus plot of the position control system. To design the PID position controllers, very similar zero placements methods  are used. In the case of the model based velocity controller, zeros are placed at $s = -6.1$ and $s = -1.2$ while for the Ziegler-Nichols based controller zeros are placed at $s = -6.2$ and $s = -1$. Even though the zeros stemming from the PID-controllers are placed almost identically, the root loci are quite different due to the different poles and zeros stemming from the velocity controllers. From the closed-loop pole locations, it is expected that the response from the control system based on the Ziegler-Nichols tuning will have a faster response, but also quite a bit more overshoot. From the bode plots to be found in the digital appendix, outlined in section \ref{sec:digital_appendix} it can be seen that the sampling frequency of \SI{200}{\hertz} is sufficient. From the phase and gain margins plot, also to be found in the digital appendix, it can be seen that the Ziegler-Nichols based design has a slightly smaller phase margin at \SI{75.7}{\degree} to the \SI{118}{\degree} of the model based design.
+Figure \ref{fig:RL_cascade} shows that as expected, the poles and zeros stemming from the closed-loop velocity control systems, appear as open-loop poles and zeros in the root locus plot of the position control system. To design the PID position controllers, very similar zero placements methods  are used. In the case of the pole placement based velocity controller, zeros are placed at $s = -6.1$ and $s = -1.2$ while for the Ziegler-Nichols based controller zeros are placed at $s = -6.2$ and $s = -1$. Even though the zeros stemming from the PID-controllers are placed almost identically, the root loci are quite different due to the different poles and zeros stemming from the velocity controllers. From the closed-loop pole locations, it is expected that the response from the control system based on the Ziegler-Nichols tuning will have a faster response, but also quite a bit more overshoot. From the bode plots to be found in the digital appendix, outlined in section \ref{sec:digital_appendix} it can be seen that the sampling frequency of \SI{200}{\hertz} is sufficient. From the phase and gain margins plot, also to be found in the digital appendix, it can be seen that the Ziegler-Nichols based design has a slightly smaller phase margin at \SI{75.7}{\degree} to the \SI{118}{\degree} of the pole placement based design.
 % If both the pole placement and Ziegler-Nichols approaches are examined, maybe they should be presented in the same plots.
 
 \begin{figure}[h]
